@@ -14,18 +14,18 @@ export default function RootLayout() {
   })
   return (
     <ClerkProvider publishableKey={process.env.EXPO_PUBLIC_CLERK_PUBLISHABLE_KEY}>
-      <SignedIn>
-        <Stack screenOptions={{
+      {/* <SignedIn> */}
+      <Stack screenOptions={{
            headerShown: false,
            }}>
          <Stack.Screen name="(tabs)" />
-        </Stack>
-      </SignedIn>
+      </Stack>
+      {/* </SignedIn>
 
       <SignedOut>
-        <LoginScreen></LoginScreen>
-        {/* <Text>helloooooooo</Text> */}
-      </SignedOut>
+        <LoginScreen />
+      </SignedOut> */}
+     
      
     </ClerkProvider>
    
