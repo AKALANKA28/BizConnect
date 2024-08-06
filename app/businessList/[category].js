@@ -38,7 +38,6 @@ export default function BusinessListByCategory() {
     );
     // Get the query snapshot
     const querySnapshot = await getDocs(q);
-
     // Loop through the query snapshot and add each business to the businessList state variable
     querySnapshot.forEach((doc) => {
       console.log(doc.id, " => ", doc.data());
