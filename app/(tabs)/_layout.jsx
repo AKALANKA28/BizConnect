@@ -10,7 +10,7 @@ export default function TabLayout() {
   return (
   <Tabs screenOptions={{
     headerShown:false,
-    tabBarActiveTintColor: Colors.primaryColor}}>
+    tabBarActiveTintColor: Colors.secondaryColor}}>
     <Tabs.Screen name="home" options={{ 
         title: 'Home',
         tabBarIcon: ({color}) => <Ionicons name="home" size={24} color={color} />
@@ -20,6 +20,11 @@ export default function TabLayout() {
       title: 'Explore',
       tabBarIcon: ({color}) => <Ionicons name="home" size={24} color={color} />
      }} /> 
+
+    <Tabs.Screen name="feed" options={{ 
+      title: 'Profile',
+      tabBarIcon: ({color}) => <Ionicons name="home" size={24} color={color}/>
+     }} />   
 
     <Tabs.Screen name="profile" options={{ 
       title: 'Profile',

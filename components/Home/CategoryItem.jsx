@@ -8,8 +8,10 @@ export default function CategoryItem({ category, onCategoryPress }) {
     <View>
     <View style={{
           padding: 15,
-          backgroundColor: Colors.primaryColor,
+          backgroundColor: "#F8F9FA",
           borderRadius: 99,
+          borderColor: "000000",
+          borderWidth: 0.5,
         //   marginRight: 15,
         }}>
         <Image source={{ uri: category.icon }}

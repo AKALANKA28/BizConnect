@@ -2,6 +2,7 @@ import { FlatList, Image, Text, View } from "react-native";
 import React, { useEffect, useState } from "react";
 import { collection, getDocs, query } from "firebase/firestore";
 import { db } from "../../config/FirebaseConfig";
+import {Colors} from "../../constants/Colors";
 
 export default function Slider() {
   const [sliderList, setSliderList] = useState([]);
@@ -23,7 +24,7 @@ export default function Slider() {
   };
 
   return (
-    <View>
+    <View style={{ backgroundColor: Colors.background }}>
       <Text
         style={{
           fontSize: 20,
@@ -31,6 +32,9 @@ export default function Slider() {
           paddingLeft: 20,
           paddingTop: 20,
           marginBottom: 5,
+
+          
+          color: Colors.text,
         }}
       >
         #Special for you
@@ -44,14 +48,15 @@ export default function Slider() {
             source={{ uri: item.imageUrl }}
             style={{
               width: 300,
-              height: 150,
+              height: 170,
               borderRadius: 15,
-              marginRight: 20,
+              marginRight: 30,
             }}
           />
         )}
         style={{
           paddingLeft: 20,
+          marginTop: 20,
         }}
       />
     </View>

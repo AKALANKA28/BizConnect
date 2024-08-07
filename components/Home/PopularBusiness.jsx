@@ -36,6 +36,7 @@ export default function PopularBusiness() {
           style={{
             fontSize: 20,
             fontFamily: "roboto-bold",
+            color: Colors.text,
           }}
         >
           Popular Business
