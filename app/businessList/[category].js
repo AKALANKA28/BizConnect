@@ -41,7 +41,7 @@ export default function BusinessListByCategory() {
     // Loop through the query snapshot and add each business to the businessList state variable
     querySnapshot.forEach((doc) => {
       console.log(doc.id, " => ", doc.data());
-      setBusinessList((prev) => [...prev, doc.data()]);
+      setBusinessList(prev => [...prev, {id:doc?.id, ...doc.data()}]);
     });
     setLoading(false);
   };

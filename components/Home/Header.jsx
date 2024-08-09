@@ -68,15 +68,16 @@ export default function Header() {
             }}
           />
           <View>
-            <Text style={{ color: "#000" }}>Gd Day,</Text>
+            <Text style={{ color: "#fff" }}>Gd Day,</Text>
             <Text
               style={{
                 fontSize: 19,
-                fontFamily: "roboto-medium",
-                color: "#000",
+                // fontFamily: "roboto-medium",
+                fontWeight:"bold",
+                color: "#fff",
               }}
             >
-              Akalanka
+              Akalanka Dias
             </Text>
 
             {/* <Text>{user?.fullName}</Text> */}

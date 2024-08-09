@@ -1,10 +1,12 @@
-import { View, Text, Image } from "react-native";
+import { View, Text, Image, TouchableOpacity } from "react-native";
 import React from "react";
 import {Colors} from "../../constants/Colors";
+import { useRouter } from "expo-router";
 
 export default function BusinessListCard({ business }) {
+  const router = useRouter();
   return (
-    <View
+    <TouchableOpacity
       style={{
         padding: 10,
         margin: 10,
@@ -12,7 +14,9 @@ export default function BusinessListCard({ business }) {
         borderRadius: 15,
         display: "flex",
         flexDirection: "row",
+        gap: 10,
       }}
+      onPress={() => router.push(`/businessdetails/`+business.id)}
     >
       <Image
         source={{ uri: business?.imageUrl }}
@@ -20,7 +24,7 @@ export default function BusinessListCard({ business }) {
       />
       <View style={{flex: 1, gap: 5}}>
         <Text style={{ fontFamily: "roboto-bold", fontSize:20, textTransform: "capitalize" }}>{business.name}</Text>
-        <Text style={{ fontFamily: "roboto",  color: Colors.GRAY, fontSize:15 }}>{business.address}</Text>
+        <Text style={{ fontFamily: "roboto",  color:"#000", fontSize:15 }}>{business.address}</Text>
 
         <View
             style={{
@@ -39,12 +43,12 @@ export default function BusinessListCard({ business }) {
               }}
             />
             {/* <Text>{business?.rating}</Text> */}
-            <Text style={{ color: Colors.GRAY, fontFamily: "roboto-bold" }}>
+            <Text style={{ color: "#000", fontFamily: "roboto-bold" }}>
               4.5
             </Text>
           </View>
       </View>
 
-    </View>
+    </TouchableOpacity>
   );
 }
