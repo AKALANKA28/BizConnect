@@ -1,7 +1,7 @@
 import {view, Text } from 'react-native'
 import React from 'react'
 
-export default function Intro(business){
+export default function Intro({business}){
     return(
         <view>
             <view>
