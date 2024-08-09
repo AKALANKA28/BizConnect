@@ -1,8 +1,15 @@
-import { View, Text, Image, TextInput } from "react-native";
+import {
+  View,
+  Text,
+  Image,
+  TextInput,
+  Button,
+  TouchableOpacity,
+} from "react-native";
 import React from "react";
 import { useUser } from "@clerk/clerk-expo";
 import { Colors } from "../../constants/Colors";
-import starImage from "../../assets/images/dddepth-345.jpg";
+import avatar from "../../assets/images/avatar.png";
 
 import Ionicons from "@expo/vector-icons/Ionicons";
 export default function Header() {
@@ -12,21 +19,17 @@ export default function Header() {
       style={{
         padding: 20,
         paddingTop: 40,
-        height: 190,
+        height: 200,
         marginBottom: 9,
         backgroundColor: Colors.secondaryColor,
         // background: Image.resolveAssetSource(
         //   require("../../assets/images/dddepth-345.jpg")
         // ),
 
-        backgroundImage: {
-          source: { starImage },
-
-        },
-        backgroundSize: 'cover',
-        backgroundPosition: 'center',
+        backgroundSize: "cover",
+        backgroundPosition: "center",
         borderBottomLeftRadius: 0,
-        borderBottomRightRadius: 20,
+        borderBottomRightRadius: 70,
         shadowColor: "#000",
         shadowOffset: {
           width: 0,
@@ -35,42 +38,80 @@ export default function Header() {
         shadowOpacity: 0.29,
         shadowRadius: 4.65,
         elevation: 7,
-
       }}
-
     >
       <View
         style={{
           display: "flex",
           flexDirection: "row",
           alignItems: "center",
+          justifyContent: "space-between",
           gap: 10,
+          marginBottom: 12,
         }}
       >
-        <Image
-          source={{ uri: user?.imageUrl }}
+        <View
           style={{
-            width: 45,
-            height: 45,
-            borderRadius: 99,
+            display: "flex",
+            flexDirection: "row",
+            alignItems: "center",
+            gap: 10,
           }}
-        />
-
-        <View>
-          <Text style={{ color: "#000" }}>Welcome</Text>
-          <Text
+        >
+          <Image
+            // source={{ uri: user?.imageUrl }}
+            source={avatar}
             style={{
-              fontSize: 19,
-              fontFamily: "roboto-medium",
-              color: "#000",
+              width: 45,
+              height: 45,
+              borderRadius: 99,
             }}
-          >
-            Akalanka Dias
-          </Text>
+          />
+          <View>
+            <Text style={{ color: "#000" }}>Gd Day,</Text>
+            <Text
+              style={{
+                fontSize: 19,
+                fontFamily: "roboto-medium",
+                color: "#000",
+              }}
+            >
+              Akalanka
+            </Text>
 
-          {/* <Text>{user?.fullName}</Text> */}
+            {/* <Text>{user?.fullName}</Text> */}
+          </View>
         </View>
+        {/* Notifications */}
+        <TouchableOpacity activeOpacity={0.5}>
+          <Ionicons
+            name="notifications"
+            size={24}
+            // color= {Colors.secondaryColor}
+            color= "#fff"
+
+            style={{
+              // padding: 2,
+              // borderWidth: 0.5,
+              // borderColor: "#fff",
+              // backgroundColor: "#fff",
+              borderRadius: 99,
+
+              margin: 5,
+              shadowColor: "rgba(149, 157, 165, 0.2)", // Shadow color
+              shadowOffset: {
+                width: 0,
+                height: 2,
+              },
+              // shadowOpacity: 0.25,
+              // shadowRadius: 3.84,
+              elevation: 5, // Elevation for Android
+            }}
+          />
+          <View />
+        </TouchableOpacity>
       </View>
+
       <View
         style={{
           display: "flex",
@@ -78,7 +119,7 @@ export default function Header() {
           alignItems: "center",
           gap: 10,
           backgroundColor: Colors.GRAY,
-        
+
           padding: 10,
           borderRadius: 99,
           marginVertical: 10,
@@ -86,7 +127,7 @@ export default function Header() {
         }}
       >
         {/* Search Bar */}
-        <Ionicons name="search" size={24} color= "black" />
+        <Ionicons name="search" size={24} color="black" />
         <TextInput
           placeholder="Search..."
           style={{
