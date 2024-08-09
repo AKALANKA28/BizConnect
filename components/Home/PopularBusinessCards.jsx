@@ -10,6 +10,16 @@ export default function PopularBusinessCards({ business }) {
         marginLeft: 20,
         backgroundColor: "#fff",
         borderRadius: 15,
+        borderColor:"#F8F9FA",
+        borderWidth:1
+        // shadowColor: "#000",
+        // shadowOffset: {
+        //   width: 0,
+        //   height: 3,
+        // },
+        // shadowOpacity: 0.29,
+        // shadowRadius: 4.65,
+        // elevation: 7,
       }}
     >
       <Image
@@ -35,7 +45,7 @@ export default function PopularBusinessCards({ business }) {
             fontFamily: "roboto-bold",
             fontSize: 13,
             textTransform: "capitalize",
-            color: Colors.GRAY,
+            color: Colors.text,
           }}
         >
           {business?.address}
@@ -66,7 +76,7 @@ export default function PopularBusinessCards({ business }) {
               }}
             />
             {/* <Text>{business?.rating}</Text> */}
-            <Text style={{ color: Colors.GRAY, fontFamily: "roboto-bold" }}>
+            <Text style={{ color: Colors.text, fontFamily: "roboto-bold" }}>
               4.5
             </Text>
           </View>

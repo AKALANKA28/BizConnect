@@ -46,6 +46,7 @@ const GetCategoryList = async () => {
           style={{
             fontSize: 20,
             fontFamily: "roboto-bold",
+            color: Colors.text,
 
           }}
         >
