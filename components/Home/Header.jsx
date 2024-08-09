@@ -2,6 +2,7 @@ import { View, Text, Image, TextInput } from "react-native";
 import React from "react";
 import { useUser } from "@clerk/clerk-expo";
 import { Colors } from "../../constants/Colors";
+import starImage from "../../assets/images/dddepth-345.jpg";
 
 import Ionicons from "@expo/vector-icons/Ionicons";
 export default function Header() {
@@ -14,7 +15,17 @@ export default function Header() {
         height: 190,
         marginBottom: 9,
         backgroundColor: Colors.secondaryColor,
-        borderBottomLeftRadius: 20,
+        // background: Image.resolveAssetSource(
+        //   require("../../assets/images/dddepth-345.jpg")
+        // ),
+
+        backgroundImage: {
+          source: { starImage },
+
+        },
+        backgroundSize: 'cover',
+        backgroundPosition: 'center',
+        borderBottomLeftRadius: 0,
         borderBottomRightRadius: 20,
         shadowColor: "#000",
         shadowOffset: {
@@ -26,6 +37,7 @@ export default function Header() {
         elevation: 7,
 
       }}
+
     >
       <View
         style={{
