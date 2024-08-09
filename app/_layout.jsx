@@ -5,13 +5,15 @@ import LoginScreen from "../components/LoginScreen";
 import { Text } from "react-native";
 
 export default function RootLayout() {
-  useFonts ({
+  const [fontsLoaded] = useFonts({
     'roboto': require('../assets/fonts/Roboto-Regular.ttf'),
     'roboto-medium': require('../assets/fonts/Roboto-Medium.ttf'),
     'roboto-bold': require('../assets/fonts/Roboto-Bold.ttf')
+  });
 
-
-  })
+  if (!fontsLoaded) {
+    return <Text>Loading...</Text>;
+  }
   return (
     <ClerkProvider publishableKey={process.env.EXPO_PUBLIC_CLERK_PUBLISHABLE_KEY}>
       {/* <SignedIn> */}
