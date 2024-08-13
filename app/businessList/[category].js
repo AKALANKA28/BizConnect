@@ -17,8 +17,7 @@ export default function BusinessListByCategory() {
   const [loading, setLoading] = useState(false);
   // Initialize the businessList state variable
   const [businessList, setBusinessList] = useState([]);
-  
-  
+
   // Use the useEffect hook to set the header title and get the business list when the component mounts
   useEffect(() => {
     navigation.setOptions({

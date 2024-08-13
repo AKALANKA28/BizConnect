@@ -63,7 +63,7 @@ const GetCategoryList = async () => {
         horizontal={true}
         // Render each item in the list
         renderItem={({item, index}) => (
-            <CategoryItem 
+            <CategoryItem
             
             // Pass category data to CategoryItem component
             category={item} 
