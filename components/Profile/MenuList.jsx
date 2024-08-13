@@ -1,5 +1,6 @@
-import { View, Text, FlatList, Image } from "react-native";
+import { View, Text, FlatList, Image, TouchableOpacity } from "react-native";
 import React from "react";
+import { useRouter } from "expo-router";
 
 export default function MenuList() {
   const menuList = [
@@ -16,7 +17,7 @@ export default function MenuList() {
       //   icon: require("./location-icon.png"),
       //   url:"https://www.google.com/maps/search/?api=1&query=" + business?.address,
 
-      path: ''
+      path: '/jobs/addJob'
 
     },
     {
@@ -37,12 +38,18 @@ export default function MenuList() {
 
     },
   ];
+
+  const router = useRouter();
+
+  const onMenuClick = (item) => {
+    router.push(item.path)
+  }
   return (
     <View>
       <FlatList
         data={menuList}
         renderItem={({ item, index }) => (
-          <View key={index}
+          <TouchableOpacity  onPress={() => onMenuClick(item)}
             style={{
               display: "flex",
               flexDirection: "row",
@@ -53,7 +60,7 @@ export default function MenuList() {
           >
             <Image source={item.icon} style={{ width: 40, height: 40 }} />
             <Text>{item.name}</Text>
-          </View>
+          </TouchableOpacity>
         )}
       />
     </View>
