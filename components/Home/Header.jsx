@@ -21,7 +21,7 @@ export default function Header() {
         paddingTop: 40,
         height: 200,
         marginBottom: 9,
-        backgroundColor: Colors.secondaryColor,
+        backgroundColor: "#fff",
         // background: Image.resolveAssetSource(
         //   require("../../assets/images/dddepth-345.jpg")
         // ),
@@ -68,13 +68,13 @@ export default function Header() {
             }}
           />
           <View>
-            <Text style={{ color: "#fff" }}>Gd Day,</Text>
+            <Text style={{ color: "#000" }}>Gd Day,</Text>
             <Text
               style={{
                 fontSize: 19,
                 // fontFamily: "roboto-medium",
                 fontWeight:"bold",
-                color: "#fff",
+                color: "#000",
               }}
             >
               Akalanka Dias
@@ -86,10 +86,9 @@ export default function Header() {
         {/* Notifications */}
         <TouchableOpacity activeOpacity={0.5}>
           <Ionicons
-            name="notifications"
+            name="notifications-outline"
             size={24}
-            // color= {Colors.secondaryColor}
-            color= "#fff"
+            color= {Colors.secondaryColor}
 
             style={{
               // padding: 2,
@@ -119,7 +118,7 @@ export default function Header() {
           flexDirection: "row",
           alignItems: "center",
           gap: 10,
-          backgroundColor: Colors.GRAY,
+          backgroundColor: "#EFEFEF",
 
           padding: 10,
           borderRadius: 99,
@@ -134,6 +133,7 @@ export default function Header() {
           style={{
             fontFamily: "roboto-regular",
             fontSize: 16,
+            color: "#BCBCBC",
           }}
         ></TextInput>
       </View>
