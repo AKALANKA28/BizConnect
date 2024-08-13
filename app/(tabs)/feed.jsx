@@ -4,7 +4,7 @@ import React from 'react'
 export default function feed() {
   return (
     <View>
-      <Text>feed</Text>
+      <Text>jobs</Text>
     </View>
   )
 }

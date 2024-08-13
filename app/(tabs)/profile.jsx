@@ -3,6 +3,8 @@ import React from "react";
 import UserIntro from "../../components/Profile/UserIntro";
 import MenuList from "../../components/Profile/MenuList";
 
+import { Colors} from "../../constants/Colors";
+
 export default function profile() {
   return (
     <View styel={{ padding: 20 }}>
