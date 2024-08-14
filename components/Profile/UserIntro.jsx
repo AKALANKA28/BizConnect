@@ -1,10 +1,10 @@
 import { View, Text } from 'react-native'
 import React from 'react'
 
-export default function feed() {
+export default function UserIntro() {
   return (
     <View>
-      <Text>jobs</Text>
+      <Text>UserIntro</Text>
     </View>
   )
 }
