@@ -1,7 +1,14 @@
-import { Redirect } from "expo-router";
-import { Text, View } from "react-native";
+import { ActivityIndicator, Text, View } from "react-native";
+import React from 'react'
 
-export default function Index() {
-  return <Redirect href={'/home'}/>
+
+export default function OnBoardingScreen() {
+
+
+  return (
+    <View style={{ flex: 1, alignItems: "center", justifyContent: "center" }}>
+      <ActivityIndicator size="large" color={'#000'} />
+    </View>
+  )
 
 }

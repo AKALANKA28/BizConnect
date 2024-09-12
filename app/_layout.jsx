@@ -1,35 +1,34 @@
-import { ClerkProvider, SignedIn, SignedOut } from "@clerk/clerk-expo";
-import { useFonts } from "expo-font";
-import { Stack } from "expo-router";
-import LoginScreen from "../components/LoginScreen";
-import { Text } from "react-native";
+import { View, Text } from "react-native";
+import React, { useEffect } from "react";
+import { Slot, useRouter, useSegments } from "expo-router";
+import { AuthContextProvider, useAuth } from "../context/authContext";
+
+const MainLayout = () => {
+  const { isAuthenticated } = useAuth();
+  const segments = useSegments();
+  const router = useRouter();
+
+  useEffect(() => {
+    if (typeof isAuthenticated == "undefined") return;
+    const inApp = segments[0] === "(tabs)";
+    if (isAuthenticated && !inApp) {
+      // Redirect to home
+      router.replace("/home");  // Replace this with the actual route to home
+    } else if (isAuthenticated === false) {
+      // Redirect to login
+      router.replace("/signIn");
+    }
+  }, [isAuthenticated]);
+
+  return <Slot />;
+};
 
 export default function RootLayout() {
-  const [fontsLoaded] = useFonts({
-    'roboto': require('../assets/fonts/Roboto-Regular.ttf'),
-    'roboto-medium': require('../assets/fonts/Roboto-Medium.ttf'),
-    'roboto-bold': require('../assets/fonts/Roboto-Bold.ttf')
-  });
+  console.log('Root layout is loading');
 
-  if (!fontsLoaded) {
-    return <Text>Loading...</Text>;
-  }
   return (
-    <ClerkProvider publishableKey={process.env.EXPO_PUBLIC_CLERK_PUBLISHABLE_KEY}>
-      {/* <SignedIn> */}
-      <Stack screenOptions={{
-           headerShown: false,
-           }}>
-         <Stack.Screen name="(tabs)" />
-      </Stack>
-      {/* </SignedIn>
-
-      <SignedOut>
-        <LoginScreen />
-      </SignedOut> */}
-     
-     
-    </ClerkProvider>
-   
+    <AuthContextProvider>
+      <MainLayout />
+    </AuthContextProvider>
   );
 }

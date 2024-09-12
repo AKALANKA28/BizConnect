@@ -7,14 +7,12 @@ import {
   TouchableOpacity,
 } from "react-native";
 import React from "react";
-import { useUser } from "@clerk/clerk-expo";
+// import { useUser } from "@clerk/clerk-expo";
 import { Colors } from "../../constants/Colors";
 import avatar from "../../assets/images/avatar.png";
 
 import Ionicons from "@expo/vector-icons/Ionicons";
-export default function Header() {
-  const { user } = useUser();
-  return (
+export default function Header() {  return (
     <View
       style={{
         padding: 20,
@@ -131,7 +129,7 @@ export default function Header() {
         <TextInput
           placeholder="Search..."
           style={{
-            fontFamily: "roboto-regular",
+            fontFamily: "roboto",
             fontSize: 16,
             color: "#BCBCBC",
           }}
