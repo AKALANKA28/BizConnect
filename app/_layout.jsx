@@ -13,10 +13,10 @@ const MainLayout = () => {
     const inApp = segments[0] === "(tabs)";
     if (isAuthenticated && !inApp) {
       // Redirect to home
-      router.replace("/home");  // Replace this with the actual route to home
+      router.replace("/OnBoarding");  // Replace this with the actual route to home
     } else if (isAuthenticated === false) {
       // Redirect to login
-      router.replace("/signIn");
+      router.replace("/userSelect");
     }
   }, [isAuthenticated]);
 

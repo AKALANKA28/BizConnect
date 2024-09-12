@@ -29,7 +29,9 @@ export const auth = initializeAuth(app, {
 });
 
 export const db = getFirestore(app);
-export const storage = getFirestore(app);
+
+import { getStorage } from "firebase/storage";
+export const storage = getStorage(app);
 
 export const usersRef = collection(db, 'users')
 // const analytics = getAnalytics(app);

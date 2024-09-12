@@ -52,7 +52,7 @@ const GetCategoryList = async () => {
         >
           Category
         </Text>
-        <Text styel={{color: Colors.primaryColor, fontFamily: "roboto-regular"}}>View All</Text>
+        <Text style={{color: Colors.primaryColor, fontFamily: "roboto-regular"}}>View All</Text>
       </View>
       <FlatList
         // Set data to categories state

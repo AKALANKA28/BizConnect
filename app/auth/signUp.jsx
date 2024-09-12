@@ -1,5 +1,6 @@
-import { useRouter } from "expo-router";
 import React, { useState } from "react";
+import { useLocalSearchParams, useRouter, useSearchParams } from "expo-router"; // Correct import
+
 import {
   View,
   Text,
@@ -7,73 +8,57 @@ import {
   TouchableOpacity,
   StyleSheet,
   Image,
+  Button,
   StatusBar,
   Alert,
 } from "react-native";
-import Loading from "../components/Loading";
-import { useAuth } from "../context/authContext";
+import Loading from "../../components/Loading";
+import { useAuth } from "../../context/authContext";
 
-export default function SignIn() {
+export default function SignUp() {
   const router = useRouter();
-
-  // States
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
+  const { role } = useLocalSearchParams(); // Retrieve the 'role' from the route params
   const [loading, setLoading] = useState(false);
-  const { signin } = useAuth();
+  const [email, setEmail] = useState(""); // Declare email state
+  const [password, setPassword] = useState(""); // Declare password state
+  const { signup } = useAuth();
 
   const handleSubmit = async () => {
-    // Start the loading state
-    setLoading(true);
-  
-    // Check if email and password fields are filled
-    if (!email || !password) {
-      // Show an alert if any field is missing
-      Alert.alert("Please Fill All Fields");
-      // Stop the loading state
-      setLoading(false);
+    if (!email || !password || !role) {
+      Alert.alert("Please fill all fields and select a role.");
       return;
     }
-  
-    // Attempt to sign in with the provided email and password
-    const response = await signin(email, password);
-  
-    // Stop the loading state once the sign-in attempt is complete
+    setLoading(true);
+
+    let response = await signup(email, password, role); // Include role in signup function
+    console.log(response);
     setLoading(false);
-  
+
     if (!response.success) {
-      // If sign-in failed, show an error message
       Alert.alert("Error", response.data);
-    } else {
-      // If sign-in succeeded, show a success message
-      Alert.alert("Success", "You have successfully signed in!");
-      // Optionally, navigate to another screen here
-      // router.push("/home");
+      return;
     }
+    router.push("/home"); // Navigate to home on success
+
   };
-  
 
   return (
     <View style={styles.container}>
       <StatusBar barStyle="dark-content" />
-      <Text style={styles.title}>Sign In</Text>
+      <Text style={styles.title}>Sign Up</Text>
 
       {/* Social Login Buttons */}
       <View style={styles.socialContainer}>
         <TouchableOpacity style={styles.socialButton}>
           <Image
-            source={{
-              uri: "https://upload.wikimedia.org/wikipedia/commons/5/51/Facebook_f_logo_%282019%29.svg",
-            }}
+            source={require("../../assets/icons/facebook.png")}
             style={styles.socialIcon}
           />
           <Text style={styles.socialButtonText}>Facebook</Text>
         </TouchableOpacity>
         <TouchableOpacity style={styles.socialButton}>
           <Image
-            source={{
-              uri: "https://upload.wikimedia.org/wikipedia/commons/4/4a/Logo_2013_Google.png",
-            }}
+            source={require("../../assets/icons/google.png")}
             style={styles.socialIcon}
           />
           <Text style={styles.socialButtonText}>Google</Text>
@@ -84,9 +69,9 @@ export default function SignIn() {
 
       {/* Email Input */}
       <TextInput
-        onChangeText={value => setEmail(value)}
-        placeholder="arunperera@gmail.com"
         value={email}
+        onChangeText={setEmail}
+        placeholder="arunperera@gmail.com"
         style={styles.input}
         placeholderTextColor="#61677d"
       />
@@ -94,10 +79,10 @@ export default function SignIn() {
       {/* Password Input */}
       <View style={styles.passwordContainer}>
         <TextInput
-          onChangeText={value => setPassword(value)}
+          value={password}
+          onChangeText={setPassword}
           placeholder="********"
           secureTextEntry={true}
-          value={password}
           style={styles.input}
           placeholderTextColor="#61677d"
         />
@@ -106,7 +91,7 @@ export default function SignIn() {
         </TouchableOpacity>
       </View>
 
-      {/* Log In Button */}
+      {/* Sign Up Button */}
       <View>
         {loading ? (
           <View>
@@ -114,16 +99,16 @@ export default function SignIn() {
           </View>
         ) : (
           <TouchableOpacity style={styles.loginButton} onPress={handleSubmit}>
-            <Text style={styles.loginButtonText}>Log In</Text>
+            <Text style={styles.loginButtonText}>Sign Up</Text>
           </TouchableOpacity>
         )}
       </View>
 
-      {/* Sign Up Link */}
+      {/* Sign In Link */}
       <View style={styles.signUpContainer}>
-        <Text style={styles.signUpText}>Don't have an account? </Text>
-        <TouchableOpacity onPress={() => router.push("/signUp")}>
-          <Text style={styles.signUpLink}>Sign Up</Text>
+        <Text style={styles.signUpText}> Have an account? </Text>
+        <TouchableOpacity onPress={() => router.push("auth/signIn")}>
+          <Text style={styles.signUpLink}>Sign In</Text>
         </TouchableOpacity>
       </View>
     </View>

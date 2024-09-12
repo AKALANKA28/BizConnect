@@ -27,15 +27,15 @@ export default function Header() {  return (
         backgroundSize: "cover",
         backgroundPosition: "center",
         borderBottomLeftRadius: 0,
-        borderBottomRightRadius: 70,
-        shadowColor: "#000",
-        shadowOffset: {
-          width: 0,
-          height: 3,
-        },
-        shadowOpacity: 0.29,
-        shadowRadius: 4.65,
-        elevation: 7,
+        borderBottomRightRadius: 0,
+        // shadowColor: "#000",
+        // shadowOffset: {
+        //   width: 0,
+        //   height: 3,
+        // },
+        // shadowOpacity: 0.29,
+        // shadowRadius: 4.65,
+        // elevation: 7,
       }}
     >
       <View
@@ -96,14 +96,14 @@ export default function Header() {  return (
               borderRadius: 99,
 
               margin: 5,
-              shadowColor: "rgba(149, 157, 165, 0.2)", // Shadow color
-              shadowOffset: {
-                width: 0,
-                height: 2,
-              },
-              // shadowOpacity: 0.25,
-              // shadowRadius: 3.84,
-              elevation: 5, // Elevation for Android
+              // shadowColor: "rgba(149, 157, 165, 0.2)", // Shadow color
+              // shadowOffset: {
+              //   width: 0,
+              //   height: 2,
+              // },
+              // // shadowOpacity: 0.25,
+              // // shadowRadius: 3.84,
+              // elevation: 5, // Elevation for Android
             }}
           />
           <View />

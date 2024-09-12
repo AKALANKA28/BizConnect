@@ -1,14 +1,21 @@
-import { ActivityIndicator, Text, View } from "react-native";
-import React from 'react'
+import React, { useEffect } from "react";
+import { RFPercentage, RFValue } from "react-native-responsive-fontsize";
+import {
+  View,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  ImageBackground,
+  ActivityIndicator,
+} from "react-native";
+import { router } from "expo-router"; // Import router for navigation
 
-
-export default function OnBoardingScreen() {
-
-
+const Index = () =>{
   return (
-    <View style={{ flex: 1, alignItems: "center", justifyContent: "center" }}>
-      <ActivityIndicator size="large" color={'#000'} />
+    <View>
+      <ActivityIndicator size={"large"} color={"#000"} />
     </View>
-  )
-
+  );
 }
+
+export default Index;

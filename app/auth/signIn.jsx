@@ -7,58 +7,69 @@ import {
   TouchableOpacity,
   StyleSheet,
   Image,
-  Button,
   StatusBar,
   Alert,
 } from "react-native";
-import Loading from "../components/Loading";
-import { useAuth } from "../context/authContext";
+import Loading from "../../components/Loading";
+import { useAuth } from "../../context/authContext";
 
-export default function SignUp() {
+export default function SignIn() {
   const router = useRouter();
+
+  // States
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
-  const [email, setEmail] = useState(''); // Declare email state
-  const [password, setPassword] = useState(''); // Declare password state
-  const { signup } = useAuth();
+  const { signin } = useAuth();
 
   const handleSubmit = async () => {
-    if (!email || !password) {
-      Alert.alert("Please Fill All Fields");
-      return;
-    }
+    // Start the loading state
     setLoading(true);
-
-    let response = await signup(email, password);
-    console.log(response);
-    setLoading(false);
-    if (!response.success) {
-      Alert.alert("Error", response.data);
+  
+    // Check if email and password fields are filled
+    if (!email || !password) {
+      // Show an alert if any field is missing
+      Alert.alert("Please Fill All Fields");
+      // Stop the loading state
+      setLoading(false);
       return;
     }
-
+  
+    // Attempt to sign in with the provided email and password
+    const response = await signin(email, password);
+  
+    // Stop the loading state once the sign-in attempt is complete
+    setLoading(false);
+  
+    if (!response.success) {
+      // If sign-in failed, show an error message
+      Alert.alert("Error", response.data);
+    } else {
+      // If sign-in succeeded, show a success message
+      Alert.alert("Success", "You have successfully signed in!");
+      // Optionally, navigate to another screen here
+      router.push("/home");
+    }
   };
+  
 
   return (
     <View style={styles.container}>
       <StatusBar barStyle="dark-content" />
-      <Text style={styles.title}>Sign Up</Text>
+      <Text style={styles.title}>Sign In</Text>
 
       {/* Social Login Buttons */}
       <View style={styles.socialContainer}>
         <TouchableOpacity style={styles.socialButton}>
           <Image
-            source={{
-              uri: "https://upload.wikimedia.org/wikipedia/commons/5/51/Facebook_f_logo_%282019%29.svg",
-            }}
+            source= {require('../../assets/icons/facebook.png')}
             style={styles.socialIcon}
           />
           <Text style={styles.socialButtonText}>Facebook</Text>
         </TouchableOpacity>
         <TouchableOpacity style={styles.socialButton}>
           <Image
-            source={{
-              uri: "https://upload.wikimedia.org/wikipedia/commons/4/4a/Logo_2013_Google.png",
-            }}
+            source= {require('../../assets/icons/google.png')}
             style={styles.socialIcon}
           />
           <Text style={styles.socialButtonText}>Google</Text>
@@ -69,9 +80,9 @@ export default function SignUp() {
 
       {/* Email Input */}
       <TextInput
-        value={email}
-        onChangeText={setEmail}
+        onChangeText={value => setEmail(value)}
         placeholder="arunperera@gmail.com"
+        value={email}
         style={styles.input}
         placeholderTextColor="#61677d"
       />
@@ -79,10 +90,10 @@ export default function SignUp() {
       {/* Password Input */}
       <View style={styles.passwordContainer}>
         <TextInput
-          value={password}
-          onChangeText={setPassword}
+          onChangeText={value => setPassword(value)}
           placeholder="********"
           secureTextEntry={true}
+          value={password}
           style={styles.input}
           placeholderTextColor="#61677d"
         />
@@ -91,7 +102,7 @@ export default function SignUp() {
         </TouchableOpacity>
       </View>
 
-      {/* Sign Up Button */}
+      {/* Log In Button */}
       <View>
         {loading ? (
           <View>
@@ -99,16 +110,16 @@ export default function SignUp() {
           </View>
         ) : (
           <TouchableOpacity style={styles.loginButton} onPress={handleSubmit}>
-            <Text style={styles.loginButtonText}>Sign Up</Text>
+            <Text style={styles.loginButtonText}>Log In</Text>
           </TouchableOpacity>
         )}
       </View>
 
-      {/* Sign In Link */}
+      {/* Sign Up Link */}
       <View style={styles.signUpContainer}>
-        <Text style={styles.signUpText}> Have an account? </Text>
-        <TouchableOpacity onPress={() => router.push("/signIn")}>
-          <Text style={styles.signUpLink}>Sign In</Text>
+        <Text style={styles.signUpText}>Don't have an account? </Text>
+        <TouchableOpacity onPress={() => router.push("/auth/signUp")}>
+          <Text style={styles.signUpLink}>Sign Up</Text>
         </TouchableOpacity>
       </View>
     </View>
