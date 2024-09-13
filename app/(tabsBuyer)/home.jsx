@@ -29,8 +29,8 @@ export default function Home() {
         <Category />
         {/* Popular Business List */}
         <PopularBusiness />
-        <PopularBusiness />
-        <PopularBusiness />
+        {/* <PopularBusiness />
+        <PopularBusiness /> */}
 
         {/* Logout Button */}
         <View>

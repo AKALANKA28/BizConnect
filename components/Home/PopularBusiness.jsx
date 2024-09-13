@@ -42,7 +42,7 @@ export default function PopularBusiness() {
           Popular Business
         </Text>
         <Text
-          styel={{ color: Colors.primaryColor, fontFamily: "roboto-regular" }}
+          styel={{ color: Colors.primaryColor, fontFamily: "roboto" }}
         >
           View All
         </Text>
