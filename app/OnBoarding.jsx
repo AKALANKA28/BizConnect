@@ -24,8 +24,9 @@ const OnBoarding = () => {
     const timeout = setTimeout(() => {
       if (authenticated) {
         router.push("/home"); // Navigate to home for authenticated users
+      
       }
-    }, 3000); // 4 seconds timeout for authenticated users
+    }, 4000); // 4 seconds timeout for authenticated users
 
     return () => clearTimeout(timeout); // Cleanup on unmount
   }, [authenticated]);
