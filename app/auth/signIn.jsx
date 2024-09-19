@@ -44,9 +44,7 @@ export default function SignIn() {
       router.push("/(tabsBuyer)/home");
     } else if (response.role === "entrepreneur") {
       router.push("/(tabsEntrepreneur)/home");
-    } else {
-      Alert.alert("Unknown Role", "Your role could not be determined.");
-    }
+    } 
   };
 
 
