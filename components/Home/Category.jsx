@@ -25,7 +25,7 @@ export default function Category() {
     const querySnapshot = await getDocs(q);
     // Loop through the documents and set the categories state
     querySnapshot.forEach((doc) => {
-      console.log(doc.data());
+      // console.log(doc.data());
       setCategories((prev) => [...prev, doc.data()]);
     });
   };

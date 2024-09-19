@@ -17,7 +17,7 @@ export default function PopularBusiness() {
     const q = query(collection(db, "BusinessList"), limit(10));
     const querySnapshot = await getDocs(q);
     querySnapshot.forEach((doc) => {
-      console.log(doc.data());
+      // console.log(doc.data());
       setBusinessList(prev =>[...prev, {id:doc.id, ...doc.data()}]);
     });
   };

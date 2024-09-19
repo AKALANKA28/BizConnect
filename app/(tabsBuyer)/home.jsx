@@ -1,15 +1,17 @@
-import { View, Text, ScrollView, Button, StyleSheet } from 'react-native';
-import React from 'react';
-import Header from '../../components/Home/Header';
-import Slider from '../../components/Home/Slider';
-import Category from '../../components/Home/Category';
-import PopularBusiness from '../../components/Home/PopularBusiness';
-import { Colors } from '../../constants/Colors';
-import { useAuth } from '../../context/authContext';
+import { View, Text, ScrollView, Button, StyleSheet } from "react-native";
+import React from "react";
+import Header from "../../components/Home/Header";
+import Slider from "../../components/Home/Slider";
+import Category from "../../components/Home/Category";
+import PopularBusiness from "../../components/Home/PopularBusiness";
+import { Colors } from "../../constants/Colors";
+import { useAuth } from "../../context/authContext";
 
 export default function Home() {
-  const { signout } = useAuth(); // Get signout function from Auth context
+  const { signout, user } = useAuth(); // Get signout function from Auth context
 
+  console.log("user data got in home:", user);
+  
   const handleLogout = async () => {
     await signout(); // Call the signout function
   };
@@ -47,14 +49,13 @@ const styles = StyleSheet.create({
     backgroundColor: Colors.background,
   },
   headerContainer: {
-    position: 'absolute',
+    position: "absolute",
     top: 0,
     left: 0,
     right: 0,
     zIndex: 1, // Ensures header is above other content
   },
   scrollContent: {
-
     marginTop: 100,
     paddingTop: 80, // Adjust this based on your header height to prevent overlapping
     paddingBottom: 160,

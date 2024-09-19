@@ -21,13 +21,7 @@ const AddBidDetails = () => {
 
   return (
     <ScrollView style={styles.container}>
-      <Image
-        resizeMode="contain"
-        source={{
-          uri: "https://cdn.builder.io/api/v1/image/assets/TEMP/87a4ffc76d46a44655dca5974ebb52da2f951111d204a9c7eaba2c73da1b3d38?placeholderIfAbsent=true&apiKey=59e835da8ea04b80ab8ace77cb34d866",
-        }}
-        style={styles.headerImage}
-      />
+    
       <View style={styles.content}>
         <View style={styles.titleContainer}>
           <Text style={styles.title}>Add Bid Details</Text>
@@ -36,13 +30,7 @@ const AddBidDetails = () => {
           <View style={styles.imageUploadContainer}>
             <Text style={styles.label}>Add Image</Text>
             <View style={styles.imageUploadBox}>
-              <Image
-                resizeMode="contain"
-                source={{
-                  uri: "https://cdn.builder.io/api/v1/image/assets/TEMP/53a1c1c359caee1271d2395cae221375184527c3b1e4d7ed79e77ce5f44b9f1f?placeholderIfAbsent=true&apiKey=59e835da8ea04b80ab8ace77cb34d866",
-                }}
-                style={styles.uploadIcon}
-              />
+            
             </View>
           </View>
           {formInputs.map((input, index) => (
@@ -54,13 +42,7 @@ const AddBidDetails = () => {
         </View>
         <SubmitButton title="Add a Post" />
       </View>
-      <Image
-        resizeMode="contain"
-        source={{
-          uri: "https://cdn.builder.io/api/v1/image/assets/TEMP/c8c7a76e5850d6073518d3a210f831c3ea3eca5c94b244d10ff9afbe8da36594?placeholderIfAbsent=true&apiKey=59e835da8ea04b80ab8ace77cb34d866",
-        }}
-        style={styles.footerImage}
-      />
+      
     </ScrollView>
   );
 };

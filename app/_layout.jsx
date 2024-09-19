@@ -6,7 +6,7 @@ import { AuthContextProvider, useAuth } from "../context/authContext";
 import { useFonts } from "expo-font";
 
 const MainLayout = () => {
-  const { isAuthenticated } = useAuth();
+  const { isAuthenticated, user  } = useAuth();
   const segments = useSegments();
   const router = useRouter();
   const [hasOnboarded, setHasOnboarded] = useState(null); // Local state to track onboarding status
@@ -34,16 +34,23 @@ const MainLayout = () => {
     // Handle navigation logic
     if (isAuthenticated && !hasOnboarded) {
       // Redirect to onboarding if user hasn't completed it
-      router.replace("/OnBoarding");
+      router.replace("/Index");
     } else if (isAuthenticated && !inApp) {
       // Redirect to home if the user is authenticated and has completed onboarding
       router.replace("/home");  // Adjust to your home route
     } else if (isAuthenticated === false) {
       // Redirect to login
-      router.replace("/OnBoarding");
+      router.replace("/Index");
     }
   }, [isAuthenticated, hasOnboarded]);
-
+  useEffect(() => {
+    if (isAuthenticated) {
+      console.log("User is authenticated.");
+      console.log("User details:", user);
+    } else {
+      console.log("User is not authenticated.");
+    }
+  }, [isAuthenticated, user]);
   return <Slot />;
 };
 

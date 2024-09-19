@@ -1,18 +1,16 @@
-import {
-  View,
-  Text,
-  Image,
-  TextInput,
-  Button,
-  TouchableOpacity,
-} from "react-native";
 import React from "react";
-// import { useUser } from "@clerk/clerk-expo";
-import { Colors } from "../../constants/Colors";
-import avatar from "../../assets/images/avatar.png";
-
+import { View, Text, Image, TextInput, TouchableOpacity } from "react-native";
 import Ionicons from "@expo/vector-icons/Ionicons";
-export default function Header() {  return (
+import { useAuth } from "../../context/authContext"; // Assuming AuthContext is in this path
+import { Colors } from "../../constants/Colors";
+import avatarPlaceholder from "../../assets/images/avatar.png"; // Default avatar
+
+export default function Header() {
+  const { user } = useAuth(); // Access the authenticated user from context
+
+  // console.log(user);
+  
+  return (
     <View
       style={{
         padding: 20,
@@ -20,22 +18,10 @@ export default function Header() {  return (
         height: 200,
         marginBottom: 9,
         backgroundColor: "#fff",
-        // background: Image.resolveAssetSource(
-        //   require("../../assets/images/dddepth-345.jpg")
-        // ),
-
         backgroundSize: "cover",
         backgroundPosition: "center",
         borderBottomLeftRadius: 0,
         borderBottomRightRadius: 0,
-        // shadowColor: "#000",
-        // shadowOffset: {
-        //   width: 0,
-        //   height: 3,
-        // },
-        // shadowOpacity: 0.29,
-        // shadowRadius: 4.65,
-        // elevation: 7,
       }}
     >
       <View
@@ -57,8 +43,7 @@ export default function Header() {  return (
           }}
         >
           <Image
-            // source={{ uri: user?.imageUrl }}
-            source={avatar}
+            source={user?.photoURL ? { uri: user.photoURL } : avatarPlaceholder} // Show user's photo if available, otherwise default avatar
             style={{
               width: 45,
               height: 45,
@@ -66,47 +51,29 @@ export default function Header() {  return (
             }}
           />
           <View>
-            <Text style={{ color: "#000" }}>Gd Day,</Text>
+            <Text style={{ color: "#000" }}>Good Day,</Text>
             <Text
               style={{
                 fontSize: 19,
-                // fontFamily: "roboto-medium",
-                fontWeight:"bold",
+                fontWeight: "bold",
                 color: "#000",
               }}
             >
-              Akalanka Dias
+              {user?.email || "Guest"} {/* Display user's name if available */}
             </Text>
-
-            {/* <Text>{user?.fullName}</Text> */}
           </View>
         </View>
+
         {/* Notifications */}
         <TouchableOpacity activeOpacity={0.5}>
           <Ionicons
             name="notifications-outline"
             size={24}
-            color= {Colors.secondaryColor}
-
+            color={Colors.secondaryColor}
             style={{
-              // padding: 2,
-              // borderWidth: 0.5,
-              // borderColor: "#fff",
-              // backgroundColor: "#fff",
-              borderRadius: 99,
-
               margin: 5,
-              // shadowColor: "rgba(149, 157, 165, 0.2)", // Shadow color
-              // shadowOffset: {
-              //   width: 0,
-              //   height: 2,
-              // },
-              // // shadowOpacity: 0.25,
-              // // shadowRadius: 3.84,
-              // elevation: 5, // Elevation for Android
             }}
           />
-          <View />
         </TouchableOpacity>
       </View>
 
@@ -117,7 +84,6 @@ export default function Header() {  return (
           alignItems: "center",
           gap: 10,
           backgroundColor: "#EFEFEF",
-
           padding: 10,
           borderRadius: 99,
           marginVertical: 10,
@@ -129,11 +95,10 @@ export default function Header() {  return (
         <TextInput
           placeholder="Search..."
           style={{
-            fontFamily: "roboto",
             fontSize: 16,
             color: "#BCBCBC",
           }}
-        ></TextInput>
+        />
       </View>
     </View>
   );

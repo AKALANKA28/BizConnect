@@ -10,26 +10,27 @@ import {
 import { router } from "expo-router"; // Import router for navigation
 import { useAuth } from "../context/authContext";
 
-const OnBoarding = () => {
-  const { isAuthenticated } = useAuth();
-
+const Index = () => {
+  const { user, isAuthenticated } = useAuth(); // Fetch user and auth status from context
   const [authenticated, setAuthenticated] = useState(false);
 
   useEffect(() => {
-    // Simulate checking authentication status
-    setAuthenticated(isAuthenticated); // Replace with actual auth logic
+    setAuthenticated(isAuthenticated); // Set authenticated based on auth status
   }, [isAuthenticated]);
 
   useEffect(() => {
     const timeout = setTimeout(() => {
-      if (authenticated) {
-        router.push("/home"); // Navigate to home for authenticated users
-      
+      if (authenticated && user?.role) {
+        if (user.role === "buyer") {
+          router.push("(tabsBuyer)/home"); // Navigate to buyer's home if role is 'buyer'
+        } else if (user.role === "entrepreneur") {
+          router.push("(tabsEntrepeneur)/home"); // Navigate to entrepreneur's home if role is 'entrepreneur'
+        }
       }
-    }, 4000); // 4 seconds timeout for authenticated users
+    }, 40); // 4 seconds timeout for authenticated users
 
     return () => clearTimeout(timeout); // Cleanup on unmount
-  }, [authenticated]);
+  }, [authenticated, user?.role]);
 
   // Handle "Get Started" button press for unauthenticated users
   const handleGetStarted = () => {
@@ -140,4 +141,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default OnBoarding;
+export default Index;
