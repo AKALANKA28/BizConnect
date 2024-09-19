@@ -52,7 +52,9 @@ export default function BuyerTabLayout() {
         <Tabs.Screen
           name="bids"
           options={{
-            title: "Bids",
+            headerShown: true, // hide the header
+
+            title: "Ongoing Bids",
             tabBarIcon: ({ color }) => (
               <MaterialCommunityIcons
                 name="clipboard-text"

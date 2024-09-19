@@ -19,16 +19,18 @@ export default function SignUp() {
   const [loading, setLoading] = useState(false);
   const [email, setEmail] = useState(""); // Declare email state
   const [password, setPassword] = useState(""); // Declare password state
+  const [username, setUsername] = useState(""); // New username state
+  const [phoneNumber, setPhoneNumber] = useState(""); // New phone number state
   const { signup } = useAuth();
 
   const handleSubmit = async () => {
-    if (!email || !password || !role) {
+    if (!email || !password || !username || !phoneNumber || !role) {
       Alert.alert("Please fill all fields and select a role.");
       return;
     }
     setLoading(true);
 
-    let response = await signup(email, password, role); // Include role in signup function
+    let response = await signup(email, password, username, phoneNumber, role); // Include new fields in signup function
     console.log(response);
     setLoading(false);
 
@@ -41,7 +43,7 @@ export default function SignUp() {
     if (role === "buyer") {
       router.push("/(tabsBuyer)/home");
     } else if (role === "entrepreneur") {
-      router.push("/(tabsEntrepeneur)/home");
+      router.push("/(tabsEntrepreneur)/home");
     } else {
       Alert.alert("Invalid role");
     }
@@ -76,7 +78,26 @@ export default function SignUp() {
       <TextInput
         value={email}
         onChangeText={setEmail}
-        placeholder="arunperera@gmail.com"
+        placeholder="Email"
+        style={styles.input}
+        placeholderTextColor="#61677d"
+      />
+
+      {/* Username Input */}
+      <TextInput
+        value={username}
+        onChangeText={setUsername}
+        placeholder="Username"
+        style={styles.input}
+        placeholderTextColor="#61677d"
+      />
+
+      {/* Phone Number Input */}
+      <TextInput
+        value={phoneNumber}
+        onChangeText={setPhoneNumber}
+        placeholder="Phone Number"
+        keyboardType="phone-pad"
         style={styles.input}
         placeholderTextColor="#61677d"
       />
@@ -86,13 +107,13 @@ export default function SignUp() {
         <TextInput
           value={password}
           onChangeText={setPassword}
-          placeholder="********"
+          placeholder="Password"
           secureTextEntry={true}
           style={styles.input}
           placeholderTextColor="#61677d"
         />
         <TouchableOpacity>
-          <Text style={styles.forgotPasswordText}>Forget Password?</Text>
+          <Text style={styles.forgotPasswordText}>Forgot Password?</Text>
         </TouchableOpacity>
       </View>
 
@@ -109,7 +130,7 @@ export default function SignUp() {
 
       {/* Sign In Link */}
       <View style={styles.signUpContainer}>
-        <Text style={styles.signUpText}> Have an account? </Text>
+        <Text style={styles.signUpText}>Have an account? </Text>
         <TouchableOpacity onPress={() => router.push("/auth/signIn")}>
           <Text style={styles.signUpLink}>Sign In</Text>
         </TouchableOpacity>

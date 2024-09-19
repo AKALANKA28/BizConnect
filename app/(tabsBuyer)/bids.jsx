@@ -44,17 +44,24 @@ export default function Bids() {
 
   const renderBidItem = ({ item }) => (
     <View style={styles.card}>
-      {item.image && (
-        <Image source={{ uri: item.image }} style={styles.cardImage} />
-      )}
+      <View style={styles.imageContainer}>
+        {item.image && (
+          <Image source={{ uri: item.image }} style={styles.cardImage} />
+        )}
+        <View style={styles.cardClosingTimeContainer}>
+          <Ionicons name="time-outline" size={14} color="white" />
+          <Text style={styles.cardClosingTimeText}>
+            {new Date(item.bidClosingTime?.seconds * 1000).toLocaleString()}
+          </Text>
+        </View>
+      </View>
       <View style={styles.cardContent}>
         <Text style={styles.cardTitle}>{item.name}</Text>
-        <Text style={styles.cardAddress}>{item.address}</Text>
+        <View style={styles.cardAddressContainer}>
+          <Ionicons name="location-outline" size={16} color="#555" />
+          <Text style={styles.cardAddress}>{item.address}</Text>
+        </View>
         <Text style={styles.cardDescription}>{item.description}</Text>
-        <Text style={styles.cardClosingTime}>
-          Closing Time:{" "}
-          {new Date(item.bidClosingTime?.seconds * 1000).toLocaleString()}
-        </Text>
       </View>
     </View>
   );
@@ -108,7 +115,7 @@ const styles = StyleSheet.create({
   card: {
     backgroundColor: "#fff",
     borderRadius: 8,
-    padding: 15,
+    padding: 8,
     marginVertical: 8,
     marginHorizontal: 16,
     elevation: 2,
@@ -117,32 +124,51 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.2,
     shadowRadius: 1,
   },
+  imageContainer: {
+    position: "relative",
+  },
   cardImage: {
     width: "100%",
-    height: 150,
+    height: 186,
     borderRadius: 8,
-    marginBottom: 10,
+  },
+  cardClosingTimeContainer: {
+    position: "absolute",
+    top: 10,
+    left: 10,
+    flexDirection: "row",
+    alignItems: "center",
+    backgroundColor: "rgba(0, 0, 0, 0.6)",
+    padding: 5,
+    borderRadius: 5,
+  },
+  cardClosingTimeText: {
+    color: "white",
+    fontSize: 12,
+    marginLeft: 5,
   },
   cardContent: {
     flexDirection: "column",
+    marginTop: 10,
   },
   cardTitle: {
     fontSize: 18,
     fontWeight: "bold",
     marginBottom: 5,
   },
+  cardAddressContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+    marginBottom: 5,
+  },
   cardAddress: {
     fontSize: 14,
     color: "#555",
-    marginBottom: 5,
+    marginLeft: 5,
   },
   cardDescription: {
     fontSize: 14,
     color: "#333",
     marginBottom: 5,
-  },
-  cardClosingTime: {
-    fontSize: 12,
-    color: "#777",
   },
 });

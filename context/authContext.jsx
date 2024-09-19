@@ -4,9 +4,11 @@ import {
   createUserWithEmailAndPassword,
   signInWithEmailAndPassword,
   signOut as firebaseSignOut,
+  signInWithPhoneNumber,
+  RecaptchaVerifier,
 } from "firebase/auth";
 import { auth, db } from "../config/FirebaseConfig";
-import { doc, setDoc, getDoc } from "firebase/firestore";
+import { doc, setDoc, getDoc, query, where, getDocs } from "firebase/firestore";
 import { Text } from "react-native";
 
 export const AuthContext = createContext();
@@ -63,20 +65,27 @@ export const AuthContextProvider = ({ children }) => {
     }
   };
 
-  // Sign In function
-  const signin = async (email, password) => {
+  // Sign In function (supports both email and phone number)
+  const signin = async (identifier, password) => {
     try {
-      const response = await signInWithEmailAndPassword(auth, email, password);
-      await fetchUserRoleAndData(response.user.uid); // Fetch user data after sign-in
-      return { success: true, data: response.user };
+      if (identifier.includes("@")) {
+        // Sign in with email and password
+        const response = await signInWithEmailAndPassword(auth, identifier, password);
+        await fetchUserRoleAndData(response.user.uid); // Fetch user data after sign-in
+        return { success: true, data: response.user };
+      } else {
+        // Sign in with phone number (phone authentication flow required)
+        await signInWithPhoneNumber(auth, identifier, password);
+        // Phone number sign-in does not need password
+      }
     } catch (e) {
       const errorMsg = handleFirebaseError(e.code);
       return { success: false, data: errorMsg };
     }
   };
 
-  // Sign Up function
-  const signup = async (email, password, role) => {
+  // Sign Up function with email, username, and phone number
+  const signup = async (email, password, username, phoneNumber, role) => {
     try {
       const response = await createUserWithEmailAndPassword(auth, email, password);
 
@@ -85,6 +94,8 @@ export const AuthContextProvider = ({ children }) => {
       await setDoc(userDocRef, {
         uid: response.user.uid,
         email: response.user.email,
+        username: username,
+        phoneNumber: phoneNumber,
         role: role,
         createdAt: new Date(),
       });
@@ -95,6 +106,8 @@ export const AuthContextProvider = ({ children }) => {
       await setDoc(specificUserDocRef, {
         uid: response.user.uid,
         email: response.user.email,
+        username: username,
+        phoneNumber: phoneNumber,
         // Additional specific data related to the user role
       });
 
@@ -132,10 +145,11 @@ export const AuthContextProvider = ({ children }) => {
         return "An unexpected error occurred. Please try again.";
     }
   };
+
   if (loading) {
     return <Text>Loading...</Text>; // You can replace this with a loading spinner or similar UI
   }
- 
+
   return (
     <AuthContext.Provider value={{ user, isAuthenticated, signin, signout, signup }}>
       {children}

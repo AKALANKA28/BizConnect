@@ -59,7 +59,7 @@ export default function Header() {
                 color: "#000",
               }}
             >
-              {user?.email || "Guest"} {/* Display user's name if available */}
+              {user?.username || "Guest"} {/* Display user's name if available */}
             </Text>
           </View>
         </View>
