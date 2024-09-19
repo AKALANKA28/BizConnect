@@ -10,7 +10,7 @@ import { useAuth } from "../../context/authContext";
 export default function Home() {
   const { signout, user } = useAuth(); // Get signout function from Auth context
 
-  console.log("user data got in home:", user);
+  // console.log("user data got in home:", user);
   
   const handleLogout = async () => {
     await signout(); // Call the signout function

@@ -7,6 +7,7 @@ import {
 } from "firebase/auth";
 import { auth, db } from "../config/FirebaseConfig";
 import { doc, setDoc, getDoc } from "firebase/firestore";
+import { Text } from "react-native";
 
 export const AuthContext = createContext();
 
@@ -131,7 +132,9 @@ export const AuthContextProvider = ({ children }) => {
         return "An unexpected error occurred. Please try again.";
     }
   };
-
+  if (loading) {
+    return <Text>Loading...</Text>; // You can replace this with a loading spinner or similar UI
+  }
  
   return (
     <AuthContext.Provider value={{ user, isAuthenticated, signin, signout, signup }}>
