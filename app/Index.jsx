@@ -27,7 +27,7 @@ const Index = () => {
           router.push("(tabsEntrepeneur)/home"); // Navigate to entrepreneur's home if role is 'entrepreneur'
         }
       }
-    }, 40); // 4 seconds timeout for authenticated users
+    }, 4000); // 4 seconds timeout for authenticated users
 
     return () => clearTimeout(timeout); // Cleanup on unmount
   }, [authenticated, user?.role]);
