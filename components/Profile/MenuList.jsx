@@ -17,7 +17,7 @@ export default function MenuList() {
       //   icon: require("./location-icon.png"),
       //   url:"https://www.google.com/maps/search/?api=1&query=" + business?.address,
 
-      path: '/jobs/addJob'
+      path: '/bids/addBid'
 
     },
     {

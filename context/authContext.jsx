@@ -1,8 +1,9 @@
-import { useContext, createContext, useState, useEffect } from "react";
+import React, { useContext, createContext, useState, useEffect } from "react";
 import {
   onAuthStateChanged,
   createUserWithEmailAndPassword,
   signInWithEmailAndPassword,
+  signOut as firebaseSignOut,
 } from "firebase/auth";
 import { auth, db } from "../config/FirebaseConfig";
 import { doc, setDoc, getDoc } from "firebase/firestore";
@@ -49,8 +50,7 @@ export const AuthContextProvider = ({ children }) => {
   const signin = async (email, password) => {
     try {
       const response = await signInWithEmailAndPassword(auth, email, password);
-      setUser(response.user);
-      setIsAuthenticated(true);
+      await updateUserData(response.user.uid); // Update user data after sign-in
       return { success: true, data: response.user };
     } catch (e) {
       const errorMsg = handleFirebaseError(e.code);
@@ -70,6 +70,7 @@ export const AuthContextProvider = ({ children }) => {
         createdAt: new Date(),
       });
 
+      await updateUserData(response.user.uid); // Update user data after sign-up
       return { success: true, data: response.user };
     } catch (e) {
       let msg = e.message || "An error occurred";
@@ -79,7 +80,7 @@ export const AuthContextProvider = ({ children }) => {
 
   const signout = async () => {
     try {
-      await auth.signOut();
+      await firebaseSignOut(auth);
       setUser(null);
       setIsAuthenticated(false);
     } catch (e) {

@@ -1,6 +1,5 @@
 import React, { useState } from "react";
-import { useLocalSearchParams, useRouter, useSearchParams } from "expo-router"; // Correct import
-
+import { Stack, useLocalSearchParams, useRouter } from "expo-router";
 import {
   View,
   Text,
@@ -8,7 +7,6 @@ import {
   TouchableOpacity,
   StyleSheet,
   Image,
-  Button,
   StatusBar,
   Alert,
 } from "react-native";
@@ -38,8 +36,15 @@ export default function SignUp() {
       Alert.alert("Error", response.data);
       return;
     }
-    router.push("/home"); // Navigate to home on success
 
+    // Navigate based on user role
+    if (role === "buyer") {
+      router.push("/(tabsBuyer)/home");
+    } else if (role === "entrepreneur") {
+      router.push("/(tabsEntrepeneur)/home");
+    } else {
+      Alert.alert("Invalid role");
+    }
   };
 
   return (
@@ -94,9 +99,7 @@ export default function SignUp() {
       {/* Sign Up Button */}
       <View>
         {loading ? (
-          <View>
-            <Loading />
-          </View>
+          <Loading />
         ) : (
           <TouchableOpacity style={styles.loginButton} onPress={handleSubmit}>
             <Text style={styles.loginButtonText}>Sign Up</Text>
@@ -107,7 +110,7 @@ export default function SignUp() {
       {/* Sign In Link */}
       <View style={styles.signUpContainer}>
         <Text style={styles.signUpText}> Have an account? </Text>
-        <TouchableOpacity onPress={() => router.push("auth/signIn")}>
+        <TouchableOpacity onPress={() => router.push("/auth/signIn")}>
           <Text style={styles.signUpLink}>Sign In</Text>
         </TouchableOpacity>
       </View>

@@ -1,5 +1,5 @@
-import { useRouter } from "expo-router";
 import React, { useState } from "react";
+import { useRouter } from "expo-router";
 import {
   View,
   Text,
@@ -23,35 +23,32 @@ export default function SignIn() {
   const { signin } = useAuth();
 
   const handleSubmit = async () => {
-    // Start the loading state
     setLoading(true);
-  
-    // Check if email and password fields are filled
+
     if (!email || !password) {
-      // Show an alert if any field is missing
       Alert.alert("Please Fill All Fields");
-      // Stop the loading state
       setLoading(false);
       return;
     }
-  
-    // Attempt to sign in with the provided email and password
+
     const response = await signin(email, password);
-  
-    // Stop the loading state once the sign-in attempt is complete
     setLoading(false);
-  
+
     if (!response.success) {
-      // If sign-in failed, show an error message
-      Alert.alert("Error", response.data);
+      Alert.alert("Error", response.message);
+      return;
+    }
+
+    // Conditional navigation based on user role
+    if (response.role === "buyer") {
+      router.push("/(tabsBuyer)/home");
+    } else if (response.role === "entrepreneur") {
+      router.push("/(tabsEntrepreneur)/home");
     } else {
-      // If sign-in succeeded, show a success message
-      Alert.alert("Success", "You have successfully signed in!");
-      // Optionally, navigate to another screen here
-      router.push("/home");
+      Alert.alert("Unknown Role", "Your role could not be determined.");
     }
   };
-  
+
 
   return (
     <View style={styles.container}>
@@ -62,14 +59,14 @@ export default function SignIn() {
       <View style={styles.socialContainer}>
         <TouchableOpacity style={styles.socialButton}>
           <Image
-            source= {require('../../assets/icons/facebook.png')}
+            source={require("../../assets/icons/facebook.png")}
             style={styles.socialIcon}
           />
           <Text style={styles.socialButtonText}>Facebook</Text>
         </TouchableOpacity>
         <TouchableOpacity style={styles.socialButton}>
           <Image
-            source= {require('../../assets/icons/google.png')}
+            source={require("../../assets/icons/google.png")}
             style={styles.socialIcon}
           />
           <Text style={styles.socialButtonText}>Google</Text>
@@ -80,7 +77,7 @@ export default function SignIn() {
 
       {/* Email Input */}
       <TextInput
-        onChangeText={value => setEmail(value)}
+        onChangeText={(value) => setEmail(value)}
         placeholder="arunperera@gmail.com"
         value={email}
         style={styles.input}
@@ -90,7 +87,7 @@ export default function SignIn() {
       {/* Password Input */}
       <View style={styles.passwordContainer}>
         <TextInput
-          onChangeText={value => setPassword(value)}
+          onChangeText={(value) => setPassword(value)}
           placeholder="********"
           secureTextEntry={true}
           value={password}
@@ -117,7 +114,7 @@ export default function SignIn() {
 
       {/* Sign Up Link */}
       <View style={styles.signUpContainer}>
-        <Text style={styles.signUpText}>Don't have an account? </Text>
+        <Text style={styles.signUpText}> Don't have an account? </Text>
         <TouchableOpacity onPress={() => router.push("/auth/signUp")}>
           <Text style={styles.signUpLink}>Sign Up</Text>
         </TouchableOpacity>
