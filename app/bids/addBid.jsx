@@ -125,7 +125,7 @@ export default function AddBid() {
           userEmail: user ? user.email : null, // Add userEmail
         });
         ToastAndroid.show("Post Added Successfully", ToastAndroid.BOTTOM);
-        router.push("Bids");
+        router.push("bids");
         ToastAndroid.show("Please fill all the fields.", ToastAndroid.BOTTOM);
       }
     } catch (error) {

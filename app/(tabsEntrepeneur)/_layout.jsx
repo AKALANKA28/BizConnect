@@ -1,15 +1,15 @@
 import { View, Text } from "react-native";
 import React from "react";
 import { Tabs } from "expo-router";
-import { Colors } from "../../../constants/Colors";
+import { Colors } from "../../constants/Colors";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
 import { useFonts } from "expo-font";
 export default function EntrepreneurTabLayout() {
   const [fontsLoaded] = useFonts({
-    "roboto": require("../../../assets/fonts/Roboto-Regular.ttf"),
-    "roboto-medium": require("../../../assets/fonts/Roboto-Medium.ttf"),
-    "roboto-bold": require("../../../assets/fonts/Roboto-Bold.ttf"),
+    roboto: require("../../assets/fonts/Roboto-Regular.ttf"),
+    "roboto-medium": require("../../assets/fonts/Roboto-Medium.ttf"),
+    "roboto-bold": require("../../assets/fonts/Roboto-Bold.ttf"),
   });
 
   if (!fontsLoaded) {

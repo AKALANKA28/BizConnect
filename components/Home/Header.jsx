@@ -8,7 +8,7 @@ import avatarPlaceholder from "../../assets/images/avatar.png"; // Default avata
 export default function Header() {
   const { user } = useAuth(); // Access the authenticated user from context
 
-  console.log(user);
+  // console.log(user);
   
   return (
     <View
@@ -59,7 +59,7 @@ export default function Header() {
                 color: "#000",
               }}
             >
-              {user?.name || "Guest"} {/* Display user's name if available */}
+              {user?.email || "Guest"} {/* Display user's name if available */}
             </Text>
           </View>
         </View>

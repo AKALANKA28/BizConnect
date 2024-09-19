@@ -1,15 +1,17 @@
 import { View, Text, ScrollView, Button, StyleSheet } from "react-native";
 import React from "react";
-import Header from "../../../components/Home/Header";
-import Slider from "../../../components/Home/Slider";
-import Category from "../../../components/Home/Category";
-import PopularBusiness from "../../../components/Home/PopularBusiness";
-import { Colors } from "../../../constants/Colors";
-import { useAuth } from "../../../context/authContext";
+import Header from "../../components/Home/Header";
+import Slider from "../../components/Home/Slider";
+import Category from "../../components/Home/Category";
+import PopularBusiness from "../../components/Home/PopularBusiness";
+import { Colors } from "../../constants/Colors";
+import { useAuth } from "../../context/authContext";
 
 export default function Home() {
-  const { signout } = useAuth(); // Get signout function from Auth context
+  const { signout, user } = useAuth(); // Get signout function from Auth context
 
+  console.log("user data got in home:", user);
+  
   const handleLogout = async () => {
     await signout(); // Call the signout function
   };
