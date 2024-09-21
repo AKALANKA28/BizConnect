@@ -9,7 +9,11 @@ import {
   Image,
   StatusBar,
   Alert,
+  KeyboardAvoidingView,
+  ScrollView,
+  Platform,
 } from "react-native";
+import { Ionicons } from "@expo/vector-icons"; // Import Ionicons from expo
 import Loading from "../../components/Loading";
 import { useAuth } from "../../context/authContext";
 
@@ -20,7 +24,12 @@ export default function SignIn() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
+  const [isPasswordVisible, setPasswordVisibility] = useState(false); // New state for password visibility
   const { signin } = useAuth();
+
+  const togglePasswordVisibility = () => {
+    setPasswordVisibility(!isPasswordVisible); // Toggles the visibility of the password
+  };
 
   const handleSubmit = async () => {
     setLoading(true);
@@ -44,89 +53,109 @@ export default function SignIn() {
       router.push("/(tabsBuyer)/home");
     } else if (response.role === "entrepreneur") {
       router.push("/(tabsEntrepreneur)/home");
-    } 
+    }
   };
 
-
   return (
-    <View style={styles.container}>
-      <StatusBar barStyle="dark-content" />
-      <Text style={styles.title}>Sign In</Text>
+    <KeyboardAvoidingView
+      style={{ flex: 1 }}
+      behavior={Platform.OS === "ios" ? "padding" : "height"} // Adjust behavior for iOS and Android
+    >
+      <ScrollView
+        contentContainerStyle={styles.container}
+        keyboardShouldPersistTaps="handled" // Dismiss the keyboard when tapping outside
+      >
+        <StatusBar barStyle="dark-content" />
+        <Text style={styles.title}>Sign In</Text>
 
-      {/* Social Login Buttons */}
-      <View style={styles.socialContainer}>
-        <TouchableOpacity style={styles.socialButton}>
-          <Image
-            source={require("../../assets/icons/facebook.png")}
-            style={styles.socialIcon}
-          />
-          <Text style={styles.socialButtonText}>Facebook</Text>
-        </TouchableOpacity>
-        <TouchableOpacity style={styles.socialButton}>
-          <Image
-            source={require("../../assets/icons/google.png")}
-            style={styles.socialIcon}
-          />
-          <Text style={styles.socialButtonText}>Google</Text>
-        </TouchableOpacity>
-      </View>
+        {/* Social Login Buttons */}
+        <View style={styles.socialContainer}>
+          <TouchableOpacity style={styles.socialButton}>
+            <Image
+              source={require("../../assets/icons/facebook.png")}
+              style={styles.socialIcon}
+            />
+            <Text style={styles.socialButtonText}>Facebook</Text>
+          </TouchableOpacity>
+          <TouchableOpacity style={styles.socialButton}>
+            <Image
+              source={require("../../assets/icons/google.png")}
+              style={styles.socialIcon}
+            />
+            <Text style={styles.socialButtonText}>Google</Text>
+          </TouchableOpacity>
+        </View>
 
-      <Text style={styles.orText}>Or</Text>
+        <Text style={styles.orText}>Or</Text>
 
-      {/* Email Input */}
-      <TextInput
-        onChangeText={(value) => setEmail(value)}
-        placeholder="arunperera@gmail.com"
-        value={email}
-        style={styles.input}
-        placeholderTextColor="#61677d"
-      />
-
-      {/* Password Input */}
-      <View style={styles.passwordContainer}>
+        {/* Email Input */}
         <TextInput
-          onChangeText={(value) => setPassword(value)}
-          placeholder="********"
-          secureTextEntry={true}
-          value={password}
+          onChangeText={(value) => setEmail(value)}
+          placeholder="arunperera@gmail.com"
+          value={email}
           style={styles.input}
           placeholderTextColor="#61677d"
         />
+
+        {/* Password Input */}
+        <View style={styles.passwordContainer}>
+          <TextInput
+            onChangeText={(value) => setPassword(value)}
+            placeholder="********"
+            secureTextEntry={!isPasswordVisible} // Toggle visibility based on state
+            value={password}
+            style={styles.input}
+            placeholderTextColor="#61677d"
+          />
+          <TouchableOpacity
+            style={styles.eyeIcon} // Positioning for the eye icon
+            onPress={togglePasswordVisibility}
+          >
+            <Ionicons
+              name={isPasswordVisible ? "eye-off" : "eye"} // Conditional icon
+              size={24}
+              color="#61677d"
+            />
+          </TouchableOpacity>
+        </View>
+
+        {/* Forgot Password */}
         <TouchableOpacity>
           <Text style={styles.forgotPasswordText}>Forget Password?</Text>
         </TouchableOpacity>
-      </View>
 
-      {/* Log In Button */}
-      <View>
-        {loading ? (
-          <View>
-            <Loading />
-          </View>
-        ) : (
-          <TouchableOpacity style={styles.loginButton} onPress={handleSubmit}>
-            <Text style={styles.loginButtonText}>Log In</Text>
+        {/* Log In Button */}
+        <View>
+          {loading ? (
+            <View>
+              <Loading />
+            </View>
+          ) : (
+            <TouchableOpacity style={styles.loginButton} onPress={handleSubmit}>
+              <Text style={styles.loginButtonText}>Log In</Text>
+            </TouchableOpacity>
+          )}
+        </View>
+
+        {/* Sign Up Link */}
+        <View style={styles.signUpContainer}>
+          <Text style={styles.signUpText}> Don't have an account? </Text>
+          <TouchableOpacity onPress={() => router.push("/auth/signUp")}>
+            <Text style={styles.signUpLink}>Sign Up</Text>
           </TouchableOpacity>
-        )}
-      </View>
-
-      {/* Sign Up Link */}
-      <View style={styles.signUpContainer}>
-        <Text style={styles.signUpText}> Don't have an account? </Text>
-        <TouchableOpacity onPress={() => router.push("/auth/signUp")}>
-          <Text style={styles.signUpLink}>Sign Up</Text>
-        </TouchableOpacity>
-      </View>
-    </View>
+        </View>
+      </ScrollView>
+    </KeyboardAvoidingView>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
-    padding: 30,
+    flexGrow: 1,
+    padding: 24,
+    marginTop: 160,
     backgroundColor: "#fff",
-    justifyContent: "center",
+    justifyContent: "flex-start",
   },
   title: {
     fontSize: 36,
@@ -177,11 +206,14 @@ const styles = StyleSheet.create({
   },
   passwordContainer: {
     position: "relative",
+    justifyContent: "center",
+  },
+  eyeIcon: {
+    position: "absolute",
+    right: 10,
+    top: 13,
   },
   forgotPasswordText: {
-    position: "absolute",
-    right: 0,
-    top: 15,
     fontSize: 14,
     color: "#AA6A1C",
   },
