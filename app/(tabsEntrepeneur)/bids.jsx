@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from "react";
 import { View, FlatList, StyleSheet } from "react-native";
 import { useRouter } from "expo-router";
-import { db, auth } from "../../config/FirebaseConfig"; // Update with your actual Firebase config path
-import { collection, getDocs, query, where } from "firebase/firestore";
+import { db } from "../../config/FirebaseConfig"; // Update with your actual Firebase config path
+import { collection, getDocs, query } from "firebase/firestore";
 import BidItem from "../../components/BuyerBidList/BidItem";
 
 export default function Bids() {

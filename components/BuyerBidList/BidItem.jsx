@@ -10,6 +10,7 @@ import {
 } from "react-native";
 import Ionicons from "react-native-vector-icons/Ionicons";
 import { Colors } from "../../constants/Colors";
+import PlaceBid from "./PlaceBid";
 
 const BidItem = ({ item }) => {
   const [expanded, setExpanded] = useState(false);
@@ -59,21 +60,7 @@ const BidItem = ({ item }) => {
                   <Text style={styles.cardInputSubTitle}>per product</Text>
                 </Text>
               </View>
-              <View style={styles.bidInputContainer}>
-                <TextInput
-                  style={styles.bidInput}
-                  placeholder="Enter your bid amount"
-                  value={bidAmount}
-                  onChangeText={setBidAmount}
-                  keyboardType="numeric"
-                />
-                <TouchableOpacity
-                  onPress={handlePlaceBid}
-                  style={styles.placeBidButton}
-                >
-                  <Text style={styles.placeBidButtonText}>Place Bid</Text>
-                </TouchableOpacity>
-              </View>
+              <PlaceBid item={item}/>
             </>
           )}
         </View>
@@ -183,11 +170,6 @@ const styles = StyleSheet.create({
   placeBidButtonText: {
     color: "white",
     fontWeight: "bold",
-  },
-  toggleButtonText: {
-    color: "#007BFF",
-    marginTop: 10,
-    textAlign: "right",
   },
 });
 
