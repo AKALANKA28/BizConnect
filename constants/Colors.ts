@@ -30,6 +30,6 @@ export const Colors = {
   background: '#FFFFFF',
 
   text: '#000000',
-  GRAY:'#F8F9FA'
+  GRAY:'#EFEFEF'
 
 };
