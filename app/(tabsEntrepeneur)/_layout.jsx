@@ -3,12 +3,22 @@ import React from "react";
 import { Tabs } from "expo-router";
 import { Colors } from "../../constants/Colors";
 import Ionicons from "@expo/vector-icons/Ionicons";
-import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons';
-export default function TabLayout() {
+import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
+import { useFonts } from "expo-font";
+export default function EntrepreneurTabLayout() {
+  const [fontsLoaded] = useFonts({
+    roboto: require("../../assets/fonts/Roboto-Regular.ttf"),
+    "roboto-medium": require("../../assets/fonts/Roboto-Medium.ttf"),
+    "roboto-bold": require("../../assets/fonts/Roboto-Bold.ttf"),
+  });
+
+  if (!fontsLoaded) {
+    return <Text>Loading...</Text>;
+  }
   return (
     <Tabs
       screenOptions={{
-        headerShown: false,
+        headerShown: false, // hide the header
         tabBarActiveTintColor: Colors.secondaryColor,
         tabBarInactiveTintColor: "black",
       }}
@@ -28,17 +38,8 @@ export default function TabLayout() {
         options={{
           title: "Explore",
           tabBarIcon: ({ color }) => (
-            <Ionicons name="search" size={24}  color={color} />
+            <Ionicons name="search" size={24} color={color} />
           ),
-        }}
-      />
-
-      <Tabs.Screen
-        name="feed"
-        options={{
-          title: "Jobs",
-          tabBarIcon: ({ color }) => (
-<MaterialCommunityIcons name="clipboard-text" size={25}color={color} />          ),
         }}
       />
 
@@ -47,7 +48,7 @@ export default function TabLayout() {
         options={{
           title: "Settings",
           tabBarIcon: ({ color }) => (
-            <Ionicons name="settings-sharp" size={24}  color={color} />
+            <Ionicons name="settings-sharp" size={24} color={color} />
           ),
         }}
       />
