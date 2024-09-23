@@ -1,5 +1,4 @@
-// PlaceBid.js
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   View,
   TextInput,
@@ -10,16 +9,33 @@ import {
 } from "react-native";
 import { db } from "../../config/FirebaseConfig"; // Update with your actual Firebase config path
 import {
-  doc,
-  updateDoc,
-  arrayUnion,
   addDoc,
   collection,
+  doc,
+  getDoc,
 } from "firebase/firestore";
 import { Colors } from "../../constants/Colors";
+import { getAuth } from "firebase/auth"; // Import Firebase Auth
 
 const PlaceBid = ({ item }) => {
   const [bidAmount, setBidAmount] = useState("");
+  const [username, setUsername] = useState(""); // State for storing the username
+  const auth = getAuth(); // Get the Auth instance
+  const entrepreneurId = auth.currentUser ? auth.currentUser.uid : null; // Get logged-in user ID
+
+  // Fetch username on component mount
+  useEffect(() => {
+    const fetchUsername = async () => {
+      if (entrepreneurId) {
+        const userDoc = await getDoc(doc(db, "users", entrepreneurId)); // Adjust "users" to your user collection name
+        if (userDoc.exists()) {
+          setUsername(userDoc.data().username); // Replace with your actual field name
+        }
+      }
+    };
+
+    fetchUsername();
+  }, [entrepreneurId]);
 
   const handlePlaceBid = async () => {
     if (!bidAmount || isNaN(bidAmount)) {
@@ -34,7 +50,7 @@ const PlaceBid = ({ item }) => {
       // Create a new document in the PlacedBids collection
       await addDoc(collection(db, "PlacedBids"), {
         bidId, // ID of the original bid
-        entrepreneurId: 'currentUserId', // Replace with the actual current user's ID
+        entrepreneurId, // Use the actual logged entrepreneur's ID here
         amount: bidAmount,
         ownerId, // ID of the bid owner
         timestamp: new Date(),
@@ -43,7 +59,8 @@ const PlaceBid = ({ item }) => {
       // Create a notification for the bid owner
       await addDoc(collection(db, "notifications"), {
         ownerId,
-        message: `You have received a new bid of ${bidAmount} from Entrepreneur ${item.userEmail}.`,
+        entrepreneurId, // Store the actual Entrepreneur's ID here
+        message: `You have received a new bid of ${bidAmount} from Entrepreneur ${username}.`, // Use the fetched username
         timestamp: new Date(),
       });
   
@@ -107,4 +124,5 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
   },
 });
+
 export default PlaceBid;
