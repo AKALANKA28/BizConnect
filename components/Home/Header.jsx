@@ -17,7 +17,7 @@ export default function Header() {
     <View
       style={{
         padding: 20,
-        paddingTop: 40,
+        paddingTop: 50,
         height: 200,
         marginBottom: 9,
         backgroundColor: "#fff",

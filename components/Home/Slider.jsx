@@ -30,7 +30,7 @@ export default function Slider() {
           fontSize: 20,
           fontFamily: "roboto-bold",
           paddingLeft: 20,
-          paddingTop: 20,
+          paddingTop: 40,
           marginBottom: 5,
 
           
@@ -47,8 +47,8 @@ export default function Slider() {
           <Image
             source={{ uri: item.imageUrl }}
             style={{
-              width: 300,
-              height: 170,
+              width: 366,
+              height: 186,
               borderRadius: 15,
               marginRight: 30,
             }}

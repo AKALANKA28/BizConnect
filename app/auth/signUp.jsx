@@ -43,7 +43,7 @@ export default function SignUp() {
     if (role === "buyer") {
       router.push("/(tabsBuyer)/home");
     } else if (role === "entrepreneur") {
-      router.push("/(tabsEntrepreneur)/home");
+      router.push("/(tabsEntrepeneur)/home");
     } else {
       Alert.alert("Invalid role");
     }

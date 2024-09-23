@@ -22,22 +22,28 @@ const styles = StyleSheet.create({
     // marginBottom: 15,
   },
   iconContainer: {
-    padding: 15,
+    width: 75, // Set width
+    height: 75, // Set height (adjust to your needs)
     backgroundColor: "#F8F9FA",
-    borderRadius: 99,
-    borderColor: "#000000", // Corrected to use a hex value for black
+    borderRadius: 99, // To make it circular
+    borderColor: "#000000", // Black border
     borderWidth: 0.5,
     marginRight: 15,
+    justifyContent: "center", // Center the image inside
+    alignItems: "center", // Center the image inside
   },
   iconImage: {
-    width: 40,
-    height: 40,
+    width: "100%", // Cover the entire width of the container
+    height: "100%", // Cover the entire height of the container
+    resizeMode: "cover", // Maintain aspect ratio and cover the container
+    borderRadius: 99, // Make sure image is circular as well
   },
   categoryName: {
     fontSize: 13,
     fontFamily: "roboto-bold",
     textTransform: "capitalize",
-    textAlign: "center",
+    textAlign: "left",
     marginTop: 5,
+    marginLeft: -15,
   },
 });
