@@ -1,5 +1,5 @@
-import { View, Text, ScrollView, Button, StyleSheet } from "react-native";
-import React from "react";
+import { View, Text, ScrollView, Button, StyleSheet, RefreshControl } from "react-native";
+import React, { useState } from "react";
 import Header from "../../components/Home/Header";
 import Slider from "../../components/Home/Slider";
 import Category from "../../components/Home/Category";
@@ -9,11 +9,19 @@ import { useAuth } from "../../context/authContext";
 
 export default function Home() {
   const { signout, user } = useAuth(); // Get signout function from Auth context
+  const [refreshing, setRefreshing] = useState(false); // State for refresh control
 
-  // console.log("user data got in home:", user);
-  
   const handleLogout = async () => {
     await signout(); // Call the signout function
+  };
+
+  // Function to handle refresh action
+  const onRefresh = async () => {
+    setRefreshing(true);
+    // Simulate a network request or data fetching
+    await new Promise(resolve => setTimeout(resolve, 2000)); // Simulating a 2 seconds delay
+    setRefreshing(false);
+    // Fetch or refresh your data here if necessary
   };
 
   return (
@@ -24,7 +32,12 @@ export default function Home() {
       </View>
 
       {/* Scrollable Content */}
-      <ScrollView contentContainerStyle={styles.scrollContent}>
+      <ScrollView
+        contentContainerStyle={styles.scrollContent}
+        refreshControl={
+          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+        }
+      >
         {/* Slider */}
         <Slider />
         {/* Category */}
@@ -35,9 +48,9 @@ export default function Home() {
         <PopularBusiness /> */}
 
         {/* Logout Button */}
-        <View>
+        {/* <View>
           <Button title="Logout" onPress={handleLogout} />
-        </View>
+        </View> */}
       </ScrollView>
     </View>
   );

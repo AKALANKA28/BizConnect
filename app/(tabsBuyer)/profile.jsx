@@ -6,6 +6,7 @@ import MenuList from "../../components/Profile/MenuList";
 // import { Colors } from "../../../constants/Colors";
 
 export default function profile() {
+
   return (
     <View styel={{ padding: 20 }}>
       <Text

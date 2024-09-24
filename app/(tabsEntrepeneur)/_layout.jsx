@@ -42,6 +42,17 @@ export default function EntrepreneurTabLayout() {
           ),
         }}
       />
+      <Tabs.Screen
+        name="bids"
+        options={{
+          title: "bids",
+          headerShown: true, // hide the header
+          title: "Place Bids",
+          tabBarIcon: ({ color }) => (
+            <Ionicons name="search" size={24} color={color} />
+          ),
+        }}
+      />
 
       <Tabs.Screen
         name="profile"

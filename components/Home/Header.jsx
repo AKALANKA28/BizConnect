@@ -4,17 +4,20 @@ import Ionicons from "@expo/vector-icons/Ionicons";
 import { useAuth } from "../../context/authContext"; // Assuming AuthContext is in this path
 import { Colors } from "../../constants/Colors";
 import avatarPlaceholder from "../../assets/images/avatar.png"; // Default avatar
+import { router } from "expo-router";
 
 export default function Header() {
   const { user } = useAuth(); // Access the authenticated user from context
-
+  const handleNotificationPress = () => {
+    router.push('/notifications'); // This will navigate to the NotificationScreen
+  };
   // console.log(user);
   
   return (
     <View
       style={{
         padding: 20,
-        paddingTop: 40,
+        paddingTop: 50,
         height: 200,
         marginBottom: 9,
         backgroundColor: "#fff",
@@ -59,13 +62,13 @@ export default function Header() {
                 color: "#000",
               }}
             >
-              {user?.email || "Guest"} {/* Display user's name if available */}
+              {user?.username || "Guest"} {/* Display user's name if available */}
             </Text>
           </View>
         </View>
 
         {/* Notifications */}
-        <TouchableOpacity activeOpacity={0.5}>
+        <TouchableOpacity activeOpacity={0.5} onPress={handleNotificationPress}>
           <Ionicons
             name="notifications-outline"
             size={24}
