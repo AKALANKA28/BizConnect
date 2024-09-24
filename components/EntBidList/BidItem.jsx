@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   View,
   Text,
@@ -14,17 +14,14 @@ import PlaceBid from "./PlaceBid";
 
 const BidItem = ({ item }) => {
   const [expanded, setExpanded] = useState(false);
-  const [bidAmount, setBidAmount] = useState("");
 
   const toggleExpand = () => {
     setExpanded(!expanded);
   };
-
-  const handlePlaceBid = () => {
-    // Handle bid placement logic here
-    console.log("Bid placed:", bidAmount);
-    setBidAmount(""); // Reset bid amount after placing the bid
-  };
+ // UseEffect hook to log the image URL only when `item.image` changes
+ useEffect(() => {
+  console.log("Image URL:", item.image);
+}, [item.image]);
 
   return (
     <TouchableWithoutFeedback onPress={toggleExpand}>

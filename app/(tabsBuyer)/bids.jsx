@@ -6,6 +6,7 @@ import {
   StyleSheet,
   FlatList,
   Image,
+  RefreshControl, // Import RefreshControl
 } from "react-native";
 import Ionicons from "react-native-vector-icons/Ionicons";
 import { useRouter } from "expo-router";
@@ -15,32 +16,40 @@ import { Colors } from "../../constants/Colors";
 
 export default function Bids() {
   const [bids, setBids] = useState([]);
+  const [refreshing, setRefreshing] = useState(false); // Add refreshing state
   const router = useRouter();
   const userId = auth.currentUser?.uid; // Get the current user ID
 
+  const fetchBids = async () => {
+    if (!userId) {
+      console.error("No user is currently logged in.");
+      return;
+    }
+
+    try {
+      const bidsCollection = collection(db, "Bids");
+      const q = query(bidsCollection, where("userId", "==", userId));
+      const bidsSnapshot = await getDocs(q);
+      const bidsList = bidsSnapshot.docs.map((doc) => ({
+        id: doc.id,
+        ...doc.data(),
+      }));
+      setBids(bidsList);
+    } catch (error) {
+      console.error("Error fetching bids: ", error);
+    }
+  };
+
   useEffect(() => {
-    const fetchBids = async () => {
-      if (!userId) {
-        console.error("No user is currently logged in.");
-        return;
-      }
-
-      try {
-        const bidsCollection = collection(db, "Bids");
-        const q = query(bidsCollection, where("userId", "==", userId));
-        const bidsSnapshot = await getDocs(q);
-        const bidsList = bidsSnapshot.docs.map((doc) => ({
-          id: doc.id,
-          ...doc.data(),
-        }));
-        setBids(bidsList);
-      } catch (error) {
-        console.error("Error fetching bids: ", error);
-      }
-    };
-
     fetchBids();
   }, [userId]);
+
+  // Handle refresh function
+  const handleRefresh = async () => {
+    setRefreshing(true); // Start the refreshing indicator
+    await fetchBids(); // Fetch bids again
+    setRefreshing(false); // Stop the refreshing indicator
+  };
 
   const renderBidItem = ({ item }) => (
     <View style={styles.card}>
@@ -68,12 +77,15 @@ export default function Bids() {
 
   return (
     <View style={{ flex: 1 }}>
-      {/* Bids List */}
+      {/* Bids List with RefreshControl */}
       <FlatList
         data={bids}
         renderItem={renderBidItem}
         keyExtractor={(item) => item.id}
         contentContainerStyle={styles.list}
+        refreshControl={
+          <RefreshControl refreshing={refreshing} onRefresh={handleRefresh} />
+        }
       />
 
       {/* Floating Action Button */}

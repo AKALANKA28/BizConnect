@@ -1,17 +1,22 @@
 import React, { useEffect, useState } from "react";
-import { View, FlatList, StyleSheet } from "react-native";
+import {
+  View,
+  FlatList,
+  StyleSheet,
+  RefreshControl, // Import RefreshControl
+} from "react-native";
 import { useRouter } from "expo-router";
 import { db } from "../../config/FirebaseConfig"; // Update with your actual Firebase config path
 import { collection, getDocs, query } from "firebase/firestore";
-import BidItem from "../../components/BuyerBidList/BidItem";
+import BidItem from "../../components/EntBidList/BidItem";
 
 export default function Bids() {
   const [bids, setBids] = useState([]);
   const router = useRouter();
+  const [refreshing, setRefreshing] = useState(false); // Add refreshing state
 
   useEffect(() => {
     const fetchBids = async () => {
-   
       try {
         const bidsCollection = collection(db, "Bids");
         const q = query(bidsCollection);
@@ -31,6 +36,13 @@ export default function Bids() {
 
   const renderBidItem = ({ item }) => <BidItem item={item} />;
 
+    // Handle refresh function
+    const handleRefresh = async () => {
+      setRefreshing(true); // Start the refreshing indicator
+      await fetchBids(); // Fetch bids again
+      setRefreshing(false); // Stop the refreshing indicator
+    };
+
   return (
     <View style={{ flex: 1 }}>
       <FlatList
@@ -39,6 +51,9 @@ export default function Bids() {
         showsVerticalScrollIndicator={false}
         keyExtractor={(item) => item.id}
         contentContainerStyle={styles.list}
+        refreshControl={
+          <RefreshControl refreshing={refreshing} onRefresh={handleRefresh} />
+        }
       />
     </View>
   );

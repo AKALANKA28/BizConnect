@@ -5,17 +5,19 @@ import { collection, getDocs, query, where } from "firebase/firestore";
 import NotificationItem from "../components/Notifications/NotificationItem";
 import Header from "../components/Header";
 import { getAuth, onAuthStateChanged } from "firebase/auth";
+import { useRouter } from "expo-router"; // Import useRouter hook
 
 export default function NotificationScreen() {
   const [notifications, setNotifications] = useState([]);
   const [userId, setUserId] = useState(null);
+  const router = useRouter(); // Get router object
 
   useEffect(() => {
     const auth = getAuth();
     const unsubscribe = onAuthStateChanged(auth, (user) => {
       if (user) {
-        console.log("User ID: ", user.uid);
-        setUserId(user.uid);  // Set userId from the authenticated user
+        // console.log("User ID: ", user.uid);
+        setUserId(user.uid);
       } else {
         console.log("No user is signed in");
       }
@@ -55,8 +57,16 @@ export default function NotificationScreen() {
     }
   }, [userId]);
 
+  const handleNotificationPress = (entrepreneurId) => {
+    router.push(`/profile/${entrepreneurId}`);
+  };
+  
+
   const renderNotificationItem = ({ item }) => (
-    <NotificationItem notification={item} />
+    <NotificationItem
+      notification={item}
+      onPress={() => handleNotificationPress(item.entrepreneurId)} // Ensure this ID is correct
+      />
   );
 
   return (
