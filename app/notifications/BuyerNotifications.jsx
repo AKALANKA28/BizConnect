@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from "react";
 import { View, FlatList, StyleSheet, Text } from "react-native";
-import { db } from "../config/FirebaseConfig";
+import { db } from "../../config/FirebaseConfig";
 import { collection, getDocs, query, where } from "firebase/firestore";
-import NotificationItem from "../components/Notifications/NotificationItem";
-import Header from "../components/Header";
+import NotificationItem from "../../components/Notifications/NotificationItem";
+import Header from "../../components/Header";
 import { getAuth, onAuthStateChanged } from "firebase/auth";
 import { useRouter } from "expo-router"; // Import useRouter hook
 
@@ -74,7 +74,7 @@ export default function NotificationScreen() {
       <Header title="Notifications" />
       <View style={styles.screen}>
         {notifications.length === 0 ? (
-          <Text style={styles.emptyText}>No notifications available for bids.</Text>
+          <Text style={styles.emptyText}>No notifications available.</Text>
         ) : (
           <FlatList
             data={notifications}
