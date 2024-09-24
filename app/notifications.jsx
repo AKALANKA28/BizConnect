@@ -34,7 +34,7 @@ export default function NotificationScreen() {
           return;
         }
 
-        const notificationsCollection = collection(db, "notifications");
+        const notificationsCollection = collection(db, "BuyerNotifications");
         const q = query(notificationsCollection, where("ownerId", "==", userId));
         const notificationsSnapshot = await getDocs(q);
         const notificationsList = notificationsSnapshot.docs.map((doc) => ({

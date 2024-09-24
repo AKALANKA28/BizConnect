@@ -1,26 +1,48 @@
 import { FlatList, Image, Text, View } from "react-native";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import { collection, getDocs, query } from "firebase/firestore";
 import { db } from "../../config/FirebaseConfig";
-import {Colors} from "../../constants/Colors";
+import { Colors } from "../../constants/Colors";
 
 export default function Slider() {
   const [sliderList, setSliderList] = useState([]);
+  const flatListRef = useRef(null);
+  const [currentIndex, setCurrentIndex] = useState(0); // State for the current index
 
   useEffect(() => {
     GetSliderList();
   }, []);
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      if (sliderList.length > 0) {
+        scrollToNextItem();
+      }
+    }, 5000); // Auto-scroll every 3 seconds
+
+    return () => clearInterval(interval); // Clear interval on component unmount
+  }, [sliderList, currentIndex]); // Add currentIndex as a dependency
 
   const GetSliderList = async () => {
     setSliderList([]);
     const q = query(collection(db, "sliders"));
 
     const querySnapshot = await getDocs(q);
+    const sliderItems = [];
 
     querySnapshot.forEach((doc) => {
-      // console.log(doc.id, " => ", doc.data());
-      setSliderList((prev) => [...prev, doc.data()]);
+      sliderItems.push(doc.data());
     });
+
+    setSliderList(sliderItems);
+  };
+
+  const scrollToNextItem = () => {
+    if (flatListRef.current) {
+      const nextIndex = (currentIndex + 1) % sliderList.length; // Looping logic
+      flatListRef.current.scrollToIndex({ index: nextIndex, animated: true });
+      setCurrentIndex(nextIndex);
+    }
   };
 
   return (
@@ -32,18 +54,17 @@ export default function Slider() {
           paddingLeft: 20,
           paddingTop: 40,
           marginBottom: 5,
-
-          
           color: Colors.text,
         }}
       >
         #Special for you
       </Text>
       <FlatList
+        ref={flatListRef}
         data={sliderList}
         showsHorizontalScrollIndicator={false}
         horizontal={true}
-        renderItem={({ item, index }) => (
+        renderItem={({ item }) => (
           <Image
             source={{ uri: item.imageUrl }}
             style={{
@@ -58,6 +79,8 @@ export default function Slider() {
           paddingLeft: 20,
           marginTop: 20,
         }}
+        keyExtractor={(item, index) => index.toString()}
+        onScrollToIndexFailed={() => {}}
       />
     </View>
   );

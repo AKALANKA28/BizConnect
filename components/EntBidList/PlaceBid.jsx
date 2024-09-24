@@ -57,7 +57,8 @@ const PlaceBid = ({ item }) => {
       });
   
       // Create a notification for the bid owner
-      await addDoc(collection(db, "notifications"), {
+      await addDoc(collection(db, "BuyerNotifications"), {
+        bidId, // ID of the original bid
         ownerId,
         entrepreneurId, // Store the actual Entrepreneur's ID here
         message: `You have received a new bid of ${bidAmount} from Entrepreneur ${username}.`, // Use the fetched username
