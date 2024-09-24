@@ -62,10 +62,10 @@ export default function BusinessListByCategory() {
         <Text
           style={{
             fontSize: 20,
-            fontFamily: "roboto-bold",
+            fontFamily: "roboto",
             textAlign: "center",
             marginTop: "50%",
-            color: Colors.GRAY,
+            color: Colors,
           }}
         >
           No Businesses Found
