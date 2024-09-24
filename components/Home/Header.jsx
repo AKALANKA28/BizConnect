@@ -8,11 +8,19 @@ import { router } from "expo-router";
 
 export default function Header() {
   const { user } = useAuth(); // Access the authenticated user from context
-  const handleNotificationPress = () => {
-    router.push('/notifications'); // This will navigate to the NotificationScreen
-  };
-  // console.log(user);
   
+  const handleNotificationPress = () => {
+    // Check user role and navigate to the corresponding notifications screen
+    if (user?.role === "entrepreneur") {
+      router.push("notifications/EntrepreneurNotifications"); // Navigate to EntrepreneurNotifications
+    } else if (user?.role === "buyer") {
+      router.push("notifications/BuyerNotifications"); // Navigate to BuyerNotifications
+    } else {
+      console.warn("No notifications available for this role.");
+      // Optionally, handle cases where the user role is not recognized
+    }
+  };
+
   return (
     <View
       style={{
@@ -21,8 +29,6 @@ export default function Header() {
         height: 200,
         marginBottom: 9,
         backgroundColor: "#fff",
-        backgroundSize: "cover",
-        backgroundPosition: "center",
         borderBottomLeftRadius: 0,
         borderBottomRightRadius: 0,
       }}
