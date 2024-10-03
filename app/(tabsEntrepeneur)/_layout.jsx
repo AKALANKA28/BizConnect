@@ -42,6 +42,18 @@ export default function EntrepreneurTabLayout() {
           ),
         }}
       />
+
+      <Tabs.Screen
+        name="community"
+        options={{
+          title: "Community",
+          headerShown: true,
+          tabBarIcon: ({ color }) => (
+            <Ionicons name="people" size={24} color={color} />
+          ),
+        }}
+      />
+
       <Tabs.Screen
         name="bids"
         options={{
