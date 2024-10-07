@@ -4,22 +4,31 @@ import Ionicons from "@expo/vector-icons/Ionicons";
 import { useAuth } from "../../context/authContext"; // Assuming AuthContext is in this path
 import { Colors } from "../../constants/Colors";
 import avatarPlaceholder from "../../assets/images/avatar.png"; // Default avatar
+import { router } from "expo-router";
 
 export default function Header() {
   const { user } = useAuth(); // Access the authenticated user from context
-
-  // console.log(user);
   
+  const handleNotificationPress = () => {
+    // Check user role and navigate to the corresponding notifications screen
+    if (user?.role === "entrepreneur") {
+      router.push("notifications/EntrepreneurNotifications"); // Navigate to EntrepreneurNotifications
+    } else if (user?.role === "buyer") {
+      router.push("notifications/BuyerNotifications"); // Navigate to BuyerNotifications
+    } else {
+      console.warn("No notifications available for this role.");
+      // Optionally, handle cases where the user role is not recognized
+    }
+  };
+
   return (
     <View
       style={{
         padding: 20,
-        paddingTop: 40,
+        paddingTop: 50,
         height: 200,
         marginBottom: 9,
         backgroundColor: "#fff",
-        backgroundSize: "cover",
-        backgroundPosition: "center",
         borderBottomLeftRadius: 0,
         borderBottomRightRadius: 0,
       }}
@@ -59,13 +68,13 @@ export default function Header() {
                 color: "#000",
               }}
             >
-              {user?.email || "Guest"} {/* Display user's name if available */}
+              {user?.username || "Guest"} {/* Display user's name if available */}
             </Text>
           </View>
         </View>
 
         {/* Notifications */}
-        <TouchableOpacity activeOpacity={0.5}>
+        <TouchableOpacity activeOpacity={0.5} onPress={handleNotificationPress}>
           <Ionicons
             name="notifications-outline"
             size={24}

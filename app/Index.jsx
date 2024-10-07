@@ -68,7 +68,7 @@ const Index = () => {
             >
               <Text style={styles.getStartedText}>Get Started</Text>
             </TouchableOpacity>
-          )}
+           )} 
         </View>
       </ImageBackground>
     </View>
