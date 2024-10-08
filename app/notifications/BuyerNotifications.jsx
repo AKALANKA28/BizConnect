@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { View, FlatList, StyleSheet, Text } from "react-native";
+import { View, FlatList, StyleSheet, Text, ActivityIndicator } from "react-native";
 import { db } from "../../config/FirebaseConfig";
 import { collection, getDocs, query, where } from "firebase/firestore";
 import NotificationItem from "../../components/Notifications/NotificationItem";
@@ -9,7 +9,10 @@ import { useRouter } from "expo-router"; // Import useRouter hook
 
 export default function NotificationScreen() {
   const [notifications, setNotifications] = useState([]);
+  const [notificationCount, setNotificationCount] = useState(0); // State for notification coun
   const [userId, setUserId] = useState(null);
+  const [isLoading, setIsLoading] = useState(true); // State for loading status
+
   const router = useRouter(); // Get router object
 
   useEffect(() => {
@@ -31,11 +34,16 @@ export default function NotificationScreen() {
       try {
         if (!userId) {
           console.log("No userId provided");
+          setIsLoading(false); // Stop loading if no user
+
           return;
         }
 
         const notificationsCollection = collection(db, "BuyerNotifications");
-        const q = query(notificationsCollection, where("ownerId", "==", userId));
+        const q = query(
+          notificationsCollection,
+          where("ownerId", "==", userId)
+        );
         const notificationsSnapshot = await getDocs(q);
         const notificationsList = notificationsSnapshot.docs.map((doc) => ({
           id: doc.id,
@@ -47,8 +55,12 @@ export default function NotificationScreen() {
         }
 
         setNotifications(notificationsList);
+
+        setNotificationCount(notificationsList.length); // Update count based on the fetched notifications
       } catch (error) {
         console.error("Error fetching notifications: ", error);
+      } finally {
+        setIsLoading(false); // Stop loading once data is fetched
       }
     };
 
@@ -60,20 +72,21 @@ export default function NotificationScreen() {
   const handleNotificationPress = (entrepreneurId) => {
     router.push(`/profile/${entrepreneurId}`);
   };
-  
 
   const renderNotificationItem = ({ item }) => (
     <NotificationItem
       notification={item}
       onPress={() => handleNotificationPress(item.entrepreneurId)} // Ensure this ID is correct
-      />
+    />
   );
 
   return (
     <>
       <Header title="Notifications" />
       <View style={styles.screen}>
-        {notifications.length === 0 ? (
+        {isLoading ? ( // Show loading spinner while fetching data
+          <ActivityIndicator size="large" color="#0000ff" style={styles.loading} />
+        ) : notifications.length === 0 ? (
           <Text style={styles.emptyText}>No notifications available.</Text>
         ) : (
           <FlatList
