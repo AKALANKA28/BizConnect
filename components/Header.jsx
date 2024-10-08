@@ -43,6 +43,6 @@ const styles = StyleSheet.create({
     textAlign: "left",
     marginLeft: 30,
     fontSize: 20,
-    fontWeight: "bold",
+    fontFamily: "poppins-semibold", // Font family for consistency
   },
 });

@@ -51,7 +51,7 @@ const AnimatedTabBar = ({ state, descriptors, navigation }) => {
         style={[styles.activeBackground, animatedStyles]}
       >
         <Path
-          fill="#EFEFEF" // Fully transparent fill
+          fill="#fff" // Fully transparent fill
           d="M20 0H0c11.046 0 20 8.953 20 20v5c0 19.33 15.67 35 35 35s35-15.67 35-35v-5c0-11.045 8.954-20 20-20H20z"
         />
       </AnimatedSvg>
@@ -119,7 +119,7 @@ const TabBarComponent = ({ active, options, onLayout, onPress, color  }) => {
 
 const styles = StyleSheet.create({
   tabBar: {
-    backgroundColor: "white",
+    backgroundColor: "#f2f2f2",
     height: 75,
 
   },
@@ -138,7 +138,7 @@ const styles = StyleSheet.create({
   componentCircle: {
     flex: 1,
     borderRadius: 30,
-    backgroundColor: "white",
+    backgroundColor: "#f2f2f2",
   },
   iconContainer: {
     position: "absolute",
