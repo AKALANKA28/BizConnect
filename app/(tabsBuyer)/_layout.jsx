@@ -1,11 +1,10 @@
-import { View, Text } from "react-native";
 import React from "react";
 import { Tabs } from "expo-router";
-import { Colors } from "../../constants/Colors";
 import { StatusBar } from "expo-status-bar";
 import AnimatedTabBar from "../../components/AnimatedTabBar";
 import Lottie from "lottie-react-native";
 import Ionicons from "@expo/vector-icons/Ionicons";
+import { GestureHandlerRootView } from 'react-native-gesture-handler';
 
 export default function BuyerTabLayout() {
   return (
@@ -13,10 +12,9 @@ export default function BuyerTabLayout() {
       <StatusBar style="dark" translucent />
       <Tabs
         screenOptions={{
-          headerShown: false, // hide the header
-          tabBarStyle: { backgroundColor: "white" },
-          tabBarLabelStyle: { display: "none" }, // Hide labels if you want only icons
-          tabBarIconStyle: { width: 36, height: 36 }, // Set icon size if needed
+          headerShown: false,
+          tabBarLabelStyle: { fontSize: 12 },
+          tabBarIconStyle: { width: 36, height: 36 }, 
         }}
         tabBar={(props) => <AnimatedTabBar {...props} />}
       >
@@ -24,6 +22,7 @@ export default function BuyerTabLayout() {
           name="home"
           options={{
             title: "Home",
+            tabBarLabel: "Home", 
             tabBarIcon: ({ color }) => (
               <Ionicons name="home-outline" size={24} color={color} />
             ),
@@ -32,6 +31,9 @@ export default function BuyerTabLayout() {
         <Tabs.Screen
           name="explore"
           options={{
+            headerShown: true,
+            title: "Explore",
+            tabBarLabel: "Explore", 
             tabBarIcon: ({ color }) => (
               <Ionicons name="search-outline" size={24} color={color} />
             ),
@@ -40,8 +42,9 @@ export default function BuyerTabLayout() {
         <Tabs.Screen
           name="bids"
           options={{
-            headerShown: true, // hide the header
-            title: "Ongoing Bids",
+            headerShown: true,
+            title: "Bids",
+            tabBarLabel: "Bids", 
             tabBarIcon: ({ color }) => (
               <Ionicons name="briefcase-outline" size={24} color={color} />
             ),
@@ -50,13 +53,14 @@ export default function BuyerTabLayout() {
         <Tabs.Screen
           name="profile"
           options={{
+            tabBarLabel: "Profile", 
             tabBarIcon: ({ color }) => (
               <Ionicons name="person-outline" size={24} color={color} />
             ),
           }}
         />
       </Tabs>
-    </>
+      </>
   );
 }
 

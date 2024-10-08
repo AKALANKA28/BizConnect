@@ -11,6 +11,7 @@ import {
 import Ionicons from "react-native-vector-icons/Ionicons";
 import { Colors } from "../../constants/Colors";
 import PlaceBid from "./PlaceBid";
+import { RFValue } from "react-native-responsive-fontsize";
 
 const BidItem = ({ item }) => {
   const [expanded, setExpanded] = useState(false);
@@ -94,14 +95,18 @@ const styles = StyleSheet.create({
     left: 10,
     flexDirection: "row",
     alignItems: "center",
+    alignContent: "center",
     backgroundColor: "rgba(0, 0, 0, 0.6)",
-    padding: 5,
-    borderRadius: 5,
+    paddingHorizontal: 10,
+    paddingVertical: 4,
+    borderRadius: 20,
   },
   cardClosingTimeText: {
     color: "white",
-    fontSize: 12,
+    fontSize: RFValue(10.5),
+    fontFamily: "poppins",
     marginLeft: 5,
+    marginTop: 2,
   },
   cardContent: {
     flexDirection: "column",

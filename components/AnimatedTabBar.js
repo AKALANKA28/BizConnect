@@ -9,7 +9,7 @@ import Animated, {
   useDerivedValue,
 } from "react-native-reanimated";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
-import Lottie from "lottie-react-native";
+import { Colors } from "@/constants/Colors";
 
 const AnimatedSvg = Animated.createAnimatedComponent(Svg);
 
@@ -61,11 +61,17 @@ const AnimatedTabBar = ({ state, descriptors, navigation }) => {
           const active = index === activeIndex;
           const { options } = descriptors[route.key];
 
+           // Pass the active status to the tabBarIcon component
+           const color = active
+           ? Colors.light.tabIconSelected // Use the selected color for active tab
+           : Colors.light.tabIconDefault; // Use the default color for inactive tabs
+
           return (
             <TabBarComponent
               key={route.key}
               active={active}
               options={options}
+              color={color}
               onLayout={(e) => handleLayout(e, index)}
               onPress={() => navigation.navigate(route.name)}
             />
@@ -76,7 +82,7 @@ const AnimatedTabBar = ({ state, descriptors, navigation }) => {
   );
 };
 
-const TabBarComponent = ({ active, options, onLayout, onPress }) => {
+const TabBarComponent = ({ active, options, onLayout, onPress, color  }) => {
   const ref = useRef(null);
 
   useEffect(() => {
@@ -105,7 +111,7 @@ const TabBarComponent = ({ active, options, onLayout, onPress }) => {
       <Animated.View
         style={[styles.iconContainer, animatedIconContainerStyles]}
       >
-        {options.tabBarIcon ? options.tabBarIcon({ ref }) : <Text>?</Text>}
+        {options.tabBarIcon ? options.tabBarIcon({ ref, color  }) : <Text>?</Text>}
       </Animated.View>
     </Pressable>
   );
@@ -114,7 +120,8 @@ const TabBarComponent = ({ active, options, onLayout, onPress }) => {
 const styles = StyleSheet.create({
   tabBar: {
     backgroundColor: "white",
-    height: 70,
+    height: 75,
+
   },
   activeBackground: {
     position: "absolute",
