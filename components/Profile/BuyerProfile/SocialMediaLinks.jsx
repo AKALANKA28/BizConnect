@@ -6,7 +6,7 @@ const SocialMediaItem = ({ icon, label, value }) => (
     <Fontisto
       name={icon}
       size={18}
-      color="rgba(141, 110, 99, 1)"
+      color="#262626"
       style={styles.icon}
     />
     <View style={styles.socialDetails}>
