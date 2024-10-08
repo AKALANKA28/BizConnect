@@ -43,7 +43,8 @@ export const AuthContextProvider = ({ children }) => {
         const role = userData.role;
 
         // Now fetch the data from the relevant collection
-        const collectionName = role === "entrepreneur" ? "entrepreneurs" : "buyers";
+        const collectionName =
+          role === "entrepreneur" ? "entrepreneurs" : "buyers";
         const specificUserDocRef = doc(db, collectionName, uid);
         const specificUserDocSnap = await getDoc(specificUserDocRef);
 
@@ -55,7 +56,9 @@ export const AuthContextProvider = ({ children }) => {
           });
           console.log("User data retrieved from Firestore:", specificData);
         } else {
-          console.log(`No data found in Firestore for UID: ${uid} in ${collectionName}`);
+          console.log(
+            `No data found in Firestore for UID: ${uid} in ${collectionName}`
+          );
         }
       } else {
         console.log(`No user data found in Firestore for UID: ${uid}`);
@@ -65,12 +68,51 @@ export const AuthContextProvider = ({ children }) => {
     }
   };
 
+  // Update profile function
+  const updateProfile = async (updatedData, imageUri = null) => {
+    try {
+      if (!user) throw new Error("No user is currently logged in");
+
+      // Determine which collection to update based on the role
+      const collectionName =
+        user.role === "entrepreneur" ? "entrepreneurs" : "buyers";
+      const userRef = doc(db, collectionName, user.uid);
+
+      // Create an object to hold the data to update
+      const dataToUpdate = { ...updatedData };
+
+      // If imageUri is provided, add it to the update object
+      if (imageUri) {
+        dataToUpdate.profileImage = imageUri;
+      }
+
+      // Update Firestore with the new profile data
+      await setDoc(userRef, dataToUpdate, { merge: true });
+
+      // Optionally update the in-memory user state
+      setUser((prevUser) => ({
+        ...prevUser,
+        ...dataToUpdate,
+      }));
+
+      console.log("Profile updated successfully");
+      return { success: true };
+    } catch (error) {
+      console.error("Error updating profile:", error);
+      return { success: false, error };
+    }
+  };
+
   // Sign In function (supports both email and phone number)
   const signin = async (identifier, password) => {
     try {
       if (identifier.includes("@")) {
         // Sign in with email and password
-        const response = await signInWithEmailAndPassword(auth, identifier, password);
+        const response = await signInWithEmailAndPassword(
+          auth,
+          identifier,
+          password
+        );
         await fetchUserRoleAndData(response.user.uid); // Fetch user data after sign-in
         return { success: true, data: response.user };
       } else {
@@ -87,7 +129,11 @@ export const AuthContextProvider = ({ children }) => {
   // Sign Up function with email, username, and phone number
   const signup = async (email, password, username, phoneNumber, role) => {
     try {
-      const response = await createUserWithEmailAndPassword(auth, email, password);
+      const response = await createUserWithEmailAndPassword(
+        auth,
+        email,
+        password
+      );
 
       // Create user document in the main "users" collection
       const userDocRef = doc(db, "users", response.user.uid);
@@ -101,7 +147,8 @@ export const AuthContextProvider = ({ children }) => {
       });
 
       // Create document in either "entrepreneurs" or "buyers" collection based on role
-      const collectionName = role === "entrepreneur" ? "entrepreneurs" : "buyers";
+      const collectionName =
+        role === "entrepreneur" ? "entrepreneurs" : "buyers";
       const specificUserDocRef = doc(db, collectionName, response.user.uid);
       await setDoc(specificUserDocRef, {
         uid: response.user.uid,
@@ -151,7 +198,9 @@ export const AuthContextProvider = ({ children }) => {
   }
 
   return (
-    <AuthContext.Provider value={{ user, isAuthenticated, signin, signout, signup }}>
+    <AuthContext.Provider
+      value={{ user, isAuthenticated, signin, signout, signup, updateProfile }}
+    >
       {children}
     </AuthContext.Provider>
   );
