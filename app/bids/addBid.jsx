@@ -141,7 +141,6 @@ export default function AddBid() {
     >
       <Header title={title} />
       <ScrollView contentContainerStyle={styles.scrollContainer}>
-        {/* Image Picker */}
         <Text
           style={{
             color: "#000",

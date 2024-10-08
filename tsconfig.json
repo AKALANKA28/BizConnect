@@ -13,5 +13,5 @@
     "**/*.tsx",
     ".expo/types/**/*.ts",
     "expo-env.d.ts"
-, "app/MainLayout.jsx", "app/Index.jsx", "hooks/warmUpBrowser.jsx"  ]
+, "app/MainLayout.jsx", "app/Index.jsx", "hooks/warmUpBrowser.jsx", "app/(tabsBuyer)/_layout.jsx"  ]
 }
