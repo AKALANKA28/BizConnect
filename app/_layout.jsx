@@ -4,9 +4,10 @@ import { Slot, useRouter, useSegments } from "expo-router";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { AuthContextProvider, useAuth } from "../context/authContext";
 import { useFonts } from "expo-font";
+import { NotificationProvider } from '../context/notificationContext'; // Import the NotificationProvider
 
 const MainLayout = () => {
-  const { isAuthenticated, user  } = useAuth();
+  const { isAuthenticated, user } = useAuth();
   const segments = useSegments();
   const router = useRouter();
   const [hasOnboarded, setHasOnboarded] = useState(null); // Local state to track onboarding status
@@ -30,14 +31,14 @@ const MainLayout = () => {
     if (typeof isAuthenticated === "undefined" || hasOnboarded === null) return; // Wait for both isAuthenticated and hasOnboarded to load
 
     const inApp = segments[0] === "(tabsBuyer)";
-    
+
     // Handle navigation logic
     if (isAuthenticated && !hasOnboarded) {
       // Redirect to onboarding if user hasn't completed it
       router.replace("/Index");
     } else if (isAuthenticated && !inApp) {
       // Redirect to home if the user is authenticated and has completed onboarding
-      router.replace("/home");  // Adjust to your home route
+      router.replace("/home"); // Adjust to your home route
     } else if (isAuthenticated === false) {
       // Redirect to login
       router.replace("/Index");
@@ -59,10 +60,11 @@ export default function RootLayout() {
     "roboto": require("../assets/fonts/Roboto-Regular.ttf"),
     "roboto-medium": require("../assets/fonts/Roboto-Medium.ttf"),
     "roboto-bold": require("../assets/fonts/Roboto-Bold.ttf"),
+    "roboto-black": require("../assets/fonts/Roboto-Black.ttf"),
+
     "poppins": require("../assets/fonts/Poppins-Regular.ttf"),
     "poppins-semibold": require("../assets/fonts/Poppins-SemiBold.ttf"),
     "poppins-bold": require("../assets/fonts/Poppins-Bold.ttf"),
-    "roboto-black": require("../assets/fonts/Roboto-Black.ttf"),
   });
 
   if (!fontsLoaded) {
@@ -75,7 +77,9 @@ export default function RootLayout() {
 
   return (
     <AuthContextProvider>
-      <MainLayout />
+      <NotificationProvider>
+        <MainLayout />
+      </NotificationProvider>
     </AuthContextProvider>
   );
 }

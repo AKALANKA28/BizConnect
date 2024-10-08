@@ -12,6 +12,7 @@ import {
 } from "react-native";
 import Loading from "../../components/Loading";
 import { useAuth } from "../../context/authContext";
+import { Colors } from "../../constants/Colors";
 
 export default function SignUp() {
   const router = useRouter();
@@ -25,7 +26,7 @@ export default function SignUp() {
 
   const handleSubmit = async () => {
     if (!email || !password || !username || !phoneNumber || !role) {
-      Alert.alert("Please fill all fields and select a role.");
+      Alert.alert("Please fill all fields");
       return;
     }
     setLoading(true);
@@ -112,15 +113,14 @@ export default function SignUp() {
           style={styles.input}
           placeholderTextColor="#61677d"
         />
-        <TouchableOpacity>
-          <Text style={styles.forgotPasswordText}>Forgot Password?</Text>
-        </TouchableOpacity>
       </View>
 
       {/* Sign Up Button */}
       <View>
         {loading ? (
-          <Loading />
+          <View styles={styles.loadingContainer}>
+            <Loading />
+          </View>
         ) : (
           <TouchableOpacity style={styles.loginButton} onPress={handleSubmit}>
             <Text style={styles.loginButtonText}>Sign Up</Text>
@@ -149,7 +149,7 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 36,
     fontWeight: "bold",
-    color: "#AA6A1C",
+    color: Colors.secondaryColor,
     textAlign: "left",
     marginBottom: 20,
   },
@@ -196,15 +196,14 @@ const styles = StyleSheet.create({
   passwordContainer: {
     position: "relative",
   },
-  forgotPasswordText: {
-    position: "absolute",
-    right: 0,
-    top: 15,
-    fontSize: 14,
-    color: "#AA6A1C",
+  loadingContainer:{
+    height: 50,
+    justifyContent: "center",
+    alignItems: "center",
+    marginTop: 20,
   },
   loginButton: {
-    backgroundColor: "#AA6A1C",
+    backgroundColor: Colors.secondaryColor,
     height: 50,
     borderRadius: 8,
     justifyContent: "center",
@@ -225,7 +224,7 @@ const styles = StyleSheet.create({
     color: "#61677d",
   },
   signUpLink: {
-    color: "#AA6A1C",
+    color: Colors.secondaryColor,
     fontWeight: "bold",
   },
 });
