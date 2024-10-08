@@ -9,7 +9,7 @@ import {
   StyleSheet,
   Platform,
 } from 'react-native';
-import * as ImagePicker from 'react-native-image-picker';
+import * as ImagePicker from "expo-image-picker";
 import RNPickerSelect from 'react-native-picker-select';
 
 const AddPostScreen = () => {
