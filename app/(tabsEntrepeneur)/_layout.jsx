@@ -60,6 +60,17 @@ export default function EntrepreneurTabLayout() {
             ),
           }}
         />
+
+<Tabs.Screen
+          name="community"
+          options={{
+            tabBarLabel: "Community",
+            headerShown: true,
+            tabBarIcon: ({ color }) => (
+              <Ionicons name="people-outline" size={24} color={color} />
+            ),
+          }}
+        />
       </Tabs>
     </>
   );
