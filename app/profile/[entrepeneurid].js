@@ -17,6 +17,7 @@ import ContactDetails from "../../components/Profile/EntrepreneurProfile/Contact
 import PreviousWorks from "../../components/Profile/EntrepreneurProfile/PreviousWorks";
 import { StatusBar } from "expo-status-bar";
 import AcceptBidButton from "../../components/Profile/EntrepreneurProfile/AcceptBidButton"; // Import the new component
+import LoadingScreen from "../../components/LoadingScreen";
 
 export default function EntrepreneurProfile() {
   const { entrepeneurid } = useLocalSearchParams(); // Get the entrepreneur ID
@@ -47,28 +48,24 @@ export default function EntrepreneurProfile() {
   }, [entrepeneurid]);
 
   if (loading) {
-    return (
-      <View style={styles.loadingContainer}>
-        <ActivityIndicator size="large" color="#0000ff" />
-        <Text>Loading entrepreneur profile...</Text>
-      </View>
-    );
+    return <LoadingScreen />;
   }
 
   return (
     <View style={styles.container}>
       <StatusBar style="dark" translucent />
       {entrepreneur ? (
-        <ScrollView style={styles.container}>
-          <View style={styles.content}>
-            <ProfileHeader />
-            <ProfileInfo />
-            <ContactDetails />
-          </View>
-          <PreviousWorks />
-          {/* Use the AcceptBidButton component here */}
+        <>
+          <ScrollView style={styles.container}>
+            <View style={styles.content}>
+              <ProfileHeader />
+              <ProfileInfo />
+              <ContactDetails />
+            </View>
+            <PreviousWorks />
+          </ScrollView>
           <AcceptBidButton entrepeneurid={entrepeneurid} />
-        </ScrollView>
+        </>
       ) : (
         <Text>No entrepreneur found.</Text>
       )}

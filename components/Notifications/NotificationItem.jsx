@@ -1,44 +1,112 @@
 import React from "react";
-import { TouchableOpacity, View, Text, StyleSheet } from "react-native";
+import {
+  TouchableOpacity,
+  View,
+  Text,
+  StyleSheet,
+  Image,
+  TouchableWithoutFeedback,
+} from "react-native";
+import { RFValue } from "react-native-responsive-fontsize";
 
-export default function NotificationItem({ notification, onPress }) {
+// Helper function to format the timestamp
+const formatTimestamp = (timestamp) => {
+  const now = Date.now();
+  const seconds = Math.floor((now - timestamp) / 1000); // Difference in seconds
+
+  const minutes = Math.floor(seconds / 60);
+  const hours = Math.floor(seconds / 3600);
+  const days = Math.floor(seconds / 86400);
+
+  if (seconds < 60) {
+    return `${seconds}s`;
+  } else if (minutes < 60) {
+    return `${minutes}m`;
+  } else if (hours < 24) {
+    return `${hours}h`;
+  } else {
+    return `${days}d`;
+  }
+};
+
+export default function NotificationItem({
+  notification,
+  onPress,
+  onLongPress,
+  onPressOut,
+  isSelected,
+  showDeleteIcon,
+}) {
   return (
-    <TouchableOpacity style={styles.item} onPress={onPress}>
-      <View style={styles.container}>
-        <Text style={styles.message}>{notification.message}</Text>
-        <Text style={styles.timestamp}>
-          {new Date(notification.timestamp.seconds * 1000).toLocaleString()}
-        </Text>
+    <TouchableWithoutFeedback
+      onPress={onPress}
+      onLongPress={onLongPress}
+      onPressOut={onPressOut}
+    >
+      <View style={[styles.item, isSelected ? styles.selected : {}]}>
+        <View style={styles.container}>
+          <View style={styles.iconAndMessageContainer}>
+            <Image
+              source={{
+                uri: notification.profileImage,
+              }}
+              style={styles.profileImage}
+              resizeMode="cover"
+            />
+              <Text style={styles.message}>{notification.message}</Text>
+              <Text style={styles.timestamp}>
+                {formatTimestamp(notification.timestamp.seconds * 1000)}
+              </Text>
+          </View>
+        </View>
       </View>
-    </TouchableOpacity>
+    </TouchableWithoutFeedback>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
-    backgroundColor: "#fff",
     padding: 15,
     borderRadius: 8,
-    marginVertical: 8,
+    marginVertical: 0,
     marginHorizontal: 16,
-    elevation: 3,
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.3,
-    shadowRadius: 3,
+    borderBottomColor: "#ccc",
+    borderBottomWidth: 0.5,
   },
-  item: {
-    // Removing extra padding for the item, as it's handled in the container
+  selected: {
+    backgroundColor: "#f0f0f0", // Highlight background for selected items
+    
+  },
+  iconAndMessageContainer: {
+    flexDirection: "row",
+    alignItems: "top",
+    justifyContent: "space-between",
+  },
+  profileImage: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    marginRight: 10,
+  },
+  messageContainer: {
+    flex: 1,
+    alignItems: "flex-start",
   },
   message: {
-    fontSize: 16,
+    flex: 1,
+    fontSize: RFValue(12),
     color: "#333",
-    marginBottom: 5,
-    fontWeight: "500", // Slightly bolder for emphasis
+    fontFamily: "lato",
+  },
+  deleteIcon: {
+    fontSize: RFValue(18),
+    color: "red",
+    marginLeft: 10,
   },
   timestamp: {
-    fontSize: 12,
-    color: "#888",
-    marginTop: 5,
+    fontSize: RFValue(10),
+    color: "#61646B",
+    marginLeft: 10,
+    fontFamily: "lato",
   },
 });

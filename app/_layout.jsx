@@ -69,9 +69,13 @@ export default function RootLayout() {
     "roboto-bold": require("../assets/fonts/Roboto-Bold.ttf"),
     "roboto-black": require("../assets/fonts/Roboto-Black.ttf"),
 
-    poppins: require("../assets/fonts/Poppins-Regular.ttf"),
+    "poppins": require("../assets/fonts/Poppins-Regular.ttf"),
     "poppins-semibold": require("../assets/fonts/Poppins-SemiBold.ttf"),
     "poppins-bold": require("../assets/fonts/Poppins-Bold.ttf"),
+
+    "lato": require("../assets/fonts/Lato-Regular.ttf"),
+
+
   });
 
   if (!fontsLoaded) {

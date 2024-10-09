@@ -29,6 +29,14 @@ const PreviousWorks = () => {
       source: "https://cdn.builder.io/api/v1/image/assets/TEMP/0c738946bbec2242f414a378a2ad225469fce4da00aa6288fdf425a85d0e92fc?placeholderIfAbsent=true&apiKey=59e835da8ea04b80ab8ace77cb34d866",
       height: 180,
     },
+    {
+      source: "https://cdn.builder.io/api/v1/image/assets/TEMP/8affc8af83e6e8abc59920127ced4f3df16f2f75fa26d2ed7856823062d4c8a6?placeholderIfAbsent=true&apiKey=59e835da8ea04b80ab8ace77cb34d866",
+      height: 250,
+    },
+    {
+      source: "https://cdn.builder.io/api/v1/image/assets/TEMP/0c738946bbec2242f414a378a2ad225469fce4da00aa6288fdf425a85d0e92fc?placeholderIfAbsent=true&apiKey=59e835da8ea04b80ab8ace77cb34d866",
+      height: 180,
+    },
   ];
 
   // Split images into two columns
