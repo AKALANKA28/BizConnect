@@ -17,8 +17,6 @@ import RNPickerSelect from "react-native-picker-select";
 import { db } from "../../config/FirebaseConfig";
 import { addDoc, collection, getDocs, query } from "firebase/firestore";
 import * as ImagePicker from "expo-image-picker";
-import DateTimePicker from "@react-native-community/datetimepicker";
-import { Ionicons } from "@expo/vector-icons";
 import Header from "../../components/Header";
 import { getAuth } from "firebase/auth";
 
@@ -27,14 +25,10 @@ export default function AddBid() {
   const [categoryList, setCategoryList] = useState([]);
   const [name, setName] = useState("");
   const [address, setAddress] = useState("");
-  const [description, setDescription] = useState("");
+  const [about, setAbout] = useState("");
+  const [contact, setContact] = useState("");
   const [categories, setCategories] = useState("");
   const [image, setImage] = useState(null);
-  const [bidClosingTime, setBidClosingTime] = useState(new Date());
-  const [showDatePicker, setShowDatePicker] = useState(false);
-  const [showTimePicker, setShowTimePicker] = useState(false);
-  const [selectedDate, setSelectedDate] = useState(new Date());
-  const [selectedTime, setSelectedTime] = useState(new Date());
   const auth = getAuth();
   const user = auth.currentUser;
   const [title, setTitle] = useState();
@@ -80,52 +74,22 @@ export default function AddBid() {
     }
   };
 
-  const onDateChange = (event, selectedDate) => {
-    setShowDatePicker(false);
-    if (event.type === "set") {
-      setSelectedDate(selectedDate || selectedDate);
-      setBidClosingTime(
-        new Date(
-          selectedDate.setHours(
-            selectedTime.getHours(),
-            selectedTime.getMinutes()
-          )
-        )
-      );
-    }
-  };
-
-  const onTimeChange = (event, selectedTime) => {
-    setShowTimePicker(false);
-    if (event.type === "set") {
-      setSelectedTime(selectedTime || selectedTime);
-      setBidClosingTime(
-        new Date(
-          selectedDate.setHours(
-            selectedTime.getHours(),
-            selectedTime.getMinutes()
-          )
-        )
-      );
-    }
-  };
-
   const onAddPost = async () => {
     try {
-      if (name && address && description && categories && bidClosingTime) {
-        // Include the user data (uid and email) when adding the post
-        await addDoc(collection(db, "posts"), {
-          name,
-          address,
-          description,
-          categories,
-          image: image || null,
-          // bidClosingTime,
+      if (name && address && about && contact && categories) {
+        await addDoc(collection(db, "BusinessList"), {
+          name, // Test name
+          address, // Address (e.g., Homagama)
+          about, // Description or about (e.g., test2)
+          contact, // Contact info (e.g., "number 2")
+          categories, // Category (e.g., Wicker)
+          imageUrl: image || null, // Image URL from picker or default
           userId: user ? user.uid : null, // Add userId
           userEmail: user ? user.email : null, // Add userEmail
         });
         ToastAndroid.show("Post Added Successfully", ToastAndroid.BOTTOM);
-        router.push("bids");
+        router.push("posts");
+      } else {
         ToastAndroid.show("Please fill all the fields.", ToastAndroid.BOTTOM);
       }
     } catch (error) {
@@ -141,21 +105,8 @@ export default function AddBid() {
     >
       <Header title={title} />
       <ScrollView contentContainerStyle={styles.scrollContainer}>
-        <Text
-          style={{
-            color: "#000",
-            fontSize: 14,
-            marginTop: -15,
-            letterSpacing: 0.4,
-            fontFamily: "poppins-semibold",
-          }}
-        >
-          Image
-        </Text>
-        <TouchableOpacity
-          onPress={pickImage}
-          style={styles.imagePreviewContainer}
-        >
+        <Text style={styles.label}>Image</Text>
+        <TouchableOpacity onPress={pickImage} style={styles.imagePreviewContainer}>
           {image ? (
             <Image source={{ uri: image }} style={styles.imagePreview} />
           ) : (
@@ -167,82 +118,36 @@ export default function AddBid() {
 
         <Text style={styles.label}>Title</Text>
         <TextInput
-          placeholder="Title"
+          placeholder="Name"
           onChangeText={setName}
           style={styles.input}
         />
-        {/* <Text style={styles.label}>Address</Text>
+
+        <Text style={styles.label}>Location</Text>
         <TextInput
           placeholder="Address"
           onChangeText={setAddress}
           style={styles.input}
-        /> */}
+        />
+
+        <Text style={styles.label}>About</Text>
+        <TextInput
+          placeholder="About"
+          onChangeText={setAbout}
+          style={styles.input}
+        />
+
+        <Text style={styles.label}>Contact</Text>
+        <TextInput
+          placeholder="Contact"
+          onChangeText={setContact}
+          style={styles.input}
+        />
+
         <Text style={styles.label}>Category</Text>
         <View style={styles.pickerContainer}>
           <RNPickerSelect onValueChange={setCategories} items={categoryList} />
         </View>
-
-        {/* <Text style={styles.label}>Bid Closing Time</Text> */}
-        {/* <View style={styles.datePickerContainer}> */}
-          {/* Date Picker Button */}
-          {/* <TouchableOpacity
-            onPress={() => setShowDatePicker(true)}
-            style={styles.datePickerButton}
-          > */}
-            {/* <Text style={styles.datePickerText}>
-              {selectedDate.toLocaleDateString()}
-            </Text> */}
-            {/* <Ionicons
-              name="calendar-outline"
-              size={16}
-              color="black"
-              style={styles.icon}
-            /> */}
-          {/* </TouchableOpacity> */}
-{/* 
-          {showDatePicker && (
-            <DateTimePicker
-              value={selectedDate}
-              mode="date"
-              display="default"
-              onChange={onDateChange}
-            />
-          )} */}
-
-          {/* Time Picker Button */}
-          {/* <TouchableOpacity
-            onPress={() => setShowTimePicker(true)}
-            style={styles.datePickerButton}
-          > */}
-            {/* <Text style={styles.datePickerText}>
-              {selectedTime.toLocaleTimeString()}
-            </Text> */}
-            {/* <Ionicons
-              name="time-outline"
-              size={16}
-              color="black"
-              style={styles.icon}
-            /> */}
-          {/* </TouchableOpacity> */}
-
-          {/* {showTimePicker && (
-            <DateTimePicker
-              value={selectedTime}
-              mode="time"
-              display="default"
-              onChange={onTimeChange}
-            />
-          )} */}
-        {/* </View> */}
-
-        <Text style={styles.label}>Description</Text>
-        <TextInput
-          multiline
-          numberOfLines={5}
-          placeholder="Description"
-          onChangeText={setDescription}
-          style={[styles.input, styles.textarea]}
-        />
 
         <TouchableOpacity onPress={onAddPost} style={styles.button}>
           <Text style={styles.buttonText}>Post</Text>
@@ -267,7 +172,6 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     borderStyle: "dashed",
     borderWidth: 2,
-    overflow: "hidden", // Ensures padding does not affect image size
   },
   imagePreview: {
     width: "100%",
@@ -276,90 +180,32 @@ const styles = StyleSheet.create({
     resizeMode: "cover",
   },
   imagePlaceholderContainer: {
-    padding: 60, // Apply padding only when showing the placeholder
+    padding: 40,
     alignItems: "center",
     justifyContent: "center",
   },
   imagePlaceholder: {
     color: "#888",
-    fontFamily: "roboto",
   },
   input: {
-    padding: 20,
-    paddingStart: 25,
-    borderRadius: 30,
+    padding: 15,
+    borderRadius: 10,
     backgroundColor: Colors.GRAY,
-    fontFamily: "roboto",
-  },
-  textarea: {
-    height: 150,
+    marginVertical: 10,
   },
   pickerContainer: {
-    padding: 5,
-    borderRadius: 30,
+    padding: 10,
+    borderRadius: 10,
     backgroundColor: Colors.GRAY,
   },
-
   button: {
-    padding: 20,
+    padding: 15,
     backgroundColor: Colors.secondaryColor,
-    borderRadius: 30,
+    borderRadius: 10,
     marginTop: 20,
     alignItems: "center",
-    shadowColor: "#000",
-    shadowOffset: { width: 1, height: 3 },
-    shadowOpacity: 0.75,
-    shadowRadius: 3.84,
-    elevation: 5,
   },
   buttonText: {
-    textAlign: "center",
     color: "#fff",
-    fontFamily: "roboto-bold",
-  },
-  label: {
-    color: "#000",
-    fontSize: 14,
-    marginTop: 20,
-    letterSpacing: 0.4,
-    fontFamily: "poppins-semibold",
-  },
-  datePickerContainer: {
-    flexDirection: "row",
-    alignItems: "center",
-    borderRadius: 30,
-    justifyContent: "space-between",
-  },
-  datePickerButton: {
-    flexDirection: "row",
-    alignItems: "center",
-    paddingHorizontal: 50,
-    paddingVertical: 20,
-    borderRadius: 30,
-    backgroundColor: Colors.GRAY,
-    justifyContent: "space-between",
-  },
-  datePickerText: {
-    fontFamily: "roboto",
-    color: "#000",
-    fontSize: 16,
-  },
-  icon: {
-    marginLeft: 10,
-  },
-  header: {
-    height: 60,
-    flexDirection: "row",
-    alignItems: "center",
-    marginVertical: 20,
-    paddingHorizontal: 16,
-    borderBottomWidth: 1,
-    borderBottomColor: "#ccc",
-  },
-  headerTitle: {
-    flex: 1,
-    textAlign: "center",
-    fontSize: 20,
-    fontWeight: "bold",
   },
 });

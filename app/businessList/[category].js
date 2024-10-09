@@ -23,7 +23,7 @@ export default function BusinessListByCategory() {
     setLoading(true);
     const q = query(
       collection(db, "BusinessList"),
-      where("category", "==", category)
+      where("categories", "==", category)
     );
     const querySnapshot = await getDocs(q);
     querySnapshot.forEach((doc) => {

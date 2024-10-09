@@ -1,5 +1,8 @@
-import React from "react";
-import { View, StyleSheet, Text, Image, Dimensions } from "react-native";
+import React, { useEffect, useState } from "react";
+import { View, StyleSheet, Text, Image, Dimensions, ScrollView } from "react-native";
+import { db } from "../../../config/FirebaseConfig"; // Import your Firebase config
+import { collection, query, where, getDocs } from "firebase/firestore";
+import { getAuth } from "firebase/auth";
 
 const screenWidth = Dimensions.get("window").width;
 
@@ -12,24 +15,32 @@ const WorkImage = ({ source, style }) => (
 );
 
 const PreviousWorks = () => {
-  const workImages = [
-    {
-      source: "https://cdn.builder.io/api/v1/image/assets/TEMP/b1ec94242342e4155ff9bcf45318daadc707b9ea8432cd96c1fddff3d1599fa2?placeholderIfAbsent=true&apiKey=59e835da8ea04b80ab8ace77cb34d866",
-      height: 180,
-    },
-    {
-      source: "https://cdn.builder.io/api/v1/image/assets/TEMP/3b7d63445b6236a9df3216108f00b160c58fabd93e023a3a7304dbd077a88334?placeholderIfAbsent=true&apiKey=59e835da8ea04b80ab8ace77cb34d866",
-      height: 250,
-    },
-    {
-      source: "https://cdn.builder.io/api/v1/image/assets/TEMP/8affc8af83e6e8abc59920127ced4f3df16f2f75fa26d2ed7856823062d4c8a6?placeholderIfAbsent=true&apiKey=59e835da8ea04b80ab8ace77cb34d866",
-      height: 250,
-    },
-    {
-      source: "https://cdn.builder.io/api/v1/image/assets/TEMP/0c738946bbec2242f414a378a2ad225469fce4da00aa6288fdf425a85d0e92fc?placeholderIfAbsent=true&apiKey=59e835da8ea04b80ab8ace77cb34d866",
-      height: 180,
-    },
-  ];
+  const [workImages, setWorkImages] = useState([]);
+  const auth = getAuth();
+  const user = auth.currentUser;
+
+  useEffect(() => {
+    if (user) {
+      fetchUserImages();
+    }
+  }, [user]);
+
+  const fetchUserImages = async () => {
+    try {
+      const q = query(
+        collection(db, "BusinessList"),
+        where("userId", "==", user.uid) // Filter based on uid
+      );
+      const querySnapshot = await getDocs(q);
+      const images = querySnapshot.docs.map((doc) => ({
+        source: doc.data().imageUrl,
+        height: 250, // You can dynamically set height if needed
+      }));
+      setWorkImages(images);
+    } catch (error) {
+      console.error("Error fetching images: ", error);
+    }
+  };
 
   // Split images into two columns
   const column1Images = workImages.filter((_, index) => index % 2 === 0); // Even index images
@@ -39,27 +50,29 @@ const PreviousWorks = () => {
     <View style={styles.container}>
       <Text style={styles.title}>Previous Works</Text>
 
-      <View style={styles.imageGrid}>
-        <View style={styles.imageColumn}>
-          {column1Images.map((item, index) => (
-            <WorkImage
-              key={index}
-              source={item.source}
-              style={{ height: item.height, width: "100%" }} // Set dynamic height, full width
-            />
-          ))}
-        </View>
+      <ScrollView>
+        <View style={styles.imageGrid}>
+          <View style={styles.imageColumn}>
+            {column1Images.map((item, index) => (
+              <WorkImage
+                key={index}
+                source={item.source}
+                style={{ height: item.height, width: "100%" }} // Set dynamic height, full width
+              />
+            ))}
+          </View>
 
-        <View style={styles.imageColumn}>
-          {column2Images.map((item, index) => (
-            <WorkImage
-              key={index}
-              source={item.source}
-              style={{ height: item.height, width: "100%" }} // Set dynamic height, full width
-            />
-          ))}
+          <View style={styles.imageColumn}>
+            {column2Images.map((item, index) => (
+              <WorkImage
+                key={index}
+                source={item.source}
+                style={{ height: item.height, width: "100%" }} // Set dynamic height, full width
+              />
+            ))}
+          </View>
         </View>
-      </View>
+      </ScrollView>
     </View>
   );
 };
@@ -75,7 +88,6 @@ const styles = StyleSheet.create({
     marginLeft: 16,
     marginBottom: 14,
     textAlign: "left",
-
   },
   imageGrid: {
     flexDirection: "row", // Keep two columns side by side
