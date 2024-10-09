@@ -268,15 +268,16 @@ export default function AddBidEdit() {
             onPress={() => setShowDatePicker(true)}
             style={styles.datePickerButton}
           >
+             <Ionicons
+              name="calendar-outline"
+              size={16}
+              color={Colors.secondaryColor}
+              style={styles.icon}
+            />
             <Text style={styles.datePickerText}>
               {selectedDate.toLocaleDateString()}
             </Text>
-            <Ionicons
-              name="calendar-outline"
-              size={16}
-              color="black"
-              style={styles.icon}
-            />
+           
           </TouchableOpacity>
 
           {showDatePicker && (
@@ -292,15 +293,16 @@ export default function AddBidEdit() {
             onPress={() => setShowTimePicker(true)}
             style={styles.datePickerButton}
           >
+             <Ionicons
+              name="time-outline"
+              size={16}
+              color={Colors.secondaryColor}
+              style={styles.icon}
+            />
             <Text style={styles.datePickerText}>
               {selectedTime.toLocaleTimeString()}
             </Text>
-            <Ionicons
-              name="time-outline"
-              size={16}
-              color="black"
-              style={styles.icon}
-            />
+           
           </TouchableOpacity>
 
           {showTimePicker && (
@@ -340,7 +342,7 @@ const styles = StyleSheet.create({
   },
   scrollContainer: {
     padding: 20,
-    marginTop: -20 
+        marginTop: -20 
 
   },
   imagePreviewContainer: {
@@ -368,24 +370,66 @@ const styles = StyleSheet.create({
     fontFamily: "roboto",
   },
   input: {
-    padding: 15,
-    paddingStart: 25,
-    borderRadius: 30,
-    backgroundColor: Colors.GRAY,
+    padding: 11,
+    paddingStart: 15,
+    borderRadius: 10,
+    borderWidth: 1,
+    borderColor: Colors.GRAY,
+    // backgroundColor: "rgba(211, 113, 69, 0.03)",
     fontFamily: "roboto",
   },
   textarea: {
     height: 100,
   },
   pickerContainer: {
-    padding: 5,
-    borderRadius: 30,
-    backgroundColor: Colors.GRAY,
+    padding: 0,
+    borderRadius: 10,
+    borderWidth: 1,
+    borderColor: Colors.GRAY,
+    // backgroundColor: "rgba(211, 113, 69, 0.03)",
+    fontFamily: "roboto",
+
+    },
+  label: {
+    color: "#000",
+    fontSize: 14,
+    marginTop: 20,
+    letterSpacing: 0.4,
+    fontFamily: "poppins-semibold",
   },
+
+ datePickerContainer: {
+    flexDirection: "row",
+    alignItems: "flex-start", // Align items to the left
+    justifyContent: "space-between", // Align content to the left
+    gap: 10,
+  },
+  datePickerButton: {
+    flexDirection: "row",
+    alignItems: "center", // Center vertically
+    paddingHorizontal: 10, // Adjust padding as necessary
+    paddingVertical: 15,
+    borderRadius: 10,
+    borderWidth: 1,
+    borderColor: Colors.GRAY,
+    // backgroundColor: "rgba(211, 113, 69, 0.03)",
+
+    justifyContent: "space-between", // Align content to the left
+    flex: 1, // Allow button to grow and fill the space
+  },
+  datePickerText: {
+    fontFamily: "roboto",
+    color: "#000",
+    fontSize: 16,
+  },
+  icon: {
+    marginLeft: 10, // Space between text and icon
+  },
+
   button: {
     padding: 20,
     backgroundColor: Colors.secondaryColor,
-    borderRadius: 30,
+    borderRadius: 10,
     marginTop: 20,
     alignItems: "center",
     shadowColor: "#000",
@@ -398,35 +442,8 @@ const styles = StyleSheet.create({
     textAlign: "center",
     color: "#fff",
     fontFamily: "roboto-bold",
-  },
-  label: {
-    color: "#000",
-    fontSize: 14,
-    marginTop: 20,
-    letterSpacing: 0.4,
-    fontFamily: "poppins-semibold",
-  },
-  datePickerContainer: {
-    flexDirection: "row",
-    alignItems: "center",
-    borderRadius: 30,
-    justifyContent: "space-between",
-  },
-  datePickerButton: {
-    flexDirection: "row",
-    alignItems: "center",
-    paddingHorizontal: 50,
-    paddingVertical: 20,
-    borderRadius: 30,
-    backgroundColor: Colors.GRAY,
-    justifyContent: "space-between",
-  },
-  datePickerText: {
-    fontFamily: "roboto",
-    color: "#000",
+    textTransform: "uppercase",
     fontSize: 16,
-  },
-  icon: {
-    marginLeft: 10,
+
   },
 });

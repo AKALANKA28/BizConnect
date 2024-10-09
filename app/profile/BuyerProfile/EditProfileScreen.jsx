@@ -13,6 +13,8 @@ import { Colors } from "../../../constants/Colors"; // Color constants
 import Header from "../../../components/Header"; // Header component
 import { useRouter } from "expo-router"; // Navigation hook
 import * as ImagePicker from "expo-image-picker"; // Image picker module
+import { storage } from "../../../config/FirebaseConfig"; // Import Firebase storage
+import { ref, uploadBytes, getDownloadURL } from "firebase/storage"; // Import functions for uploading and getting download URL
 
 const EditProfileScreen = () => {
   const { user, updateProfile } = useAuth(); // Access user data and update function
@@ -55,14 +57,31 @@ const EditProfileScreen = () => {
       return;
     }
 
-    // Update the profile image state and call the updateProfile function
+    // Update the profile image state
     const imageUri = pickerResult.assets[0]?.uri; // Extract URI
     setProfileImage(imageUri); // Update state
 
-    const response = await updateProfile({}, imageUri); // Update profile with new image
-    if (!response.success) {
-      Alert.alert("Error", "Failed to update profile image.");
+    // Upload image and get the URL
+    try {
+      const imageUrl = await uploadImage(imageUri); // Upload image to Firebase
+      await updateProfile({ profileImage: imageUrl }); // Update profile with new image URL
+      Alert.alert("Profile image updated successfully!");
+    } catch (error) {
+      Alert.alert("Error updating profile image.");
+      console.error("Error uploading image:", error);
     }
+  };
+
+  // Function to upload image to Firebase Storage
+  const uploadImage = async (uri) => {
+    const response = await fetch(uri);
+    const blob = await response.blob();
+    const fileName = `profile-images/${user.uid}-${Date.now()}.jpg`; // Create a unique file name
+    const storageRef = ref(storage, fileName); // Create a reference to the storage location
+
+    await uploadBytes(storageRef, blob); // Upload the blob to Firebase Storage
+    const downloadURL = await getDownloadURL(storageRef); // Get the download URL for the uploaded image
+    return downloadURL; // Return the URL
   };
 
   // Function to navigate to edit field screen
@@ -146,7 +165,7 @@ const styles = StyleSheet.create({
     fontSize: 16,
   },
   editRow: {
-    paddingVertical: 20,
+    paddingVertical: 16,
     borderBottomWidth: 1,
     borderBottomColor: "#ccc",
     flexDirection: "row",
@@ -154,7 +173,7 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
   },
   label: {
-    fontSize: 16,
+    fontSize: 14,
     color: "#000",
     fontFamily: "poppins-semibold",
     flex: 1, // Allow the label to take available space
@@ -164,7 +183,8 @@ const styles = StyleSheet.create({
     fontSize: 16,
     flexShrink: 1, // Prevent value text from overflowing
     textAlign: "right", // Align value to the right
-  },
+    flex: 4, // Allow the value to take available space
+    },
 });
 
 export default EditProfileScreen;
