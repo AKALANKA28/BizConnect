@@ -27,8 +27,6 @@ export const Colors = {
 
   primaryColor: '#FFFFFF',
   secondaryColor: '#AA6A1C',
-
-  text: '#000000',
-  GRAY:'#EFEFEF'
+  GRAY:'#ccc'
 
 };

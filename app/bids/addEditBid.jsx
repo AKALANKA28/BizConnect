@@ -11,19 +11,32 @@ import {
   ScrollView,
   KeyboardAvoidingView,
 } from "react-native";
-import { router, useNavigation } from "expo-router";
+import { useLocalSearchParams, useRouter } from "expo-router";
 import { Colors } from "../../constants/Colors";
 import RNPickerSelect from "react-native-picker-select";
-import { db } from "../../config/FirebaseConfig";
-import { addDoc, collection, getDocs, query } from "firebase/firestore";
-import * as ImagePicker from "expo-image-picker";
+import { db, storage } from "../../config/FirebaseConfig";
+import {
+  addDoc,
+  collection,
+  getDoc,
+  getDocs,
+  query,
+  updateDoc,
+  doc,
+} from "firebase/firestore"; // Ensure you import doc from firestore
+import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
+import * as ImagePicker from 'expo-image-picker';
 import DateTimePicker from "@react-native-community/datetimepicker";
 import { Ionicons } from "@expo/vector-icons";
 import Header from "../../components/Header";
 import { getAuth } from "firebase/auth";
 
-export default function AddBid() {
-  const navigation = useNavigation();
+export default function AddBidEdit() {
+  const router = useRouter();
+  const { bidId } = useLocalSearchParams();
+  const auth = getAuth();
+  const user = auth.currentUser;
+
   const [categoryList, setCategoryList] = useState([]);
   const [name, setName] = useState("");
   const [address, setAddress] = useState("");
@@ -35,15 +48,15 @@ export default function AddBid() {
   const [showTimePicker, setShowTimePicker] = useState(false);
   const [selectedDate, setSelectedDate] = useState(new Date());
   const [selectedTime, setSelectedTime] = useState(new Date());
-  const auth = getAuth();
-  const user = auth.currentUser;
-  const [title, setTitle] = useState();
+  const [title, setTitle] = useState(bidId ? "Edit Bid" : "Add Bid");
 
   useEffect(() => {
-    setTitle("Add Details"); // Update title dynamically as required
     fetchCategoryList();
-    requestCameraPermission();
-  }, []);
+    if (bidId) {
+      fetchBidDetails();
+    }
+    requestMediaLibraryPermission(); // Request media library permission when component mounts
+  }, [bidId]);
 
   const fetchCategoryList = async () => {
     setCategoryList([]);
@@ -60,26 +73,55 @@ export default function AddBid() {
     }
   };
 
-  const requestCameraPermission = async () => {
-    const { status } = await ImagePicker.requestCameraPermissionsAsync();
-    if (status !== "granted") {
-      alert("Sorry, we need camera roll permissions to make this work!");
+  const fetchBidDetails = async () => {
+    try {
+      const bidDoc = await getDoc(doc(db, "Bids", bidId)); // Make sure you import doc
+      if (bidDoc.exists()) {
+        const data = bidDoc.data();
+        setName(data.name);
+        setAddress(data.address);
+        setDescription(data.description);
+        setCategories(data.categories);
+        setImage(data.image);
+        setBidClosingTime(data.bidClosingTime.toDate());
+      } else {
+        ToastAndroid.show("Bid not found!", ToastAndroid.BOTTOM);
+        router.back();
+      }
+    } catch (error) {
+      console.error("Error fetching bid details: ", error);
+      ToastAndroid.show("Error fetching bid details", ToastAndroid.BOTTOM);
+    }
+  };
+
+  const requestMediaLibraryPermission = async () => {
+    const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
+    if (status !== 'granted') {
+      alert('Sorry, we need media library permissions to make this work!');
     }
   };
 
   const pickImage = async () => {
+    // Ensure that permission has been granted before picking an image
+    const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
+    if (status !== 'granted') {
+      alert('You need to grant permission to access the image library!');
+      return;
+    }
+  
     let result = await ImagePicker.launchImageLibraryAsync({
       mediaTypes: ImagePicker.MediaTypeOptions.Images,
       allowsEditing: true,
       aspect: [4, 3],
       quality: 1,
     });
-
+  
     if (!result.canceled) {
-      setImage(result.assets[0].uri);
+      setImage(result.assets[0].uri); // Set the picked image URI
     }
   };
 
+  
   const onDateChange = (event, selectedDate) => {
     setShowDatePicker(false);
     if (event.type === "set") {
@@ -110,27 +152,69 @@ export default function AddBid() {
     }
   };
 
-  const onAddPost = async () => {
+  const uploadImage = async (uri) => {
+    const response = await fetch(uri);
+    const blob = await response.blob();
+
+    const fileName = `bid-images/${user.uid}-${Date.now()}.jpg`;
+    const storageRef = ref(storage, fileName);
+
+    try {
+      await uploadBytes(storageRef, blob);
+      const downloadURL = await getDownloadURL(storageRef);
+      return downloadURL;
+    } catch (error) {
+      console.error("Image upload failed:", error);
+      throw error;
+    }
+  };
+
+  const onSubmitPost = async () => {
     try {
       if (name && address && description && categories && bidClosingTime) {
-        // Include the user data (uid and email) when adding the post
-        await addDoc(collection(db, "Bids"), {
-          name,
-          address,
-          description,
-          categories,
-          image: image || null,
-          bidClosingTime,
-          userId: user ? user.uid : null, // Add userId
-          userEmail: user ? user.email : null, // Add userEmail
-        });
-        ToastAndroid.show("Post Added Successfully", ToastAndroid.BOTTOM);
-        router.push("bids");
+        let imageUrl = null;
+
+        if (image) {
+          imageUrl = await uploadImage(image);
+        }
+
+        if (bidId) {
+          // Edit existing bid
+          await updateDoc(doc(db, "Bids", bidId), {
+            name,
+            address,
+            description,
+            categories,
+            image: imageUrl || image, // Update image URL if a new image is uploaded
+            bidClosingTime,
+            userId: user ? user.uid : null,
+            userEmail: user ? user.email : null,
+          });
+          ToastAndroid.show("Bid Updated Successfully", ToastAndroid.BOTTOM);
+        } else {
+          // Add new bid
+          const bidDocRef = await addDoc(collection(db, "Bids"), {
+            name,
+            address,
+            description,
+            categories,
+            image: imageUrl,
+            bidClosingTime,
+            userId: user ? user.uid : null,
+            userEmail: user ? user.email : null,
+          });
+          await updateDoc(bidDocRef, { bidId: bidDocRef.id });
+          ToastAndroid.show("Post Added Successfully", ToastAndroid.BOTTOM);
+        }
+
+        // Refresh the page by navigating back
+        router.back();
+      } else {
         ToastAndroid.show("Please fill all the fields.", ToastAndroid.BOTTOM);
       }
     } catch (error) {
-      console.error("Error adding document: ", error);
-      ToastAndroid.show("Error adding post", ToastAndroid.BOTTOM);
+      console.error("Error adding/updating document: ", error);
+      ToastAndroid.show("Error processing bid", ToastAndroid.BOTTOM);
     }
   };
 
@@ -141,19 +225,9 @@ export default function AddBid() {
     >
       <Header title={title} />
       <ScrollView contentContainerStyle={styles.scrollContainer}>
-        <Text
-          style={{
-            color: "#000",
-            fontSize: 14,
-            marginTop: -15,
-            letterSpacing: 0.4,
-            fontFamily: "poppins-semibold",
-          }}
-        >
-          Image
-        </Text>
+        <Text style={styles.label}>Image</Text>
         <TouchableOpacity
-          onPress={pickImage}
+          onPress={pickImage} // This should always allow picking an image
           style={styles.imagePreviewContainer}
         >
           {image ? (
@@ -168,36 +242,42 @@ export default function AddBid() {
         <Text style={styles.label}>Bid Label</Text>
         <TextInput
           placeholder="Title"
+          value={name}
           onChangeText={setName}
           style={styles.input}
         />
         <Text style={styles.label}>Address</Text>
         <TextInput
           placeholder="Address"
+          value={address}
           onChangeText={setAddress}
           style={styles.input}
         />
         <Text style={styles.label}>Category</Text>
         <View style={styles.pickerContainer}>
-          <RNPickerSelect onValueChange={setCategories} items={categoryList} />
+          <RNPickerSelect
+            onValueChange={setCategories}
+            items={categoryList}
+            value={categories}
+          />
         </View>
 
         <Text style={styles.label}>Bid Closing Time</Text>
         <View style={styles.datePickerContainer}>
-          {/* Date Picker Button */}
           <TouchableOpacity
             onPress={() => setShowDatePicker(true)}
             style={styles.datePickerButton}
           >
+             <Ionicons
+              name="calendar-outline"
+              size={16}
+              color={Colors.secondaryColor}
+              style={styles.icon}
+            />
             <Text style={styles.datePickerText}>
               {selectedDate.toLocaleDateString()}
             </Text>
-            <Ionicons
-              name="calendar-outline"
-              size={16}
-              color="black"
-              style={styles.icon}
-            />
+           
           </TouchableOpacity>
 
           {showDatePicker && (
@@ -209,20 +289,20 @@ export default function AddBid() {
             />
           )}
 
-          {/* Time Picker Button */}
           <TouchableOpacity
             onPress={() => setShowTimePicker(true)}
             style={styles.datePickerButton}
           >
+             <Ionicons
+              name="time-outline"
+              size={16}
+              color={Colors.secondaryColor}
+              style={styles.icon}
+            />
             <Text style={styles.datePickerText}>
               {selectedTime.toLocaleTimeString()}
             </Text>
-            <Ionicons
-              name="time-outline"
-              size={16}
-              color="black"
-              style={styles.icon}
-            />
+           
           </TouchableOpacity>
 
           {showTimePicker && (
@@ -237,15 +317,18 @@ export default function AddBid() {
 
         <Text style={styles.label}>Description</Text>
         <TextInput
-          multiline
-          numberOfLines={5}
           placeholder="Description"
+          value={description}
           onChangeText={setDescription}
-          style={[styles.input, styles.textarea]}
+          multiline
+          numberOfLines={4}
+          style={styles.input}
         />
 
-        <TouchableOpacity onPress={onAddPost} style={styles.button}>
-          <Text style={styles.buttonText}>Post</Text>
+        <TouchableOpacity style={styles.button} onPress={onSubmitPost}>
+          <Text style={styles.buttonText}>
+            {bidId ? "Update Bid" : "Add Bid"}
+          </Text>
         </TouchableOpacity>
       </ScrollView>
     </KeyboardAvoidingView>
@@ -259,6 +342,8 @@ const styles = StyleSheet.create({
   },
   scrollContainer: {
     padding: 20,
+        marginTop: -20 
+
   },
   imagePreviewContainer: {
     borderRadius: 10,
@@ -285,25 +370,66 @@ const styles = StyleSheet.create({
     fontFamily: "roboto",
   },
   input: {
-    padding: 15,
-    paddingStart: 25,
-    borderRadius: 30,
-    backgroundColor: Colors.GRAY,
+    padding: 11,
+    paddingStart: 15,
+    borderRadius: 10,
+    borderWidth: 1,
+    borderColor: Colors.GRAY,
+    // backgroundColor: "rgba(211, 113, 69, 0.03)",
     fontFamily: "roboto",
   },
   textarea: {
     height: 100,
   },
   pickerContainer: {
-    padding: 5,
-    borderRadius: 30,
-    backgroundColor: Colors.GRAY,
+    padding: 0,
+    borderRadius: 10,
+    borderWidth: 1,
+    borderColor: Colors.GRAY,
+    // backgroundColor: "rgba(211, 113, 69, 0.03)",
+    fontFamily: "roboto",
+
+    },
+  label: {
+    color: "#000",
+    fontSize: 14,
+    marginTop: 20,
+    letterSpacing: 0.4,
+    fontFamily: "poppins-semibold",
+  },
+
+ datePickerContainer: {
+    flexDirection: "row",
+    alignItems: "flex-start", // Align items to the left
+    justifyContent: "space-between", // Align content to the left
+    gap: 10,
+  },
+  datePickerButton: {
+    flexDirection: "row",
+    alignItems: "center", // Center vertically
+    paddingHorizontal: 10, // Adjust padding as necessary
+    paddingVertical: 15,
+    borderRadius: 10,
+    borderWidth: 1,
+    borderColor: Colors.GRAY,
+    // backgroundColor: "rgba(211, 113, 69, 0.03)",
+
+    justifyContent: "space-between", // Align content to the left
+    flex: 1, // Allow button to grow and fill the space
+  },
+  datePickerText: {
+    fontFamily: "roboto",
+    color: "#000",
+    fontSize: 16,
+  },
+  icon: {
+    marginLeft: 10, // Space between text and icon
   },
 
   button: {
     padding: 20,
     backgroundColor: Colors.secondaryColor,
-    borderRadius: 30,
+    borderRadius: 10,
     marginTop: 20,
     alignItems: "center",
     shadowColor: "#000",
@@ -316,50 +442,8 @@ const styles = StyleSheet.create({
     textAlign: "center",
     color: "#fff",
     fontFamily: "roboto-bold",
-  },
-  label: {
-    color: "#000",
-    fontSize: 14,
-    marginTop: 20,
-    letterSpacing: 0.4,
-    fontFamily: "poppins-semibold",
-  },
-  datePickerContainer: {
-    flexDirection: "row",
-    alignItems: "center",
-    borderRadius: 30,
-    justifyContent: "space-between",
-  },
-  datePickerButton: {
-    flexDirection: "row",
-    alignItems: "center",
-    paddingHorizontal: 50,
-    paddingVertical: 20,
-    borderRadius: 30,
-    backgroundColor: Colors.GRAY,
-    justifyContent: "space-between",
-  },
-  datePickerText: {
-    fontFamily: "roboto",
-    color: "#000",
+    textTransform: "uppercase",
     fontSize: 16,
-  },
-  icon: {
-    marginLeft: 10,
-  },
-  header: {
-    height: 60,
-    flexDirection: "row",
-    alignItems: "center",
-    marginVertical: 20,
-    paddingHorizontal: 16,
-    borderBottomWidth: 1,
-    borderBottomColor: "#ccc",
-  },
-  headerTitle: {
-    flex: 1,
-    textAlign: "center",
-    fontSize: 20,
-    fontWeight: "bold",
+
   },
 });
