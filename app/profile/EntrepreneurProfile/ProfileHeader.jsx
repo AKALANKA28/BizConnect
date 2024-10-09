@@ -1,11 +1,5 @@
 import React, { useEffect, useState } from "react";
-import {
-  View,
-  StyleSheet,
-  Image,
-  Text,
-  TouchableOpacity,
-} from "react-native";
+import { View, StyleSheet, Image, Text, TouchableOpacity } from "react-native";
 import { FontAwesome5 } from "react-native-vector-icons"; // Use FontAwesome5 for icons
 import { useAuth } from "../../../context/authContext"; // Import useAuth hook
 import { doc, getDoc } from "firebase/firestore";
@@ -13,7 +7,7 @@ import { db } from "../../../config/FirebaseConfig"; // Firestore instance
 import ProfileStats from "../../../components/Profile/EntrepreneurProfile/ProfileStats";
 import { router } from "expo-router";
 
-const ProfileHeader = () => {
+const ProfileHeader = ({ entrepreneurId }) => {
   const { user } = useAuth(); // Get the currently logged-in user
   const [profileData, setProfileData] = useState({
     firstName: "Loading...",
@@ -23,11 +17,12 @@ const ProfileHeader = () => {
   });
 
   const fetchProfileData = async () => {
-    if (user) {
-      try {
-        // Reference to the user's document in Firestore
-        const userDocRef = doc(db, "entrepreneurs", user.uid);
-        
+    try {
+      // Use the provided entrepreneurId or the current user's ID
+      const idToFetch = entrepreneurId || user?.uid;
+
+      if (idToFetch) {
+        const userDocRef = doc(db, "entrepreneurs", idToFetch);
         const userDocSnap = await getDoc(userDocRef);
 
         if (userDocSnap.exists()) {
@@ -41,36 +36,39 @@ const ProfileHeader = () => {
         } else {
           console.log("No such user document!");
         }
-      } catch (error) {
-        console.error("Error fetching profile data: ", error);
       }
+    } catch (error) {
+      console.error("Error fetching profile data: ", error);
     }
   };
 
   useEffect(() => {
     fetchProfileData();
-  }, [user]);
+  }, [entrepreneurId, user]);
 
   return (
     <View style={styles.container}>
       <View style={styles.profileInfo}>
         <Image
           resizeMode="contain"
-          source={{
-            uri: profileData.profileImage,
-          }}
+          source={{ uri: profileData.profileImage }}
           style={styles.profileImage}
         />
         <ProfileStats />
       </View>
       <View style={styles.infoContainer}>
         <View style={styles.nameContainer}>
-          <Text style={styles.name}>{profileData.firstName} </Text>
-          <Text style={styles.title}>{profileData.title}</Text> 
+          <Text style={styles.name}>{profileData.firstName}</Text>
+          <Text style={styles.title}>{profileData.title}</Text>
         </View>
-        <TouchableOpacity onPress={() => router.push("/profile/EntrepreneurProfile/EditProfileScreen")}>
-          <FontAwesome5 name="edit" size={24} color="black" />
-        </TouchableOpacity>
+        {user?.role === "entrepreneur" && (
+          // Only show the edit button if the logged-in user is an entrepreneur
+          <TouchableOpacity
+            onPress={() => router.push("/profile/EntrepreneurProfile/EditProfileScreen")}
+          >
+            <FontAwesome5 name="edit" size={24} color="black" />
+          </TouchableOpacity>
+        )}
       </View>
     </View>
   );
@@ -85,10 +83,8 @@ const styles = StyleSheet.create({
   profileInfo: {
     flexDirection: "row",
     alignItems: "center",
-    alignContent: "center",
     gap: 20,
     marginBottom: 20,
-    marginVertical: 15,
   },
   profileImage: {
     width: 70,

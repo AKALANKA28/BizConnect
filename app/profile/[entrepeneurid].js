@@ -57,11 +57,17 @@ export default function EntrepreneurProfile() {
         <>
           <ScrollView style={styles.container}>
             <View style={styles.content}>
-              <ProfileHeader />
-              <ProfileInfo />
-              <ContactDetails />
+              <ProfileHeader entrepreneurId={entrepeneurid} />
+              <ProfileInfo entrepreneurId={entrepeneurid} />
+              <ContactDetails entrepreneurId={entrepeneurid} />
             </View>
-            <PreviousWorks />
+            <View>
+              {entrepeneurid ? (
+                <PreviousWorks entrepreneurId={entrepeneurid} />
+              ) : (
+                <Text>No Entrepreneur ID available</Text>
+              )}
+            </View>
           </ScrollView>
           <AcceptBidButton entrepeneurid={entrepeneurid} />
         </>

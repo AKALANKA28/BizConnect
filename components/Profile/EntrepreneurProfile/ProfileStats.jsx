@@ -28,7 +28,7 @@ const ProfileStats = () => {
           const imageUrls = userData.imageUrls || []; // Assuming imageUrls is an array of URLs
           setPostCount(imageUrls.length); // Set the post count based on the number of image URLs
         } else {
-          console.log("No such user document in BusinessList!");
+          // console.log("No such user document in BusinessList!");
         }
       } catch (error) {
         console.error("Error fetching image URL count: ", error);

@@ -14,11 +14,12 @@ import {
 import { router, useNavigation } from "expo-router";
 import { Colors } from "../../constants/Colors";
 import RNPickerSelect from "react-native-picker-select";
-import { db } from "../../config/FirebaseConfig";
-import { addDoc, collection, getDocs, query } from "firebase/firestore";
+import { db, storage } from "../../config/FirebaseConfig";
+import { addDoc, collection, getDocs, query, doc, updateDoc,arrayUnion  } from "firebase/firestore";
 import * as ImagePicker from "expo-image-picker";
 import Header from "../../components/Header";
 import { getAuth } from "firebase/auth";
+import { ref, uploadBytes, getDownloadURL } from "firebase/storage"; // Import necessary storage functions
 
 export default function AddBid() {
   const navigation = useNavigation();
@@ -27,7 +28,7 @@ export default function AddBid() {
   const [address, setAddress] = useState("");
   const [about, setAbout] = useState("");
   const [contact, setContact] = useState("");
-  const [categories, setCategories] = useState("");
+  const [category, setCategory] = useState("");
   const [image, setImage] = useState(null);
   const auth = getAuth();
   const user = auth.currentUser;
@@ -74,29 +75,65 @@ export default function AddBid() {
     }
   };
 
-  const onAddPost = async () => {
-    try {
-      if (name && address && about && contact && categories) {
-        await addDoc(collection(db, "BusinessList"), {
-          name, // Test name
-          address, // Address (e.g., Homagama)
-          about, // Description or about (e.g., test2)
-          contact, // Contact info (e.g., "number 2")
-          categories, // Category (e.g., Wicker)
-          imageUrl: image || null, // Image URL from picker or default
-          userId: user ? user.uid : null, // Add userId
-          userEmail: user ? user.email : null, // Add userEmail
-        });
-        ToastAndroid.show("Post Added Successfully", ToastAndroid.BOTTOM);
-        router.push("posts");
-      } else {
-        ToastAndroid.show("Please fill all the fields.", ToastAndroid.BOTTOM);
-      }
-    } catch (error) {
-      console.error("Error adding document: ", error);
-      ToastAndroid.show("Error adding post", ToastAndroid.BOTTOM);
-    }
+  const uploadImage = async (uri) => {
+    const response = await fetch(uri);
+    const blob = await response.blob();
+    const fileName = `profile-images/${user.uid}-${Date.now()}.jpg`; // Create a unique file name
+    const storageRef = ref(storage, fileName); // Create a reference to the storage location
+
+    await uploadBytes(storageRef, blob); // Upload the blob to Firebase Storage
+    const downloadURL = await getDownloadURL(storageRef); // Get the download URL for the uploaded image
+    return downloadURL; // Return the URL
   };
+
+  const onAddPost = async () => {
+    if (!user) {
+        ToastAndroid.show("User not authenticated.", ToastAndroid.BOTTOM);
+        return;
+    }
+
+    try {
+        if (name && address && about && contact && category) {
+            let imageUrl = null; // Initialize imageUrl as null
+
+            if (image) {
+                imageUrl = await uploadImage(image); // Upload the image and get the download URL
+            }
+
+            // Add new post to BusinessList
+            const postRef = await addDoc(collection(db, "BusinessList"), {
+                name, // Test name
+                address, // Address (e.g., Homagama)
+                about, // Description or about (e.g., test2)
+                contact, // Contact info (e.g., "number 2")
+                category, // Category (e.g., Wicker)
+                imageUrl: imageUrl || null, // Use the uploaded image URL or null
+                userId: user.uid, // Add userId
+                userEmail: user.email, // Add userEmail
+            });
+
+            // Update the corresponding entrepreneur document with the new post
+            const entrepreneurRef = doc(db, "entrepreneurs", user.uid); // Assuming user.uid corresponds to the entrepreneur's document ID
+            await updateDoc(entrepreneurRef, {
+                posts: arrayUnion({ // Use arrayUnion directly
+                    postId: postRef.id,
+                    name,
+                    about,
+                    category,
+                    imageUrl: imageUrl || null,
+                }),
+            });
+
+            ToastAndroid.show("Post Added Successfully", ToastAndroid.BOTTOM);
+            router.push("posts");
+        } else {
+            ToastAndroid.show("Please fill all the fields.", ToastAndroid.BOTTOM);
+        }
+    } catch (error) {
+        console.error("Error adding document: ", error);
+        ToastAndroid.show("Error adding post", ToastAndroid.BOTTOM);
+    }
+};
 
   return (
     <KeyboardAvoidingView
@@ -106,7 +143,10 @@ export default function AddBid() {
       <Header title={title} />
       <ScrollView contentContainerStyle={styles.scrollContainer}>
         <Text style={styles.label}>Image</Text>
-        <TouchableOpacity onPress={pickImage} style={styles.imagePreviewContainer}>
+        <TouchableOpacity
+          onPress={pickImage}
+          style={styles.imagePreviewContainer}
+        >
           {image ? (
             <Image source={{ uri: image }} style={styles.imagePreview} />
           ) : (
@@ -146,7 +186,7 @@ export default function AddBid() {
 
         <Text style={styles.label}>Category</Text>
         <View style={styles.pickerContainer}>
-          <RNPickerSelect onValueChange={setCategories} items={categoryList} />
+          <RNPickerSelect onValueChange={setCategory} items={categoryList} />
         </View>
 
         <TouchableOpacity onPress={onAddPost} style={styles.button}>
