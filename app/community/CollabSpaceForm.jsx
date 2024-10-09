@@ -13,8 +13,7 @@ import {
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import * as ImagePicker from "expo-image-picker";
-import { addDoc, collection } from "firebase/firestore";
-import { getAuth } from "firebase/auth";
+import { addDoc, updateDoc,doc, collection } from "firebase/firestore";
 import { db } from "../../config/FirebaseConfig";
 import Header from "./Header";
 import { Colors } from "../../constants/Colors";
@@ -22,8 +21,6 @@ import { useAuth } from "../../context/authContext";
 
 export default function CollabSpaceForm() {
   const { user } = useAuth();
-  //const user = auth.currentUser; // Get the current logged-in user
-
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const [location, setLocation] = useState("");
@@ -79,37 +76,49 @@ export default function CollabSpaceForm() {
   };
 
   const today = new Date();
-  
-  // Format date as YYYY-MM-DD (you can adjust the format as needed)
   const createdAt = today.toISOString().split('T')[0]; // YYYY-MM-DD format
 
   const onSubmit = async () => {
     try {
       if (title && description && goals.length && featuredImage) {
-        // Save the form data along with the current user's details
-        await addDoc(collection(db, "CollabSpaces"), {
+        // Step 1: Save the CollabSpace document
+        const collabSpaceDoc = await addDoc(collection(db, "CollabSpaces"), {
           title,
           description,
           location,
           goals,
           featuredImage,
           moreImages,
-          userId: user ? user.uid : null, // Add userId from the logged-in user
-          userEmail: user ? user.email : null, // Add userEmail from the logged-in user
-          userName: user ? user.username : null, // Add userEmail from the logged-in user
+          userId: user.uid, // Add userId from the logged-in user
+          userEmail: user.email, // Add userEmail from the logged-in user
+          userName: user.username, // Add userName from the logged-in user
           createdAt: createdAt,
         });
+  
+        // Step 2: Create a chat room document
+        const chatRoomDoc = await addDoc(collection(db, "ChatRooms"), {
+          collabSpaceId: collabSpaceDoc.id, // Link to the CollabSpace
+          members: [user.uid], // Add the creator as a member
+          createdAt: createdAt,
+          title: `Chat Room for ${title}`, // Optional title for the chat room
+        });
+  
+        // Step 3: Update the CollabSpace document with the chatRoomId
+        const collabSpaceRef = doc(db, "CollabSpaces", collabSpaceDoc.id); // Reference to the CollabSpace document
+        await updateDoc(collabSpaceRef, {
+          chatRoomId: chatRoomDoc.id, // Save the chat room document ID in the CollabSpace document
+        });
+  
         ToastAndroid.show("CollabSpace Added Successfully", ToastAndroid.BOTTOM);
       } else {
         ToastAndroid.show("Please fill all fields", ToastAndroid.BOTTOM);
       }
     } catch (error) {
       console.error("Error adding document: ", error);
-      console.log('user name' ,user?.username);
-      
       ToastAndroid.show("Error adding CollabSpace", ToastAndroid.BOTTOM);
     }
   };
+  
 
   return (
     <KeyboardAvoidingView
@@ -135,7 +144,7 @@ export default function CollabSpaceForm() {
           multiline
         />
 
-<Text style={styles.label}>Location</Text>
+        <Text style={styles.label}>Location</Text>
         <TextInput
           placeholder="Location"
           value={location}
