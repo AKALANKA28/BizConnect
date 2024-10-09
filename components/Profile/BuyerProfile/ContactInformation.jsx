@@ -1,6 +1,9 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { View, StyleSheet, Text } from "react-native";
 import Ionicons from '@expo/vector-icons/Ionicons';
+import { useAuth } from "../../../context/authContext"; // Import useAuth hook
+import { doc, getDoc } from "firebase/firestore";
+import { db } from "../../../config/FirebaseConfig"; // Firestore instance
 
 const ContactItem = ({ icon, label, value }) => (
   <View style={styles.contactItem}>
@@ -13,21 +16,57 @@ const ContactItem = ({ icon, label, value }) => (
 );
 
 const ContactInformation = () => {
+  const { user } = useAuth(); // Get the currently logged-in user
+  const [contactInfo, setContactInfo] = useState({
+    email: "",
+    phoneNumber: "",
+    address: "",
+  }); // State to hold contact information
+
+  // Function to fetch contact information from Firestore
+  const fetchContactInfo = async () => {
+    if (user) {
+      try {
+        // Reference to the user's document in Firestore
+        const userDocRef = doc(db, "buyers", user.uid);
+        const userDocSnap = await getDoc(userDocRef);
+
+        if (userDocSnap.exists()) {
+          const userData = userDocSnap.data();
+          setContactInfo({
+            email: userData.email || "No email available",
+            phoneNumber: userData.phoneNumber || "No phone number available",
+            address: userData.address || "No address available",
+          });
+        } else {
+          console.log("No such user document!");
+        }
+      } catch (error) {
+        console.error("Error fetching contact information: ", error);
+      }
+    }
+  };
+
+  // Fetch contact information when the component mounts
+  useEffect(() => {
+    fetchContactInfo();
+  }, [user]);
+
   const contactData = [
     {
       label: "Email",
-      value: "info@pererahandlooms.com",
-      icon: "mail-outline", 
+      value: contactInfo.email,
+      icon: "mail-outline",
     },
     {
       label: "Phone",
-      value: "+94 77 123 4567",
-      icon: "call-outline", 
+      value: contactInfo.phoneNumber,
+      icon: "call-outline",
     },
     {
       label: "Address",
-      value: "No.56/2, Kurunduwatta, Colombo 07, Colombo",
-      icon: "location-outline", 
+      value: contactInfo.address,
+      icon: "location-outline",
     },
   ];
 

@@ -1,11 +1,11 @@
 import { View, Text } from "react-native";
 import React, { useEffect, useState } from "react";
-import { Slot, useRouter, useSegments } from "expo-router";
+import { Slot, Stack, useRouter, useSegments } from "expo-router";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { AuthContextProvider, useAuth } from "../context/authContext";
 import { useFonts } from "expo-font";
 import { NotificationProvider } from "../context/notificationContext"; // Import the NotificationProvider
-import { GestureHandlerRootView } from 'react-native-gesture-handler';
+import { GestureHandlerRootView } from "react-native-gesture-handler";
 
 const MainLayout = () => {
   const { isAuthenticated, user } = useAuth();
@@ -53,7 +53,13 @@ const MainLayout = () => {
       console.log("User is not authenticated.");
     }
   }, [isAuthenticated, user]);
-  return <Slot />;
+  return (
+    <Stack
+      screenOptions={{
+        headerShown: false, // Ensure header is not shown globally for the stack
+      }}
+    />
+  );
 };
 
 export default function RootLayout() {
@@ -78,7 +84,7 @@ export default function RootLayout() {
 
   return (
     <AuthContextProvider>
-      <GestureHandlerRootView >
+      <GestureHandlerRootView>
         <NotificationProvider>
           <MainLayout />
         </NotificationProvider>
