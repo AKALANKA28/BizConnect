@@ -13,11 +13,15 @@ import {
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import * as ImagePicker from "expo-image-picker";
-import { addDoc, updateDoc,doc, collection } from "firebase/firestore";
-import { db } from "../../config/FirebaseConfig";
+import { addDoc, updateDoc, doc, collection } from "firebase/firestore";
+import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
+import { db, storage } from "../../config/FirebaseConfig";
 import Header from "./Header";
 import { Colors } from "../../constants/Colors";
 import { useAuth } from "../../context/authContext";
+import { v4 as uuidv4 } from "uuid"; // For generating unique image names
+import 'react-native-get-random-values';
+
 
 export default function CollabSpaceForm() {
   const { user } = useAuth();
@@ -29,16 +33,33 @@ export default function CollabSpaceForm() {
   const [moreImages, setMoreImages] = useState([]);
 
   useEffect(() => {
-    requestCameraPermission();
+    requestMediaLibraryPermission();
   }, []);
 
-  const requestCameraPermission = async () => {
-    const { status } = await ImagePicker.requestCameraPermissionsAsync();
+  const requestMediaLibraryPermission = async () => {
+    const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
     if (status !== "granted") {
-      alert("Sorry, we need camera roll permissions to make this work!");
+      alert("Sorry, we need media library permissions to make this work!");
     }
   };
 
+  // Function to upload image to Firebase Storage
+  const uploadImage = async (uri) => {
+    try {
+      const response = await fetch(uri);
+      const blob = await response.blob();
+      const imageName = `collabspace-images/${uuidv4()}.jpg`; // Unique image name
+      const storageRef = ref(storage, imageName);
+      await uploadBytes(storageRef, blob);
+      const downloadUrl = await getDownloadURL(storageRef);
+      return downloadUrl;
+    } catch (error) {
+      console.error("Error uploading image: ", error);
+      throw error;
+    }
+  };
+
+  // Picking the featured image and uploading it
   const pickFeaturedImage = async () => {
     let result = await ImagePicker.launchImageLibraryAsync({
       mediaTypes: ImagePicker.MediaTypeOptions.Images,
@@ -48,10 +69,12 @@ export default function CollabSpaceForm() {
     });
 
     if (!result.canceled) {
-      setFeaturedImage(result.assets[0].uri);
+      const downloadUrl = await uploadImage(result.assets[0].uri);
+      if (downloadUrl) setFeaturedImage(downloadUrl);
     }
   };
 
+  // Picking more images and uploading them
   const pickMoreImages = async () => {
     let result = await ImagePicker.launchImageLibraryAsync({
       mediaTypes: ImagePicker.MediaTypeOptions.Images,
@@ -61,7 +84,8 @@ export default function CollabSpaceForm() {
     });
 
     if (!result.canceled) {
-      setMoreImages([...moreImages, result.assets[0].uri]);
+      const downloadUrl = await uploadImage(result.assets[0].uri);
+      if (downloadUrl) setMoreImages([...moreImages, downloadUrl]);
     }
   };
 
@@ -75,40 +99,37 @@ export default function CollabSpaceForm() {
     setGoals(newGoals);
   };
 
-  const today = new Date();
-  const createdAt = today.toISOString().split('T')[0]; // YYYY-MM-DD format
-
   const onSubmit = async () => {
     try {
       if (title && description && goals.length && featuredImage) {
-        // Step 1: Save the CollabSpace document
+        // Save the CollabSpace document
         const collabSpaceDoc = await addDoc(collection(db, "CollabSpaces"), {
           title,
           description,
           location,
           goals,
-          featuredImage,
-          moreImages,
-          userId: user.uid, // Add userId from the logged-in user
-          userEmail: user.email, // Add userEmail from the logged-in user
-          userName: user.username, // Add userName from the logged-in user
-          createdAt: createdAt,
+          featuredImage, // Firebase Storage URL
+          moreImages,    // Array of Firebase Storage URLs
+          userId: user.uid,
+          userEmail: user.email,
+          userName: user.username,
+          createdAt: new Date().toISOString(),
         });
-  
-        // Step 2: Create a chat room document
+
+        // Create a chat room document
         const chatRoomDoc = await addDoc(collection(db, "ChatRooms"), {
-          collabSpaceId: collabSpaceDoc.id, // Link to the CollabSpace
-          members: [user.uid], // Add the creator as a member
-          createdAt: createdAt,
-          title: `Chat Room for ${title}`, // Optional title for the chat room
+          collabSpaceId: collabSpaceDoc.id,
+          members: [user.uid],
+          createdAt: new Date().toISOString(),
+          title: `Chat Room for ${title}`,
         });
-  
-        // Step 3: Update the CollabSpace document with the chatRoomId
-        const collabSpaceRef = doc(db, "CollabSpaces", collabSpaceDoc.id); // Reference to the CollabSpace document
+
+        // Update the CollabSpace with the chatRoomId
+        const collabSpaceRef = doc(db, "CollabSpaces", collabSpaceDoc.id);
         await updateDoc(collabSpaceRef, {
-          chatRoomId: chatRoomDoc.id, // Save the chat room document ID in the CollabSpace document
+          chatRoomId: chatRoomDoc.id,
         });
-  
+
         ToastAndroid.show("CollabSpace Added Successfully", ToastAndroid.BOTTOM);
       } else {
         ToastAndroid.show("Please fill all fields", ToastAndroid.BOTTOM);
@@ -118,7 +139,6 @@ export default function CollabSpaceForm() {
       ToastAndroid.show("Error adding CollabSpace", ToastAndroid.BOTTOM);
     }
   };
-  
 
   return (
     <KeyboardAvoidingView
@@ -127,6 +147,7 @@ export default function CollabSpaceForm() {
     >
       <Header title="Create New CollabSpace" />
       <ScrollView contentContainerStyle={styles.scrollContainer}>
+        {/* Form Fields */}
         <Text style={styles.label}>Title</Text>
         <TextInput
           placeholder="Title"
@@ -134,7 +155,6 @@ export default function CollabSpaceForm() {
           onChangeText={setTitle}
           style={styles.input}
         />
-
         <Text style={styles.label}>Description</Text>
         <TextInput
           placeholder="Description"
@@ -143,7 +163,6 @@ export default function CollabSpaceForm() {
           style={[styles.input, { height: 100 }]}
           multiline
         />
-
         <Text style={styles.label}>Location</Text>
         <TextInput
           placeholder="Location"
@@ -152,7 +171,6 @@ export default function CollabSpaceForm() {
           style={[styles.input]}
           multiline
         />
-
         <Text style={styles.label}>Goals</Text>
         {goals.map((goal, index) => (
           <TextInput

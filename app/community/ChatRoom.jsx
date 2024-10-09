@@ -55,6 +55,14 @@ export default function ChatScreen() {
       behavior={Platform.OS === "ios" ? "padding" : "height"}
       keyboardVerticalOffset={90}
     >
+      {/* Header */}
+      <View style={styles.header}>
+        <Text style={styles.headerTitle}>Chat</Text>
+        <TouchableOpacity style={styles.headerButton}>
+          <Text style={styles.headerButtonText}>Info</Text>
+        </TouchableOpacity>
+      </View>
+
       {/* Message list */}
       <FlatList
         data={messages}
@@ -93,15 +101,40 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: "#f5f5f5",
   },
+  header: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    padding: 16,
+    backgroundColor: "#FF8C00", // Change to your accent color
+    elevation: 5, // Shadow effect for Android
+    shadowColor: "#000", // Shadow effect for iOS
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.2,
+    shadowRadius: 2,
+  },
+  headerTitle: {
+    fontSize: 20,
+    fontWeight: "bold",
+    color: "#fff",
+  },
+  headerButton: {
+    backgroundColor: "transparent",
+    padding: 10,
+  },
+  headerButtonText: {
+    color: "#fff",
+    fontWeight: "bold",
+  },
   messageList: {
     padding: 10,
+    flexGrow: 1, // Ensure the FlatList takes full height
   },
   messageContainer: {
     maxWidth: "80%",
     borderRadius: 10,
     padding: 10,
     marginVertical: 5,
-    alignSelf: "flex-start",
   },
   sentMessage: {
     backgroundColor: "#dcf8c6",
@@ -124,8 +157,7 @@ const styles = StyleSheet.create({
   inputContainer: {
     flexDirection: "row",
     alignItems: "center",
-    paddingHorizontal: 10,
-    paddingVertical: 5,
+    padding: 10,
     borderTopWidth: 1,
     borderColor: "#ddd",
     backgroundColor: "#fff",
@@ -136,11 +168,13 @@ const styles = StyleSheet.create({
     backgroundColor: "#f1f1f1",
     borderRadius: 20,
     marginRight: 10,
+    elevation: 2, // Add shadow to input
   },
   sendButton: {
     backgroundColor: "#25D366",
     padding: 10,
     borderRadius: 50,
+    elevation: 2, // Add shadow to button
   },
   sendButtonText: {
     color: "#fff",

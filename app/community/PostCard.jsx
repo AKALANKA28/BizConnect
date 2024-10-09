@@ -1,7 +1,6 @@
 import React from "react";
 import { View, Text, Image, StyleSheet, TouchableOpacity } from "react-native";
-import { Colors } from "../../constants/Colors";
-import { useRouter,useSearchParams } from 'expo-router';
+import { useRouter } from 'expo-router';
 
 export default function PostCard({ post }) {
   const router = useRouter();
@@ -13,7 +12,6 @@ export default function PostCard({ post }) {
     });
   };
 
-
   return (
     <View style={styles.cardContainer}>
       {/* Publisher Info */}
@@ -21,21 +19,23 @@ export default function PostCard({ post }) {
         <Image source={{ uri: post.profileImage }} style={styles.profileImage} />
         <View style={styles.publisherDetails}>
           <Text style={styles.publisherName}>{post.userName}</Text>
-          <Text style={styles.publisherCity}>{post.location}</Text>
-          <Text style={styles.publisherCity}>{post.createdAt}</Text>
+          <Text style={styles.publisherLocation}>{post.location}</Text>
+          <Text style={styles.postDate}>{post.createdAt}</Text>
         </View>
       </View>
 
-      {/* Post Info */}
-      <Image
-        source={{ uri: post.featuredImage}}
-        style={styles.cardImage}
-      />
-      <View style={styles.cardContent}>
-        <Text style={styles.cardTitle}>{post.title}</Text>
-        <TouchableOpacity style={styles.detailsButton} onPress={handleViewDetails}>
-          <Text style={styles.detailsButtonText}>View Details</Text>
-        </TouchableOpacity>
+      {/* Image with Overlay */}
+      <View style={styles.imageContainer}>
+        <Image
+          source={{ uri: post.featuredImage }}
+          style={styles.cardImage}
+        />
+        <View style={styles.overlay}>
+          <Text style={styles.cardTitle}>{post.title}</Text>
+          <TouchableOpacity style={styles.detailsButton} onPress={handleViewDetails}>
+            <Text style={styles.detailsButtonText}>View Details</Text>
+          </TouchableOpacity>
+        </View>
       </View>
     </View>
   );
@@ -44,7 +44,7 @@ export default function PostCard({ post }) {
 const styles = StyleSheet.create({
   cardContainer: {
     backgroundColor: "white",
-    borderRadius: 10,
+    borderRadius: 15,
     padding: 15,
     marginVertical: 10,
     shadowColor: "#000",
@@ -58,9 +58,9 @@ const styles = StyleSheet.create({
     marginBottom: 10,
   },
   profileImage: {
-    width: 40, // Adjusted for a smaller profile image
-    height: 40,
-    borderRadius: 20,
+    width: 50, // Adjusted to match the image size in the design
+    height: 50,
+    borderRadius: 25,
     marginRight: 10,
   },
   publisherDetails: {
@@ -68,38 +68,53 @@ const styles = StyleSheet.create({
   },
   publisherName: {
     fontSize: 16,
-    fontFamily: "roboto-bold",
-    color: Colors.text,
+    fontWeight: "bold",
+    color: "#333", // Darker color for the name as per the design
   },
-  publisherCity: {
+  publisherLocation: {
     fontSize: 14,
-    fontFamily: "roboto",
-    color: Colors.secondaryColor,
+    color: "#666", // Subtle color for the location
+  },
+  postDate: {
+    fontSize: 12,
+    color: "#888", // Lighter color for the date
+  },
+  imageContainer: {
+    position: "relative",
+    borderRadius: 15,
+    overflow: "hidden", // Ensure the image and overlay follow rounded corners
   },
   cardImage: {
     width: "100%",
-    height: 200, // Increased to match the design
-    borderRadius: 10, // Add border-radius for rounded corners
+    height: 200, // Matches the height from the design
+    borderRadius: 15,
   },
-  cardContent: {
-    paddingTop: 10, // Adjusted to add space above the text
+  overlay: {
+    position: "absolute",
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    backgroundColor: "rgba(0, 0, 0, 0.4)", // Dark overlay for text visibility
+    justifyContent: "flex-end", // Align content at the bottom
+    padding: 15, // Padding to match the design
   },
   cardTitle: {
-    fontSize: 18,
+    color: "#fff", // White text for readability on dark overlay
+    fontSize: 20,
     fontWeight: "bold",
-    color: "#333",
-    marginBottom: 10,
+    marginBottom: 10, // Spacing between title and button
   },
   detailsButton: {
-    backgroundColor: "#f4a261", // Adjusted to the color matching the UI
+    backgroundColor: "#e3b04b", // Button color matches the image
     paddingVertical: 10,
-    paddingHorizontal: 15,
-    borderRadius: 5,
-    alignSelf: "flex-start", // Align button to the left
+    paddingHorizontal: 25,
+    borderRadius: 25, // Fully rounded button as per design
+    alignSelf: "flex-start", // Align the button to the left as in the design
   },
   detailsButtonText: {
     color: "#fff",
-    fontSize: 16, // Increased font size for better readability
-    fontWeight: "bold", // Bold text as per UI
+    fontSize: 16,
+    fontWeight: "bold",
   },
 });

@@ -3,14 +3,14 @@ import { View, Text, Image, StyleSheet, ScrollView, TouchableOpacity } from 'rea
 import { useLocalSearchParams, useRouter } from 'expo-router'; // Access route params
 import { db } from '../../config/FirebaseConfig'; // Firebase config
 import { doc, getDoc, updateDoc, arrayUnion, arrayRemove } from 'firebase/firestore';
-import Header from './Header';
 import { useAuth } from "../../context/authContext";
+import Icon from 'react-native-vector-icons/MaterialIcons';
 
 export default function CollabSpace() {
   const { postId } = useLocalSearchParams();
   const [post, setPost] = useState(null);
   const [activeTab, setActiveTab] = useState('about'); // State for tab switching
-  const { user } = useAuth(); // Assuming you have a hook that provides the logged-in user
+  const { user } = useAuth();
   const [isMember, setIsMember] = useState(false);
   const router = useRouter(); 
 
@@ -30,7 +30,6 @@ export default function CollabSpace() {
     try {
       const postRef = doc(db, 'CollabSpaces', id);
       const postSnap = await getDoc(postRef);
-
       if (postSnap.exists()) {
         setPost(postSnap.data());
       } else {
@@ -45,20 +44,9 @@ export default function CollabSpace() {
     if (!user || !postId) return;
     try {
       const postRef = doc(db, 'CollabSpaces', postId);
-      // Add user to CollabSpace
-      await updateDoc(postRef, {
-        members: arrayUnion(user.uid),
-      });
-
-      // Add user to the relevant chat room
-      const chatRoomRef = doc(db, 'ChatRooms', post.chatRoomId); // Assuming the chat room has the same ID as the CollabSpace
-      await updateDoc(chatRoomRef, {
-        members: arrayUnion(user.uid),
-      });
-
+      await updateDoc(postRef, { members: arrayUnion(user.uid) });
       setIsMember(true); // Update UI
     } catch (error) {
-      console.log(postId);
       console.error("Error joining CollabSpace: ", error);
     }
   };
@@ -67,16 +55,7 @@ export default function CollabSpace() {
     if (!user || !postId) return;
     try {
       const postRef = doc(db, 'CollabSpaces', postId);
-      await updateDoc(postRef, {
-        members: arrayRemove(user.uid),
-      });
-
-      // Remove user from the relevant chat room
-      const chatRoomRef = doc(db, 'ChatRooms', post.chatRoomId);
-      await updateDoc(chatRoomRef, {
-        members: arrayRemove(user.uid),
-      });
-
+      await updateDoc(postRef, { members: arrayRemove(user.uid) });
       setIsMember(false); // Update UI
     } catch (error) {
       console.error("Error leaving CollabSpace: ", error);
@@ -84,15 +63,11 @@ export default function CollabSpace() {
   };
 
   const navigateToUpdateScreen = () => {
-    // Navigate to the update screen to edit CollabSpace details
-    router.push(`/updateCollabSpace/${postId}`);
+    router.push({ pathname: '/community/UpdateCollabSpace', params: { postId } });
   };
 
   const navigateToChatRoom = () => {
-    router.push({
-      pathname: '/community/ChatRoom',
-      params: { chatRoomId: post.chatRoomId }, // Pass only the post ID
-    });
+    router.push({ pathname: '/community/ChatRoom', params: { chatRoomId: post.chatRoomId } });
   };
 
   if (!post) {
@@ -101,18 +76,20 @@ export default function CollabSpace() {
 
   return (
     <View style={styles.mainContainer}>
-      <Header title="CollabSpace" />
+      {/* Custom Header */}
+      <View style={styles.header}>
+        <TouchableOpacity onPress={() => router.back()}>
+          <Icon name="arrow-back" size={24} color="#000" />
+        </TouchableOpacity>
+        <Text style={styles.headerTitle}>CollabSpace</Text>
+      </View>
 
       <ScrollView contentContainerStyle={styles.container}>
         {/* Featured Image with Overlay */}
         <View style={styles.featuredImageContainer}>
           <Image source={{ uri: post.featuredImage }} style={styles.featuredImage} />
-
-          {/* Overlay for title and publisher info */}
           <View style={styles.overlay}>
             <Text style={styles.title}>{post.title}</Text>
-
-            {/* Publisher Info */}
             <View style={styles.publisherInfo}>
               <Image source={{ uri: post.userImage }} style={styles.profileImage} />
               <View>
@@ -121,22 +98,6 @@ export default function CollabSpace() {
               </View>
             </View>
           </View>
-        </View>
-
-        {/* Join Button */}
-        <View style={styles.joinButton}>
-          {user && user.uid === post.userId ? (
-            <TouchableOpacity style={styles.updateButton} onPress={navigateToUpdateScreen}>
-              <Text style={styles.buttonText}>Update</Text>
-            </TouchableOpacity>
-          ) : (
-            <TouchableOpacity
-              style={styles.joinButton}
-              onPress={isMember ? leaveCollabSpace : joinCollabSpace}
-            >
-              <Text style={styles.buttonText}>{isMember ? "Joined (Leave)" : "Join"}</Text>
-            </TouchableOpacity>
-          )}
         </View>
 
         {/* Tab Section */}
@@ -149,7 +110,6 @@ export default function CollabSpace() {
               About CollabSpace
             </Text>
           </TouchableOpacity>
-
           <TouchableOpacity
             style={[styles.tabButton, activeTab === 'goals' && styles.activeTab]}
             onPress={() => setActiveTab('goals')}
@@ -158,21 +118,28 @@ export default function CollabSpace() {
               Goals
             </Text>
           </TouchableOpacity>
+
+          {/* Join Button */}
+          <TouchableOpacity
+            style={styles.joinButton}
+            onPress={isMember ? leaveCollabSpace : joinCollabSpace}
+          >
+            <Text style={styles.buttonText}>{isMember ? "Joined" : "Join"}</Text>
+          </TouchableOpacity>
         </View>
 
         {/* Tab Content */}
         {activeTab === 'about' ? (
-          <>
+          <View>
             <Text style={styles.sectionTitle}>Welcome to my CollabSpace</Text>
             <Text style={styles.description}>{post.description}</Text>
-
-            {/* More Images */}
+            {/* Image Grid */}
             <View style={styles.moreImagesContainer}>
               {post.moreImages?.map((imageUri, index) => (
                 <Image key={index} source={{ uri: imageUri }} style={styles.moreImage} />
               ))}
             </View>
-          </>
+          </View>
         ) : (
           <View style={styles.goalsContainer}>
             <Text style={styles.sectionTitle}>Goals</Text>
@@ -185,7 +152,7 @@ export default function CollabSpace() {
 
       {/* Floating Action Button */}
       <TouchableOpacity style={styles.fab} onPress={navigateToChatRoom}>
-        <Text style={styles.fabText}>💬</Text>
+        <Icon name="chat" size={24} color="#fff" />
       </TouchableOpacity>
     </View>
   );
@@ -194,11 +161,25 @@ export default function CollabSpace() {
 const styles = StyleSheet.create({
   mainContainer: {
     flex: 1,
+    backgroundColor: '#fff',
   },
   container: {
     padding: 20,
-    backgroundColor: '#fff',
-    flexGrow: 1,
+  },
+  header: {
+    height: 70,
+    flexDirection: "row",
+    alignItems: "center",
+    marginVertical: 24,
+    marginBottom: 0,
+    paddingHorizontal: 16,
+    borderBottomWidth: 1,
+    borderBottomColor: "#ccc",
+  },
+  headerTitle: {
+    marginLeft: 10,
+    fontSize: 18,
+    fontWeight: 'bold',
   },
   featuredImageContainer: {
     position: 'relative',
@@ -211,7 +192,7 @@ const styles = StyleSheet.create({
   },
   overlay: {
     position: 'absolute',
-    bottom: 15, 
+    bottom: 15,
     left: 20,
     right: 20,
     backgroundColor: 'rgba(0, 0, 0, 0.5)',
@@ -222,7 +203,6 @@ const styles = StyleSheet.create({
     fontSize: 18,
     color: '#fff',
     fontWeight: 'bold',
-    marginBottom: 5,
   },
   publisherInfo: {
     flexDirection: 'row',
@@ -243,28 +223,10 @@ const styles = StyleSheet.create({
     fontSize: 12,
     color: '#ddd',
   },
-  joinButton: {
-    backgroundColor: '#B98539',
-    paddingVertical: 10,
-    paddingHorizontal: 20,
-    borderRadius: 20,
-    alignSelf: 'flex-end',
-    marginBottom: 15,
-  },
-  updateButton: {
-    backgroundColor: '#B98539',
-    paddingVertical: 10,
-    paddingHorizontal: 20,
-    borderRadius: 20,
-    alignSelf: 'flex-end',
-    marginBottom: 15,
-  },
-  buttonText: {
-    color: '#fff',
-    fontWeight: 'bold',
-  },
   tabContainer: {
     flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
     marginBottom: 15,
   },
   tabButton: {
@@ -284,49 +246,55 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     fontWeight: 'bold',
   },
+  joinButton: {
+    backgroundColor: '#B98539',
+    paddingVertical: 10,
+    paddingHorizontal: 20,
+    borderRadius: 20,
+  },
+  buttonText: {
+    color: '#fff',
+    fontWeight: 'bold',
+    textAlign: 'center',
+  },
   sectionTitle: {
-    fontSize: 18,
+    fontSize: 20,
     fontWeight: 'bold',
     marginBottom: 10,
   },
   description: {
-    fontSize: 14,
+    fontSize: 16,
+    color: '#666',
     marginBottom: 15,
   },
   moreImagesContainer: {
     flexDirection: 'row',
     flexWrap: 'wrap',
+    justifyContent: 'space-between',
   },
   moreImage: {
-    width: 100,
+    width: '48%',
     height: 100,
-    marginRight: 10,
-    marginBottom: 10,
     borderRadius: 10,
+    marginBottom: 10,
   },
   goalsContainer: {
-    marginBottom: 20,
+    marginTop: 10,
   },
   goalItem: {
-    fontSize: 14,
+    fontSize: 16,
+    color: '#666',
     marginBottom: 5,
   },
   fab: {
     position: 'absolute',
-    right: 20,
     bottom: 20,
+    right: 20,
     backgroundColor: '#B98539',
-    borderRadius: 50,
-    padding: 15,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.3,
-    shadowRadius: 4,
-    elevation: 5,
-  },
-  fabText: {
-    fontSize: 18,
-    color: '#fff',
-    fontWeight: 'bold',
+    width: 60,
+    height: 60,
+    borderRadius: 30,
+    alignItems: 'center',
+    justifyContent: 'center',
   },
 });
