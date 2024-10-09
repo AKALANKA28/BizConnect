@@ -1,6 +1,9 @@
-import React from "react";
-import { View, StyleSheet, Text, Image } from "react-native";
+import React, { useEffect, useState } from "react";
+import { View, StyleSheet, Text } from "react-native";
 import Ionicons from "react-native-vector-icons/Ionicons"; // Importing Ionicons
+import { useAuth } from "../../../context/authContext"; // Importing useAuth hook
+import { doc, getDoc } from "firebase/firestore";
+import { db } from "../../../config/FirebaseConfig"; // Firestore instance
 
 const ContactItem = ({ label, value, iconName }) => (
   <View style={styles.contactItem}>
@@ -13,38 +16,66 @@ const ContactItem = ({ label, value, iconName }) => (
 );
 
 const ContactDetails = () => {
-  const contactInfo = [
-    {
-      iconName: "call-outline", // Phone icon from Ionicons
-      label: "Phone",
-      value: "+94 77 123 4567",
-    },
-    {
-      iconName: "location-outline", // Location icon from Ionicons
-      label: "Address",
-      value: "718/5, Keremulla Road, Panagoda, Homamagama, Western, Colombo",
-    },
-  ];
+  const { user } = useAuth(); // Get the currently logged-in user
+  const [contactInfo, setContactInfo] = useState([]); // State to hold contact details
+
+  // Function to fetch contact details from Firestore
+  const fetchContactDetails = async () => {
+    if (user) {
+      try {
+        // Reference to the user's document in Firestore
+        const userDocRef = doc(db, "entrepreneurs", user.uid); // Adjust "buyers" to your collection
+        const userDocSnap = await getDoc(userDocRef);
+
+        if (userDocSnap.exists()) {
+          const userData = userDocSnap.data();
+          const contactData = [
+            {
+              iconName: "call-outline", // Phone icon
+              label: "Phone",
+              value: userData.phoneNumber || "Not provided",
+            },
+            {
+              iconName: "location-outline", // Location icon
+              label: "Address",
+              value: userData.address || "Not provided",
+            },
+          ];
+          setContactInfo(contactData); // Update state with fetched contact details
+        } else {
+          console.log("No such user document!");
+        }
+      } catch (error) {
+        console.error("Error fetching contact details: ", error);
+      }
+    }
+  };
+
+  // Fetch contact details when component mounts
+  useEffect(() => {
+    fetchContactDetails();
+  }, [user]);
 
   return (
     <View style={styles.container}>
       <Text style={styles.title}>Business Contact Details:</Text>
-      {contactInfo.map((item, index) => (
-        <ContactItem
-          key={index}
-          iconName={item.iconName}
-          label={item.label}
-          value={item.value}
-        />
-      ))}
+      {contactInfo.length > 0 ? (
+        contactInfo.map((item, index) => (
+          <ContactItem
+            key={index}
+            iconName={item.iconName}
+            label={item.label}
+            value={item.value}
+          />
+        ))
+      ) : (
+        <Text>Loading contact details...</Text>
+      )}
     </View>
   );
 };
 
 const styles = StyleSheet.create({
-  // container: {
-  //   // marginBottom: 20,
-  // },
   title: {
     color: "rgba(141, 110, 99, 1)",
     fontFamily: "poppins-semibold",
@@ -54,7 +85,6 @@ const styles = StyleSheet.create({
   contactItem: {
     flexDirection: "row",
     alignItems: "center",
-    alignContent: "center", 
     marginBottom: 10,
   },
   contactIcon: {
@@ -66,7 +96,6 @@ const styles = StyleSheet.create({
     flex: 1,
     flexDirection: "row",
     alignItems: "center", // Centers text within the row
-
   },
   contactLabel: {
     width: 64,

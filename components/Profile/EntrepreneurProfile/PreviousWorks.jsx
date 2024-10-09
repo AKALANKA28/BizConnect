@@ -1,8 +1,17 @@
 import React, { useEffect, useState } from "react";
-import { View, StyleSheet, Text, Image, Dimensions, ScrollView } from "react-native";
+import {
+  View,
+  StyleSheet,
+  Text,
+  Image,
+  Dimensions,
+  ScrollView,
+  TouchableOpacity,
+} from "react-native";
 import { db } from "../../../config/FirebaseConfig"; // Import your Firebase config
 import { collection, query, where, getDocs } from "firebase/firestore";
 import { getAuth } from "firebase/auth";
+import { router } from "expo-router";
 
 const screenWidth = Dimensions.get("window").width;
 
@@ -48,8 +57,16 @@ const PreviousWorks = () => {
 
   return (
     <View style={styles.container}>
+      <View style={styles.titleContainer}>
       <Text style={styles.title}>Previous Works</Text>
-
+      <TouchableOpacity
+        style={styles.addNewButton}
+        onPress={() => router.push("/posts/AddPostScreen")}
+      >
+        <Text style={styles.addNewText}>Add New</Text>
+      </TouchableOpacity>
+      </View>
+      
       <ScrollView>
         <View style={styles.imageGrid}>
           <View style={styles.imageColumn}>
@@ -81,6 +98,21 @@ const styles = StyleSheet.create({
   container: {
     paddingHorizontal: 5,
   },
+  titleContainer: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    paddingHorizontal: 7,
+
+  },
+  addNewText: {
+    color: "rgba(0, 0, 0, 1)",
+    fontFamily: "poppins-semibold",
+    fontSize: 17,
+    marginLeft: 16,
+    marginBottom: 14,
+    textAlign: "left",
+  },
   title: {
     color: "rgba(0, 0, 0, 1)",
     fontFamily: "poppins-semibold",
@@ -101,6 +133,15 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: "#ddd",
     marginBottom: 10,
+  },
+  addNewButton: {
+    backgroundColor: "rgba(170, 106, 28, 1)",
+    borderRadius: 50,
+    padding: 7,
+  },
+  addNewText: {
+    color: "#FFF",
+    fontSize: 12,
   },
 });
 

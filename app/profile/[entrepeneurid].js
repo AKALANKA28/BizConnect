@@ -10,8 +10,7 @@ import {
 import { db } from "../../config/FirebaseConfig";
 import { doc, getDoc } from "firebase/firestore";
 import { useLocalSearchParams } from "expo-router";
-import ProfileHeader from "../../components/Profile/EntrepreneurProfile/ProfileHeader";
-import ProfileStats from "../../components/Profile/EntrepreneurProfile/ProfileStats";
+import ProfileHeader from "./EntrepreneurProfile/ProfileHeader";
 import ProfileInfo from "../../components/Profile/EntrepreneurProfile/ProfileInfo";
 import ContactDetails from "../../components/Profile/EntrepreneurProfile/ContactDetails";
 import PreviousWorks from "../../components/Profile/EntrepreneurProfile/PreviousWorks";
