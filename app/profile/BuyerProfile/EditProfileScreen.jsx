@@ -36,15 +36,12 @@ const EditProfileScreen = () => {
 
   // Function to handle image picking
   const pickImage = async () => {
-    // Request permission to access the media library
-    const permissionResult =
-      await ImagePicker.requestMediaLibraryPermissionsAsync();
-    if (permissionResult.granted === false) {
+    const permissionResult = await ImagePicker.requestMediaLibraryPermissionsAsync();
+    if (!permissionResult.granted) {
       Alert.alert("Permission to access camera roll is required!");
       return;
     }
 
-    // Launch the image picker
     const pickerResult = await ImagePicker.launchImageLibraryAsync({
       mediaTypes: ImagePicker.MediaTypeOptions.Images,
       allowsEditing: true,
@@ -52,16 +49,13 @@ const EditProfileScreen = () => {
       quality: 1,
     });
 
-    // If the user canceled the image picking, return
     if (pickerResult.canceled) {
       return;
     }
 
-    // Update the profile image state
     const imageUri = pickerResult.assets[0]?.uri; // Extract URI
     setProfileImage(imageUri); // Update state
 
-    // Upload image and get the URL
     try {
       const imageUrl = await uploadImage(imageUri); // Upload image to Firebase
       await updateProfile({ profileImage: imageUrl }); // Update profile with new image URL
@@ -76,8 +70,8 @@ const EditProfileScreen = () => {
   const uploadImage = async (uri) => {
     const response = await fetch(uri);
     const blob = await response.blob();
-    const fileName = `profile-images/${user.uid}-${Date.now()}.jpg`; // Create a unique file name
-    const storageRef = ref(storage, fileName); // Create a reference to the storage location
+    const fileName = `profile-images/${user.uid}-${Date.now()}.jpg`;
+    const storageRef = ref(storage, fileName);
 
     await uploadBytes(storageRef, blob); // Upload the blob to Firebase Storage
     const downloadURL = await getDownloadURL(storageRef); // Get the download URL for the uploaded image
@@ -109,29 +103,45 @@ const EditProfileScreen = () => {
         </TouchableOpacity>
 
         {/* Editable Fields */}
-        {[
-          {
-            label: "Name",
-            value: `${user.firstName} ${user.lastName}`,
-            field: "firstName",
-          },
-          { label: "Username", value: user.username, field: "username" },
-          { label: "Email", value: user.email, field: "email" },
-          {
-            label: "Bio",
-            value: user.bio || "Tell us about yourself",
-            field: "bio",
-          },
-        ].map(({ label, value, field }) => (
-          <TouchableOpacity
-            key={field}
-            style={styles.editRow}
-            onPress={() => navigateToEditField(field, value)}
-          >
-            <Text style={styles.label}>{label}</Text>
-            <Text style={styles.value}>{value}</Text>
-          </TouchableOpacity>
-        ))}
+        <TouchableOpacity
+          style={styles.editRow}
+          onPress={() => navigateToEditField("firstName", user.firstName)}
+        >
+          <Text style={styles.label}>First Name</Text>
+          <Text style={styles.value}>{user.firstName}</Text>
+        </TouchableOpacity>
+        
+        <TouchableOpacity
+          style={styles.editRow}
+          onPress={() => navigateToEditField("lastName", user.lastName)}
+        >
+          <Text style={styles.label}>Last Name</Text>
+          <Text style={styles.value}>{user.lastName}</Text>
+        </TouchableOpacity>
+
+        <TouchableOpacity
+          style={styles.editRow}
+          onPress={() => navigateToEditField("username", user.username)}
+        >
+          <Text style={styles.label}>Username</Text>
+          <Text style={styles.value}>{user.username}</Text>
+        </TouchableOpacity>
+
+        <TouchableOpacity
+          style={styles.editRow}
+          onPress={() => navigateToEditField("email", user.email)}
+        >
+          <Text style={styles.label}>Email</Text>
+          <Text style={styles.value}>{user.email}</Text>
+        </TouchableOpacity>
+
+        <TouchableOpacity
+          style={styles.editRow}
+          onPress={() => navigateToEditField("bio", user.bio || "Tell us about yourself")}
+        >
+          <Text style={styles.label}>Bio</Text>
+          <Text style={styles.value}>{user.bio || "Tell us about yourself"}</Text>
+        </TouchableOpacity>
       </ScrollView>
     </View>
   );
@@ -169,22 +179,22 @@ const styles = StyleSheet.create({
     borderBottomWidth: 1,
     borderBottomColor: "#ccc",
     flexDirection: "row",
-    alignItems: "center", // Align items vertically centered
+    alignItems: "center",
     justifyContent: "space-between",
   },
   label: {
     fontSize: 14,
     color: "#000",
     fontFamily: "poppins-semibold",
-    flex: 1, // Allow the label to take available space
+    flex: 1,
   },
   value: {
     color: "#888",
     fontSize: 16,
-    flexShrink: 1, // Prevent value text from overflowing
-    textAlign: "right", // Align value to the right
-    flex: 4, // Allow the value to take available space
-    },
+    flexShrink: 1,
+    textAlign: "right",
+    flex: 4,
+  },
 });
 
 export default EditProfileScreen;
