@@ -28,27 +28,28 @@ export default function EntrepreneurTabLayout() {
           }}
         />
 
-        <Tabs.Screen
-          name="explore"
-          options={{
-            headerShown: true, // hide the header
-            title: "Explore",
-            tabBarLabel: "Explore",
-            tabBarIcon: ({ color }) => (
-              <Ionicons name="search" size={24} color={color} />
-            ),
-          }}
-        />
-        <Tabs.Screen
-          name="bids"
-          options={{
-            tabBarLabel: "Bids",
-            headerShown: true, // hide the header
-            tabBarIcon: ({ color }) => (
-              <Ionicons name="briefcase-outline" size={24} color={color} />
-            ),
-          }}
-        />
+      <Tabs.Screen
+        name="explore"
+        options={{
+          headerShown: true, // hide the header
+          title: "Explore",
+          tabBarLabel: "Explore",
+          tabBarIcon: ({ color }) => (
+            <Ionicons name="search" size={24} color={color} />
+          ),
+        }}
+      />
+      <Tabs.Screen
+        name="bids"
+        options={{
+          title: "bids",
+          headerShown: true, // hide the header
+          title: "Place Bids",
+          tabBarIcon: ({ color }) => (
+            <Ionicons name="search" size={24} color={color} />
+          ),
+        }}
+      />
 
         <Tabs.Screen
           name="profile"
@@ -56,6 +57,17 @@ export default function EntrepreneurTabLayout() {
             tabBarLabel: "Profile",
             tabBarIcon: ({ color }) => (
               <Ionicons name="person-outline" size={24} color={color} />
+            ),
+          }}
+        />
+
+<Tabs.Screen
+          name="community"
+          options={{
+            tabBarLabel: "Community",
+            headerShown: true,
+            tabBarIcon: ({ color }) => (
+              <Ionicons name="people-outline" size={24} color={color} />
             ),
           }}
         />
