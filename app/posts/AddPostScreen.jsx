@@ -1,174 +1,365 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from "react";
 import {
   View,
   Text,
   TextInput,
-  Button,
   TouchableOpacity,
+  ToastAndroid,
   Image,
   StyleSheet,
   Platform,
-} from 'react-native';
+  ScrollView,
+  KeyboardAvoidingView,
+} from "react-native";
+import { router, useNavigation } from "expo-router";
+import { Colors } from "../../constants/Colors";
+import RNPickerSelect from "react-native-picker-select";
+import { db } from "../../config/FirebaseConfig";
+import { addDoc, collection, getDocs, query } from "firebase/firestore";
 import * as ImagePicker from "expo-image-picker";
-import RNPickerSelect from 'react-native-picker-select';
+import DateTimePicker from "@react-native-community/datetimepicker";
+import { Ionicons } from "@expo/vector-icons";
+import Header from "../../components/Header";
+import { getAuth } from "firebase/auth";
 
-const AddPostScreen = () => {
-  const [title, setTitle] = useState('');
-  const [category, setCategory] = useState('');
-  const [description, setDescription] = useState('');
+export default function AddBid() {
+  const navigation = useNavigation();
+  const [categoryList, setCategoryList] = useState([]);
+  const [name, setName] = useState("");
+  const [address, setAddress] = useState("");
+  const [description, setDescription] = useState("");
+  const [categories, setCategories] = useState("");
   const [image, setImage] = useState(null);
+  const [bidClosingTime, setBidClosingTime] = useState(new Date());
+  const [showDatePicker, setShowDatePicker] = useState(false);
+  const [showTimePicker, setShowTimePicker] = useState(false);
+  const [selectedDate, setSelectedDate] = useState(new Date());
+  const [selectedTime, setSelectedTime] = useState(new Date());
+  const auth = getAuth();
+  const user = auth.currentUser;
+  const [title, setTitle] = useState();
 
-  // Image Picker Function
-  const selectImage = () => {
-    const options = {
-      mediaType: 'photo',
-    };
-    ImagePicker.launchImageLibrary(options, response => {
-      if (response.didCancel) {
-        console.log('User cancelled image picker');
-      } else if (response.error) {
-        console.log('ImagePicker Error: ', response.error);
-      } else {
-        const source = { uri: response.assets[0].uri };
-        setImage(source);
-      }
-    });
+  useEffect(() => {
+    setTitle("Add New Post"); // Update title dynamically as required
+    fetchCategoryList();
+    requestCameraPermission();
+  }, []);
+
+  const fetchCategoryList = async () => {
+    setCategoryList([]);
+    try {
+      const q = query(collection(db, "Category"));
+      const querySnapshot = await getDocs(q);
+      const categories = querySnapshot.docs.map((doc) => ({
+        label: doc.data().name,
+        value: doc.data().name,
+      }));
+      setCategoryList(categories);
+    } catch (error) {
+      console.error("Error fetching categories: ", error);
+    }
   };
 
-  const handleSubmit = () => {
-    // Handle post submission logic here
-    console.log('Title:', title);
-    console.log('Category:', category);
-    console.log('Description:', description);
-    console.log('Image:', image);
+  const requestCameraPermission = async () => {
+    const { status } = await ImagePicker.requestCameraPermissionsAsync();
+    if (status !== "granted") {
+      alert("Sorry, we need camera roll permissions to make this work!");
+    }
+  };
+
+  const pickImage = async () => {
+    let result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ImagePicker.MediaTypeOptions.Images,
+      allowsEditing: true,
+      aspect: [4, 3],
+      quality: 1,
+    });
+
+    if (!result.canceled) {
+      setImage(result.assets[0].uri);
+    }
+  };
+
+  const onDateChange = (event, selectedDate) => {
+    setShowDatePicker(false);
+    if (event.type === "set") {
+      setSelectedDate(selectedDate || selectedDate);
+      setBidClosingTime(
+        new Date(
+          selectedDate.setHours(
+            selectedTime.getHours(),
+            selectedTime.getMinutes()
+          )
+        )
+      );
+    }
+  };
+
+  const onTimeChange = (event, selectedTime) => {
+    setShowTimePicker(false);
+    if (event.type === "set") {
+      setSelectedTime(selectedTime || selectedTime);
+      setBidClosingTime(
+        new Date(
+          selectedDate.setHours(
+            selectedTime.getHours(),
+            selectedTime.getMinutes()
+          )
+        )
+      );
+    }
+  };
+
+  const onAddPost = async () => {
+    try {
+      if (name && address && description && categories && bidClosingTime) {
+        // Include the user data (uid and email) when adding the post
+        await addDoc(collection(db, "posts"), {
+          name,
+          address,
+          description,
+          categories,
+          image: image || null,
+          // bidClosingTime,
+          userId: user ? user.uid : null, // Add userId
+          userEmail: user ? user.email : null, // Add userEmail
+        });
+        ToastAndroid.show("Post Added Successfully", ToastAndroid.BOTTOM);
+        router.push("bids");
+        ToastAndroid.show("Please fill all the fields.", ToastAndroid.BOTTOM);
+      }
+    } catch (error) {
+      console.error("Error adding document: ", error);
+      ToastAndroid.show("Error adding post", ToastAndroid.BOTTOM);
+    }
   };
 
   return (
-    <View style={styles.container}>
-      <Text style={styles.label}>Upload the Image</Text>
-      <TouchableOpacity style={styles.imageUploadBox} onPress={selectImage}>
-        {image ? (
-          <Image source={image} style={styles.image} />
-        ) : (
-          <Text style={styles.placeholder}>Tap to select an image</Text>
-        )}
-      </TouchableOpacity>
+    <KeyboardAvoidingView
+      style={styles.container}
+      behavior={Platform.OS === "ios" ? "padding" : "height"}
+    >
+      <Header title={title} />
+      <ScrollView contentContainerStyle={styles.scrollContainer}>
+        <Text
+          style={{
+            color: "#000",
+            fontSize: 14,
+            marginTop: -15,
+            letterSpacing: 0.4,
+            fontFamily: "poppins-semibold",
+          }}
+        >
+          Image
+        </Text>
+        <TouchableOpacity
+          onPress={pickImage}
+          style={styles.imagePreviewContainer}
+        >
+          {image ? (
+            <Image source={{ uri: image }} style={styles.imagePreview} />
+          ) : (
+            <View style={styles.imagePlaceholderContainer}>
+              <Text style={styles.imagePlaceholder}>Tap to Add Image</Text>
+            </View>
+          )}
+        </TouchableOpacity>
 
-      <Text style={styles.label}>Title</Text>
-      <TextInput
-        style={styles.input}
-        placeholder="Post Title"
-        value={title}
-        onChangeText={setTitle}
-      />
+        <Text style={styles.label}>Title</Text>
+        <TextInput
+          placeholder="Title"
+          onChangeText={setName}
+          style={styles.input}
+        />
+        {/* <Text style={styles.label}>Address</Text>
+        <TextInput
+          placeholder="Address"
+          onChangeText={setAddress}
+          style={styles.input}
+        /> */}
+        <Text style={styles.label}>Category</Text>
+        <View style={styles.pickerContainer}>
+          <RNPickerSelect onValueChange={setCategories} items={categoryList} />
+        </View>
 
-      <Text style={styles.label}>Category</Text>
-      <RNPickerSelect
-        onValueChange={(value) => setCategory(value)}
-        placeholder={{
-          label: 'Select Product Category',
-          value: null,
-        }}
-        items={[
-          { label: 'Electronics', value: 'electronics' },
-          { label: 'Furniture', value: 'furniture' },
-          { label: 'Clothing', value: 'clothing' },
-          // Add more categories as needed
-        ]}
-        style={pickerSelectStyles}
-      />
+        {/* <Text style={styles.label}>Bid Closing Time</Text> */}
+        {/* <View style={styles.datePickerContainer}> */}
+          {/* Date Picker Button */}
+          {/* <TouchableOpacity
+            onPress={() => setShowDatePicker(true)}
+            style={styles.datePickerButton}
+          > */}
+            {/* <Text style={styles.datePickerText}>
+              {selectedDate.toLocaleDateString()}
+            </Text> */}
+            {/* <Ionicons
+              name="calendar-outline"
+              size={16}
+              color="black"
+              style={styles.icon}
+            /> */}
+          {/* </TouchableOpacity> */}
+{/* 
+          {showDatePicker && (
+            <DateTimePicker
+              value={selectedDate}
+              mode="date"
+              display="default"
+              onChange={onDateChange}
+            />
+          )} */}
 
-      <Text style={styles.label}>Add Description</Text>
-      <TextInput
-        style={[styles.input, styles.textArea]}
-        placeholder="Product Description"
-        value={description}
-        onChangeText={setDescription}
-        multiline={true}
-        numberOfLines={4}
-      />
+          {/* Time Picker Button */}
+          {/* <TouchableOpacity
+            onPress={() => setShowTimePicker(true)}
+            style={styles.datePickerButton}
+          > */}
+            {/* <Text style={styles.datePickerText}>
+              {selectedTime.toLocaleTimeString()}
+            </Text> */}
+            {/* <Ionicons
+              name="time-outline"
+              size={16}
+              color="black"
+              style={styles.icon}
+            /> */}
+          {/* </TouchableOpacity> */}
 
-      <TouchableOpacity style={styles.submitButton} onPress={handleSubmit}>
-        <Text style={styles.submitButtonText}>Add a Post</Text>
-      </TouchableOpacity>
-    </View>
+          {/* {showTimePicker && (
+            <DateTimePicker
+              value={selectedTime}
+              mode="time"
+              display="default"
+              onChange={onTimeChange}
+            />
+          )} */}
+        {/* </View> */}
+
+        <Text style={styles.label}>Description</Text>
+        <TextInput
+          multiline
+          numberOfLines={5}
+          placeholder="Description"
+          onChangeText={setDescription}
+          style={[styles.input, styles.textarea]}
+        />
+
+        <TouchableOpacity onPress={onAddPost} style={styles.button}>
+          <Text style={styles.buttonText}>Post</Text>
+        </TouchableOpacity>
+      </ScrollView>
+    </KeyboardAvoidingView>
   );
-};
+}
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    backgroundColor: Colors.primaryColor,
+  },
+  scrollContainer: {
     padding: 20,
-    backgroundColor: '#fff',
   },
-  label: {
-    fontSize: 16,
-    marginBottom: 8,
-    color: '#333',
+  imagePreviewContainer: {
+    borderRadius: 10,
+    backgroundColor: Colors.GRAY,
+    alignItems: "center",
+    justifyContent: "center",
+    borderStyle: "dashed",
+    borderWidth: 2,
+    overflow: "hidden", // Ensures padding does not affect image size
   },
-  imageUploadBox: {
-    height: 150,
-    backgroundColor: '#f0f0f0',
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginBottom: 20,
-    borderRadius: 8,
-    borderWidth: 1,
-    borderColor: '#ccc',
+  imagePreview: {
+    width: "100%",
+    height: 200,
+    borderRadius: 10,
+    resizeMode: "cover",
   },
-  placeholder: {
-    color: '#999',
+  imagePlaceholderContainer: {
+    padding: 60, // Apply padding only when showing the placeholder
+    alignItems: "center",
+    justifyContent: "center",
   },
-  image: {
-    width: '100%',
-    height: '100%',
-    borderRadius: 8,
+  imagePlaceholder: {
+    color: "#888",
+    fontFamily: "roboto",
   },
   input: {
-    borderWidth: 1,
-    borderColor: '#ccc',
-    borderRadius: 8,
-    padding: 10,
+    padding: 20,
+    paddingStart: 25,
+    borderRadius: 30,
+    backgroundColor: Colors.GRAY,
+    fontFamily: "roboto",
+  },
+  textarea: {
+    height: 150,
+  },
+  pickerContainer: {
+    padding: 5,
+    borderRadius: 30,
+    backgroundColor: Colors.GRAY,
+  },
+
+  button: {
+    padding: 20,
+    backgroundColor: Colors.secondaryColor,
+    borderRadius: 30,
+    marginTop: 20,
+    alignItems: "center",
+    shadowColor: "#000",
+    shadowOffset: { width: 1, height: 3 },
+    shadowOpacity: 0.75,
+    shadowRadius: 3.84,
+    elevation: 5,
+  },
+  buttonText: {
+    textAlign: "center",
+    color: "#fff",
+    fontFamily: "roboto-bold",
+  },
+  label: {
+    color: "#000",
+    fontSize: 14,
+    marginTop: 20,
+    letterSpacing: 0.4,
+    fontFamily: "poppins-semibold",
+  },
+  datePickerContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+    borderRadius: 30,
+    justifyContent: "space-between",
+  },
+  datePickerButton: {
+    flexDirection: "row",
+    alignItems: "center",
+    paddingHorizontal: 50,
+    paddingVertical: 20,
+    borderRadius: 30,
+    backgroundColor: Colors.GRAY,
+    justifyContent: "space-between",
+  },
+  datePickerText: {
+    fontFamily: "roboto",
+    color: "#000",
     fontSize: 16,
-    marginBottom: 20,
   },
-  textArea: {
-    height: 100,
+  icon: {
+    marginLeft: 10,
   },
-  submitButton: {
-    backgroundColor: '#a1692d',
-    paddingVertical: 15,
-    borderRadius: 8,
-    alignItems: 'center',
+  header: {
+    height: 60,
+    flexDirection: "row",
+    alignItems: "center",
+    marginVertical: 20,
+    paddingHorizontal: 16,
+    borderBottomWidth: 1,
+    borderBottomColor: "#ccc",
   },
-  submitButtonText: {
-    color: '#fff',
-    fontSize: 18,
-    fontWeight: 'bold',
+  headerTitle: {
+    flex: 1,
+    textAlign: "center",
+    fontSize: 20,
+    fontWeight: "bold",
   },
 });
-
-const pickerSelectStyles = StyleSheet.create({
-  inputIOS: {
-    fontSize: 16,
-    paddingVertical: 12,
-    paddingHorizontal: 10,
-    borderWidth: 1,
-    borderColor: '#ccc',
-    borderRadius: 8,
-    color: '#333',
-    marginBottom: 20,
-  },
-  inputAndroid: {
-    fontSize: 16,
-    paddingHorizontal: 10,
-    paddingVertical: 8,
-    borderWidth: 1,
-    borderColor: '#ccc',
-    borderRadius: 8,
-    color: '#333',
-    marginBottom: 20,
-  },
-});
-
-export default AddPostScreen;
