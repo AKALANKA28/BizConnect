@@ -9,7 +9,8 @@ import {
 } from "firebase/auth";
 import { auth, db } from "../config/FirebaseConfig";
 import { doc, setDoc, getDoc, query, where, getDocs } from "firebase/firestore";
-import { Text } from "react-native";
+import { StyleSheet, Text, View } from "react-native";
+import { Image } from "react-native";
 
 export const AuthContext = createContext();
 
@@ -194,7 +195,15 @@ export const AuthContextProvider = ({ children }) => {
   };
 
   if (loading) {
-    return <Text>Loading...</Text>; // You can replace this with a loading spinner or similar UI
+    return  (
+      <View style={styles.container}>
+        <Image
+          source={require("../assets/Bizconnect_Logo.png")} // Replace with your logo's path
+          style={styles.logo}
+          resizeMode="contain"
+        />
+      </View>
+    );; // You can replace this with a loading spinner or similar UI
   }
 
   return (
@@ -214,3 +223,21 @@ export const useAuth = () => {
   }
   return value;
 };
+
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: "#fff", // Change to your desired background color
+  },
+  logo: {
+    width: 100, // Adjust the size according to your logo dimensions
+    height: 100, // Adjust the size according to your logo dimensions
+    marginBottom: 20, // Space between the logo and spinner
+  },
+  spinner: {
+    marginTop: 20,
+  },
+});

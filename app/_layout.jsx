@@ -6,6 +6,7 @@ import { AuthContextProvider, useAuth } from "../context/authContext";
 import { useFonts } from "expo-font";
 import { NotificationProvider } from "../context/notificationContext"; // Import the NotificationProvider
 import { GestureHandlerRootView } from "react-native-gesture-handler";
+import LoadingScreen from "../components/LoadingScreen";
 
 const MainLayout = () => {
   const { isAuthenticated, user } = useAuth();
@@ -80,9 +81,7 @@ export default function RootLayout() {
 
   if (!fontsLoaded) {
     return (
-      <View style={{ flex: 1, alignItems: "center", justifyContent: "center" }}>
-        <Text>Loading...</Text>
-      </View>
+     <LoadingScreen/>
     );
   }
 
