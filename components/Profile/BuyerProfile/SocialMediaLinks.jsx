@@ -1,12 +1,16 @@
-import React from "react";
-import { View, StyleSheet, Text, Image } from "react-native";
+import React, { useEffect, useState } from "react";
+import { View, StyleSheet, Text } from "react-native";
 import Fontisto from '@expo/vector-icons/Fontisto';
+import { useAuth } from "../../../context/authContext"; // Import useAuth hook
+import { doc, getDoc } from "firebase/firestore";
+import { db } from "../../../config/FirebaseConfig"; // Firestore instance
+
 const SocialMediaItem = ({ icon, label, value }) => (
   <View style={styles.socialItem}>
     <Fontisto
       name={icon}
       size={18}
-      color="rgba(141, 110, 99, 1)"
+      color="#262626"
       style={styles.icon}
     />
     <View style={styles.socialDetails}>
@@ -17,19 +21,57 @@ const SocialMediaItem = ({ icon, label, value }) => (
 );
 
 const SocialMediaLinks = () => {
+  const { user } = useAuth(); // Get the currently logged-in user
+  const [socialLinks, setSocialLinks] = useState({
+    website: "",
+    instagram: "",
+    facebook: "",
+  }); // State to hold social media links
+
+  // Function to fetch social media links from Firestore
+  const fetchSocialLinks = async () => {
+    if (user) {
+      try {
+        // Reference to the user's document in Firestore
+        const userDocRef = doc(db, "buyers", user.uid);
+        const userDocSnap = await getDoc(userDocRef);
+
+        if (userDocSnap.exists()) {
+          const userData = userDocSnap.data();
+          setSocialLinks({
+            website: userData.website || "No website available",
+            instagram: userData.instagram || "No Instagram link available",
+            facebook: userData.facebook || "No Facebook link available",
+          });
+        } else {
+          console.log("No such user document!");
+        }
+      } catch (error) {
+        console.error("Error fetching social media links: ", error);
+      }
+    }
+  };
+
+  // Fetch social media links when component mounts
+  useEffect(() => {
+    fetchSocialLinks();
+  }, [user]);
+
   const socialData = [
     {
       icon: "world-o",
       label: "Website",
-      value: "info@pererahandlooms.com",
+      value: socialLinks.website,
     },
     {
       icon: "instagram",
       label: "Instagram",
+      value: socialLinks.instagram,
     },
     {
       icon: "facebook",
       label: "Facebook",
+      value: socialLinks.facebook,
     },
   ];
 

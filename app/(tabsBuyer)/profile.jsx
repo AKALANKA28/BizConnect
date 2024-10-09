@@ -1,10 +1,10 @@
 import React from "react";
 import { View, StyleSheet, Image, Text, ScrollView } from "react-native";
-import ProfileHeader from "../../components/Profile/BuyerProfile/ProfileHeader";
+import ProfileHeader from "../profile/BuyerProfile/ProfileHeader";
 import AboutMe from "../../components/Profile/BuyerProfile/AboutMe";
 import ContactInformation from "../../components/Profile/BuyerProfile/ContactInformation";
 import SocialMediaLinks from "../../components/Profile/BuyerProfile/SocialMediaLinks";
-// import { Colors } from "../../../constants/Colors";
+import { Colors } from "../../constants/Colors";
 
 export default function profile() {
 
@@ -25,9 +25,9 @@ export default function profile() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    borderRadius: 40,
     maxWidth: 480,
     width: "100%",
+    backgroundColor: Colors.primaryColor,
   },
   content: {
     marginTop: 25,

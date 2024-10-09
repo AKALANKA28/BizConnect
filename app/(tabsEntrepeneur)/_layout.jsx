@@ -1,59 +1,44 @@
-import { View, Text } from "react-native";
 import React from "react";
 import { Tabs } from "expo-router";
 import { Colors } from "../../constants/Colors";
 import Ionicons from "@expo/vector-icons/Ionicons";
-import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
-import { useFonts } from "expo-font";
-export default function EntrepreneurTabLayout() {
-  const [fontsLoaded] = useFonts({
-    roboto: require("../../assets/fonts/Roboto-Regular.ttf"),
-    "roboto-medium": require("../../assets/fonts/Roboto-Medium.ttf"),
-    "roboto-bold": require("../../assets/fonts/Roboto-Bold.ttf"),
-  });
+import AnimatedTabBar from "../../components/AnimatedTabBar";
+import { StatusBar } from "expo-status-bar";
 
-  if (!fontsLoaded) {
-    return <Text>Loading...</Text>;
-  }
+export default function EntrepreneurTabLayout() {
   return (
-    <Tabs
-      screenOptions={{
-        headerShown: false, // hide the header
-        tabBarActiveTintColor: Colors.secondaryColor,
-        tabBarInactiveTintColor: "black",
-      }}
-    >
-      <Tabs.Screen
-        name="home"
-        options={{
-          title: "Home",
-          tabBarIcon: ({ color }) => (
-            <Ionicons name="home" size={24} color={color} />
-          ),
+    <>
+      <StatusBar style="dark" translucent />
+
+      <Tabs
+        screenOptions={{
+          headerShown: false,
+          tabBarLabelStyle: { fontSize: 12 },
+          tabBarIconStyle: { width: 36, height: 36 }, 
         }}
-      />
+        tabBar={(props) => <AnimatedTabBar {...props} />}
+      >
+        <Tabs.Screen
+          name="home"
+          options={{
+            tabBarLabel: "Home",
+            tabBarIcon: ({ color }) => (
+              <Ionicons name="home-outline" size={24} color={color} />
+            ),
+          }}
+        />
 
       <Tabs.Screen
         name="explore"
         options={{
+          headerShown: true, // hide the header
           title: "Explore",
+          tabBarLabel: "Explore",
           tabBarIcon: ({ color }) => (
             <Ionicons name="search" size={24} color={color} />
           ),
         }}
       />
-
-      <Tabs.Screen
-        name="community"
-        options={{
-          title: "Community",
-          headerShown: true,
-          tabBarIcon: ({ color }) => (
-            <Ionicons name="people" size={24} color={color} />
-          ),
-        }}
-      />
-
       <Tabs.Screen
         name="bids"
         options={{
@@ -66,15 +51,16 @@ export default function EntrepreneurTabLayout() {
         }}
       />
 
-      <Tabs.Screen
-        name="profile"
-        options={{
-          title: "Settings",
-          tabBarIcon: ({ color }) => (
-            <Ionicons name="settings-sharp" size={24} color={color} />
-          ),
-        }}
-      />
-    </Tabs>
+        <Tabs.Screen
+          name="profile"
+          options={{
+            tabBarLabel: "Profile",
+            tabBarIcon: ({ color }) => (
+              <Ionicons name="person-outline" size={24} color={color} />
+            ),
+          }}
+        />
+      </Tabs>
+    </>
   );
 }

@@ -1,10 +1,11 @@
 import { View, Text } from "react-native";
 import React, { useEffect, useState } from "react";
-import { Slot, useRouter, useSegments } from "expo-router";
+import { Slot, Stack, useRouter, useSegments } from "expo-router";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { AuthContextProvider, useAuth } from "../context/authContext";
 import { useFonts } from "expo-font";
-import { NotificationProvider } from '../context/notificationContext'; // Import the NotificationProvider
+import { NotificationProvider } from "../context/notificationContext"; // Import the NotificationProvider
+import { GestureHandlerRootView } from "react-native-gesture-handler";
 
 const MainLayout = () => {
   const { isAuthenticated, user } = useAuth();
@@ -52,17 +53,23 @@ const MainLayout = () => {
       console.log("User is not authenticated.");
     }
   }, [isAuthenticated, user]);
-  return <Slot />;
+  return (
+    <Stack
+      screenOptions={{
+        headerShown: false, // Ensure header is not shown globally for the stack
+      }}
+    />
+  );
 };
 
 export default function RootLayout() {
   const [fontsLoaded] = useFonts({
-    "roboto": require("../assets/fonts/Roboto-Regular.ttf"),
+    roboto: require("../assets/fonts/Roboto-Regular.ttf"),
     "roboto-medium": require("../assets/fonts/Roboto-Medium.ttf"),
     "roboto-bold": require("../assets/fonts/Roboto-Bold.ttf"),
     "roboto-black": require("../assets/fonts/Roboto-Black.ttf"),
 
-    "poppins": require("../assets/fonts/Poppins-Regular.ttf"),
+    poppins: require("../assets/fonts/Poppins-Regular.ttf"),
     "poppins-semibold": require("../assets/fonts/Poppins-SemiBold.ttf"),
     "poppins-bold": require("../assets/fonts/Poppins-Bold.ttf"),
   });
@@ -77,9 +84,11 @@ export default function RootLayout() {
 
   return (
     <AuthContextProvider>
-      <NotificationProvider>
-        <MainLayout />
-      </NotificationProvider>
+      <GestureHandlerRootView>
+        <NotificationProvider>
+          <MainLayout />
+        </NotificationProvider>
+      </GestureHandlerRootView>
     </AuthContextProvider>
   );
 }
