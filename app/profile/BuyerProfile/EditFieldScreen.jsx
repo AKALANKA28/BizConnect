@@ -55,7 +55,7 @@ const EditFieldScreen = () => {
         </TouchableOpacity>
       </View>
       <View style={styles.container}>
-        <Text style={styles.label}>{`Edit ${field.charAt(0).toUpperCase() + field.slice(1)}`}</Text>
+        <Text style={styles.label}>{`${field.charAt(0).toUpperCase() + field.slice(1)}`}</Text>
         <TextInput
           style={styles.input}
           value={value}
@@ -74,7 +74,7 @@ const styles = StyleSheet.create({
     flex: 1,
     padding: 20,
     backgroundColor: Colors.primaryColor, // Use your primary color here
-    marginTop: -18,
+    marginTop: -24,
   },
   header: {
     height: 70,
@@ -85,6 +85,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
     borderBottomWidth: 1,
     borderBottomColor: "#ccc",
+    backgroundColor: "#fff",
   },
   headerTitle: {
     fontSize: 18,
@@ -93,11 +94,10 @@ const styles = StyleSheet.create({
     flex: 1, // This allows the title to take up available space
     textAlign: "left", // Centers the header title
     fontFamily: "poppins-semibold", // Font family for consistency
-    marginLeft: 20,
+    marginLeft: 10,
   },
   label: {
-    fontSize: 16,
-    fontWeight: "600",
+    fontSize: 14,
     color: "#000",
     fontFamily: "poppins-semibold", // Font family for consistency
   },
