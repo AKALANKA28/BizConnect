@@ -13,6 +13,9 @@ export default function BuyerTabLayout() {
       <Tabs
         screenOptions={{
           headerShown: false,
+          headerStyle: {
+            backgroundColor: '#f2f2f2', // Set your desired header color here
+          },
           tabBarLabelStyle: { fontSize: 12 },
           tabBarIconStyle: { width: 36, height: 36 }, 
         }}

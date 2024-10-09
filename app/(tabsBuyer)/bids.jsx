@@ -16,6 +16,10 @@ import { db, auth } from "../../config/FirebaseConfig"; // Update with your actu
 import { collection, getDocs, query, where, deleteDoc, doc } from "firebase/firestore";
 import { Colors } from "../../constants/Colors";
 import { RFValue } from "react-native-responsive-fontsize";
+import { getStorage, ref, deleteObject } from "firebase/storage"; // Import the necessary storage functions
+import { useFocusEffect } from '@react-navigation/native'; // Import useFocusEffect
+import * as ImagePicker from "expo-image-picker";
+import DateTimePicker from "@react-native-community/datetimepicker";
 
 export default function Bids() {
   const [bids, setBids] = useState([]);
@@ -45,9 +49,12 @@ export default function Bids() {
     }
   };
 
-  useEffect(() => {
-    fetchBids();
-  }, [userId]);
+  // Use useFocusEffect to refresh the bids whenever the screen comes into focus
+  useFocusEffect(
+    React.useCallback(() => {
+      fetchBids();
+    }, [userId])
+  );
 
   const handleRefresh = async () => {
     setRefreshing(true);
@@ -64,11 +71,13 @@ export default function Bids() {
   };
 
   const handleEdit = (bidId) => {
-    router.push(`/bids/addBid/${bidId}`);
+    router.push(`/bids/addEditBid?bidId=${bidId}`); // Pass the bidId in the query parameter
     setVisibleMenu(null); // Close menu after action
   };
 
-  const handleDelete = (bidId) => {
+  const storage = getStorage(); // Initialize Firebase Storage
+
+  const handleDelete = (bidId, imageUrl) => {
     Alert.alert(
       "Confirm Delete",
       "Are you sure you want to delete this bid?",
@@ -81,7 +90,13 @@ export default function Bids() {
           text: "Delete",
           onPress: async () => {
             try {
-              await deleteDoc(doc(db, "Bids", bidId));
+              // Check if imageUrl exists before attempting to delete it
+              if (imageUrl) {
+                const imageRef = ref(storage, imageUrl); // Create a reference to the image in storage
+                await deleteObject(imageRef); // Delete the image
+              }
+
+              await deleteDoc(doc(db, "Bids", bidId)); // Now delete the bid document
               handleRefresh(); // Refresh the list after deletion
               setVisibleMenu(null); // Close menu after action
             } catch (error) {
@@ -117,7 +132,7 @@ export default function Bids() {
                 <Ionicons name="pencil" size={20} color={Colors.secondaryColor} />
                 <Text style={styles.menuOptionText}>Edit</Text>
               </TouchableOpacity>
-              <TouchableOpacity onPress={() => handleDelete(item.id)} style={styles.menuOption}>
+              <TouchableOpacity onPress={() => handleDelete(item.id, item.image)} style={styles.menuOption}>
                 <Ionicons name="trash" size={20} color="red" />
                 <Text style={styles.menuOptionText}>Delete</Text>
               </TouchableOpacity>
@@ -167,7 +182,7 @@ export default function Bids() {
   };
 
   return (
-    <View style={{ flex: 1, backgroundColor: Colors.primaryColor }}>
+    <View style={{ flex: 1, backgroundColor: Colors.primaryColor}}>
       <FlatList
         data={bids}
         renderItem={renderBidItem}
@@ -180,7 +195,7 @@ export default function Bids() {
 
       <TouchableOpacity
         style={styles.fab}
-        onPress={() => router.push("/bids/addBid")}
+        onPress={() => router.push("/bids/addEditBid")}
       >
         <Ionicons name="add" size={30} color="white" />
       </TouchableOpacity>
