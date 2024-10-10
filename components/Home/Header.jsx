@@ -50,7 +50,7 @@ export default function Header({ notificationCount }) {
           </TouchableOpacity>
           <View>
             <Text style={styles.greetingText}>Good Day,</Text>
-            <Text style={styles.usernameText}>{user?.firstName || "Guest"} {user?.lastName || "Guest"}</Text>
+            <Text style={styles.usernameText}>{user?.firstName || "Guest"}</Text>
           </View>
         </View>
 
