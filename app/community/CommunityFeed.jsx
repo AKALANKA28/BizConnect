@@ -1,8 +1,9 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState,useCallback  } from 'react';
 import { View, FlatList, StyleSheet, Text } from 'react-native';
 import PostCard from './PostCard'; // Assuming PostCard is imported correctly
 import { db } from '../../config/FirebaseConfig'; // Firebase config import
-import { getDocs, collection, query } from 'firebase/firestore';
+import { getDocs, collection, query, doc as firestoreDoc, getDoc } from 'firebase/firestore'; // Fixed doc import conflict
+import { useFocusEffect } from '@react-navigation/native'; // For automatic refresh
 
 export default function CommunityFeed() {
   const [posts, setPosts] = useState([]);
@@ -13,22 +14,42 @@ export default function CommunityFeed() {
 
   const fetchCollabSpacePosts = async () => {
     try {
-      const q = query(collection(db, 'CollabSpaces')); // Fetching from 'collabspace' collection
+      // Fetch all CollabSpace posts
+      const q = query(collection(db, 'CollabSpaces'));
       const querySnapshot = await getDocs(q);
-      const postsData = querySnapshot.docs.map((doc) => ({
-        id: doc.id,
-        ...doc.data(),
-      }));
-      // Adding a sample profile image for now
-      const postsWithProfileImage = postsData.map(post => ({
-        ...post,
-        profileImage: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQbxcbt8ejR6RhFF5ysw97gpXm6yf0woiXAig&s', // Replace with actual image URL
-      }));
-      setPosts(postsWithProfileImage);
+
+      // Map through posts to add profile image from entrepreneurs collection
+      const postsData = await Promise.all(
+        querySnapshot.docs.map(async (postDoc) => {
+          const postData = { id: postDoc.id, ...postDoc.data() };
+
+          // Fetch the corresponding entrepreneur profile image using the creator's uid
+          const entrepreneurRef = firestoreDoc(db, 'entrepreneurs', postData.userId); // firestoreDoc fixes conflict with doc import
+          const entrepreneurSnap = await getDoc(entrepreneurRef);
+
+          // Check if the entrepreneur document exists and get the profileImage
+          let profileImage = 'https://www.pikpng.com/pngl/b/417-4172348_testimonial-user-icon-color-clipart.png'; // Default image URL
+          if (entrepreneurSnap.exists()) {
+            profileImage = entrepreneurSnap.data().profileImage || profileImage;
+          }
+
+          // Return the post data with the profile image
+          return { ...postData, profileImage };
+        })
+      );
+
+      setPosts(postsData);
     } catch (error) {
       console.error('Error fetching posts: ', error);
     }
   };
+
+    // useFocusEffect will refresh data when screen is focused
+    useFocusEffect(
+      useCallback(() => {
+        fetchCollabSpacePosts();
+      }, [])
+    );
 
   const renderPost = ({ item }) => <PostCard post={item} />;
 

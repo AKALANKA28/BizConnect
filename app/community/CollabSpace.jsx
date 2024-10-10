@@ -7,12 +7,14 @@ import Header from './Header';
 import { useAuth } from "../../context/authContext";
 
 export default function CollabSpace() {
-  const { postId } = useLocalSearchParams();
+  const { postId, proPic } = useLocalSearchParams();
   const [post, setPost] = useState(null);
   const [activeTab, setActiveTab] = useState('about'); // State for tab switching
   const { user } = useAuth(); // Assuming you have a hook that provides the logged-in user
   const [isMember, setIsMember] = useState(false);
   const router = useRouter(); 
+
+  console.log('in collabspace' + proPic );
 
   useEffect(() => {
     if (postId) {
@@ -83,13 +85,12 @@ export default function CollabSpace() {
     }
   };
 
-const navigateToUpdateScreen = () => {
-  router.push({
-    pathname: '/community/UpdateCollabSpace', 
-    params: { postId }, // Pass the postId to the update screen
-  });
-};
-
+  const navigateToUpdateScreen = () => {
+    router.push({
+      pathname: '/community/UpdateCollabSpace', 
+      params: { postId }, // Pass the postId to the update screen
+    });
+  };
 
   const navigateToChatRoom = () => {
     router.push({
@@ -117,7 +118,7 @@ const navigateToUpdateScreen = () => {
 
             {/* Publisher Info */}
             <View style={styles.publisherInfo}>
-              <Image source={{ uri: post.userImage }} style={styles.profileImage} />
+              <Image source={{ uri: proPic }} style={styles.profileImage} />
               <View>
                 <Text style={styles.publisherName}>{post.userName}</Text>
                 <Text style={styles.publisherLocation}>{post.location}</Text>
@@ -127,7 +128,7 @@ const navigateToUpdateScreen = () => {
         </View>
 
         {/* Join Button */}
-        <View style={styles.joinButton}>
+        <View style={styles.joinButtonContainer}>
           {user && user.uid === post.userId ? (
             <TouchableOpacity style={styles.updateButton} onPress={navigateToUpdateScreen}>
               <Text style={styles.buttonText}>Update</Text>
@@ -188,8 +189,11 @@ const navigateToUpdateScreen = () => {
 
       {/* Floating Action Button */}
       <TouchableOpacity style={styles.fab} onPress={navigateToChatRoom}>
-        <Text style={styles.fabText}>💬</Text>
-      </TouchableOpacity>
+  <Image 
+    source={require('../../assets/icons/Chat.png')} // Update the path to your icon
+    style={styles.fabIcon} 
+  />
+</TouchableOpacity>
     </View>
   );
 }
@@ -246,21 +250,22 @@ const styles = StyleSheet.create({
     fontSize: 12,
     color: '#ddd',
   },
+  joinButtonContainer: {
+    flexDirection: 'row',
+    justifyContent: 'flex-end',
+    marginBottom: 15,
+  },
   joinButton: {
     backgroundColor: '#B98539',
     paddingVertical: 10,
     paddingHorizontal: 20,
     borderRadius: 20,
-    alignSelf: 'flex-end',
-    marginBottom: 15,
   },
   updateButton: {
     backgroundColor: '#B98539',
     paddingVertical: 10,
     paddingHorizontal: 20,
     borderRadius: 20,
-    alignSelf: 'flex-end',
-    marginBottom: 15,
   },
   buttonText: {
     color: '#fff',
@@ -278,41 +283,42 @@ const styles = StyleSheet.create({
   activeTab: {
     borderBottomColor: '#B98539',
   },
+  activeTabText: {
+    color: '#B98539',
+    fontWeight: 'bold',
+    textAlign: 'center',
+  },
   inactiveTabText: {
     color: '#888',
     textAlign: 'center',
   },
-  activeTabText: {
-    color: '#B98539',
-    textAlign: 'center',
-    fontWeight: 'bold',
-  },
   sectionTitle: {
-    fontSize: 18,
+    fontSize: 20,
     fontWeight: 'bold',
     marginBottom: 10,
   },
   description: {
-    fontSize: 14,
-    marginBottom: 15,
+    fontSize: 16,
+    marginBottom: 20,
   },
   moreImagesContainer: {
     flexDirection: 'row',
     flexWrap: 'wrap',
+    justifyContent: 'space-between',
+    marginTop: 10,
   },
   moreImage: {
-    width: 100,
+    width: '48%',
     height: 100,
-    marginRight: 10,
-    marginBottom: 10,
     borderRadius: 10,
+    marginBottom: 10,
   },
   goalsContainer: {
-    marginBottom: 20,
+    marginTop: 20,
   },
   goalItem: {
-    fontSize: 14,
-    marginBottom: 5,
+    fontSize: 16,
+    marginBottom: 10,
   },
   fab: {
     position: 'absolute',
@@ -320,16 +326,20 @@ const styles = StyleSheet.create({
     bottom: 20,
     backgroundColor: '#B98539',
     borderRadius: 50,
-    padding: 15,
+    padding: 20,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.3,
     shadowRadius: 4,
     elevation: 5,
   },
+  fabIcon: {
+    width: 34, // Set the width of your icon
+    height: 34, // Set the height of your icon
+  },
   fabText: {
-    fontSize: 18,
     color: '#fff',
+    fontSize: 24,
     fontWeight: 'bold',
   },
 });
