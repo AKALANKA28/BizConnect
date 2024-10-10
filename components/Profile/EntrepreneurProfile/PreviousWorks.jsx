@@ -14,6 +14,8 @@ import { doc, getDoc } from "firebase/firestore"; // Importing the necessary Fir
 import { getAuth } from "firebase/auth";
 import { router } from "expo-router";
 import { useAuth } from "../../../context/authContext"; // Import useAuth hook
+import { RFValue } from "react-native-responsive-fontsize";
+import { Colors } from "../../../constants/Colors";
 
 const screenWidth = Dimensions.get("window").width;
 
@@ -26,7 +28,8 @@ const WorkImage = ({ source, style }) => (
   />
 );
 
-const PreviousWorks = ({ entrepreneurId }) => { // Accept entrepreneurId prop
+const PreviousWorks = ({ entrepreneurId }) => {
+  // Accept entrepreneurId prop
   const { user } = useAuth(); // Get the currently logged-in user
   const [workImages, setWorkImages] = useState([]);
   const [loading, setLoading] = useState(true); // Loading state
@@ -43,16 +46,17 @@ const PreviousWorks = ({ entrepreneurId }) => { // Accept entrepreneurId prop
       const idToFetch = entrepreneurId || currentUser?.uid; // Use provided entrepreneurId or current user's ID
       const entrepreneurDocRef = doc(db, "entrepreneurs", idToFetch);
       const entrepreneurDocSnap = await getDoc(entrepreneurDocRef);
-  
+
       if (entrepreneurDocSnap.exists()) {
         const entrepreneurData = entrepreneurDocSnap.data();
         console.log("Entrepreneur Data:", entrepreneurData);
-        
-        const images = entrepreneurData.posts?.map((post) => ({
-          source: post.imageUrl, // Ensure this is the correct property
-          height: 250,
-        })) || [];
-        
+
+        const images =
+          entrepreneurData.posts?.map((post) => ({
+            source: post.imageUrl, // Ensure this is the correct property
+            height: 250,
+          })) || [];
+
         setWorkImages(images);
       } else {
         console.log("No entrepreneur found with the provided ID:", idToFetch);
@@ -133,9 +137,9 @@ const styles = StyleSheet.create({
   },
   title: {
     color: "rgba(0, 0, 0, 1)",
-    fontFamily: "poppins-semibold",
-    fontSize: 17,
-    marginLeft: 16,
+    fontFamily: "lato-bold",
+    fontSize: RFValue(15),
+    marginLeft: 1,
     marginBottom: 14,
     textAlign: "left",
   },
@@ -153,13 +157,17 @@ const styles = StyleSheet.create({
     marginBottom: 10,
   },
   addNewButton: {
-    backgroundColor: "rgba(170, 106, 28, 1)",
+    backgroundColor: Colors.secondaryColor, // Brown color for the button
+    paddingVertical: 8,
+    padding: 8,
+    paddingHorizontal: 20,
     borderRadius: 50,
-    padding: 7,
+    marginBottom: 10,
   },
   addNewText: {
     color: "#FFF",
-    fontSize: 12,
+    fontSize: RFValue(12),
+    fontFamily: "lato-bold",
   },
   noPostsText: {
     fontFamily: "poppins",

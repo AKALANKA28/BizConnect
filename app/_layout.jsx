@@ -49,7 +49,7 @@ const MainLayout = () => {
   useEffect(() => {
     if (isAuthenticated) {
       console.log("User is authenticated.");
-      console.log("User details:", user);
+      // console.log("User details:", user);
     } else {
       console.log("User is not authenticated.");
     }
@@ -75,6 +75,7 @@ export default function RootLayout() {
     "poppins-bold": require("../assets/fonts/Poppins-Bold.ttf"),
 
     "lato": require("../assets/fonts/Lato-Regular.ttf"),
+    "lato-bold": require("../assets/fonts/Lato-Bold.ttf"),
 
 
   });

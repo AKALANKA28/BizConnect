@@ -4,11 +4,12 @@ import Ionicons from "react-native-vector-icons/Ionicons"; // Importing Ionicons
 import { doc, getDoc } from "firebase/firestore";
 import { db } from "../../../config/FirebaseConfig"; // Firestore instance
 import { useAuth } from "../../../context/authContext"; // Importing useAuth
+import { RFValue } from "react-native-responsive-fontsize";
 
 // Component for rendering individual contact details
 const ContactItem = ({ label, value, iconName }) => (
   <View style={styles.contactItem}>
-    <Ionicons name={iconName} size={17} color="#000" style={styles.contactIcon} />
+    <Ionicons name={iconName} size={17} color="#6D4C41" style={styles.contactIcon} />
     <View style={styles.contactInfo}>
       <Text style={styles.contactLabel}>{label}:</Text>
       <Text style={styles.contactValue}>{value}</Text>
@@ -88,11 +89,13 @@ const ContactDetails = ({ entrepreneurId }) => {
 const styles = StyleSheet.create({
   container: {
     paddingVertical: 16,
+    marginBottom: -16,
+    paddingHorizontal: 4,
   },
   title: {
     color: "rgba(141, 110, 99, 1)",
-    fontFamily: "poppins-semibold",
-    fontSize: 14,
+    fontFamily: "lato-bold",
+    fontSize: RFValue(13),
     marginBottom: 8,
   },
   contactItem: {
@@ -113,16 +116,14 @@ const styles = StyleSheet.create({
   contactLabel: {
     width: 64,
     color: "#262626",
-    fontFamily: "poppins",
-    fontWeight: "400",
-    fontSize: 14,
+    fontFamily: "lato-bold",
+    fontSize: RFValue(13),
   },
   contactValue: {
     flex: 1,
     color: "#262626",
-    fontFamily: "poppins",
-    fontWeight: "400",
-    fontSize: 14,
+    fontFamily: "lato",
+    fontSize: RFValue(12),
     textAlignVertical: "center", // Ensures the value text is vertically aligned
   },
 });

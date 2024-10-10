@@ -1,9 +1,16 @@
 import React, { useEffect, useState } from "react";
-import { View, StyleSheet, Text, TouchableOpacity, ActivityIndicator } from "react-native";
+import {
+  View,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  ActivityIndicator,
+} from "react-native";
 import { doc, getDoc } from "firebase/firestore";
 import { db } from "../../../config/FirebaseConfig"; // Firestore instance
 import { useAuth } from "../../../context/authContext"; // Importing useAuth for current user
 import { Colors } from "../../../constants/Colors"; // Import Colors for consistency
+import { RFValue } from "react-native-responsive-fontsize";
 
 const ProfileInfo = ({ entrepreneurId }) => {
   const { user } = useAuth(); // Get the currently logged-in user
@@ -20,8 +27,8 @@ const ProfileInfo = ({ entrepreneurId }) => {
 
       if (userDocSnap.exists()) {
         const userData = userDocSnap.data();
-        console.log(userData);
-        
+        // console.log(userData);
+
         setBio(userData.bio || "No bio available"); // Set bio or default if not available
       } else {
         console.log("No document found for this UID:", idToFetch); // Log if no document is found
@@ -50,15 +57,24 @@ const ProfileInfo = ({ entrepreneurId }) => {
           <ActivityIndicator size="small" color={Colors.secondaryColor} />
         ) : (
           <Text style={styles.aboutText}>
-            {expanded ? bio : bio.length > 100 ? `${bio.substring(0, 100)}...` : bio}
+            {/* Display the bio with read more/read less inline */}
+            {expanded
+              ? bio
+              : bio.length > 100
+              ? `${bio.substring(0, 100)}`
+              : bio}
+            {bio.length > 100 && !expanded && "..."}{" "}
+            {/* Add ellipsis if truncated */}
+            {/* Show the read more/read less button inline */}
+            {bio.length > 100 && (
+              <Text
+                style={styles.readMore}
+                onPress={() => setExpanded(!expanded)} // Toggle expanded state
+              >
+                {expanded ? " read less" : " read more"}
+              </Text>
+            )}
           </Text>
-        )}
-        {bio.length > 100 && (
-          <TouchableOpacity onPress={() => setExpanded(!expanded)}>
-            <Text style={styles.readMore}>
-              {expanded ? "read less" : "read more"}
-            </Text>
-          </TouchableOpacity>
         )}
       </View>
     </View>
@@ -67,29 +83,34 @@ const ProfileInfo = ({ entrepreneurId }) => {
 
 const styles = StyleSheet.create({
   container: {
-    marginVertical: 10, // Vertical margin for spacing
+    flexDirection: "row",
+    alignItems: "flex-start",
+    marginBottom: 8,
   },
   aboutSection: {
     flex: 1,
   },
   aboutTitle: {
-    color: "rgba(141, 110, 99, 1)", // Brownish title color
-    fontFamily: "poppins-semibold", // Using poppins-semibold font
+    color: "rgba(141, 110, 99, 1)",
+    fontFamily: "lato-bold",
     marginBottom: 8,
-    fontSize: 17,
+    fontSize: RFValue(13),
+    textTransform: "uppercase",
   },
   aboutText: {
-    fontFamily: "poppins", // Using regular poppins font
-    fontSize: 14,
-    lineHeight: 22, // Line height for better readability
-    color: "#333", // Dark text color
+    color: "#000",
+    fontFamily: "lato",
+    fontSize: RFValue(13),
+    lineHeight: 22,
   },
   readMore: {
-    color: Colors.secondaryColor, // Use secondary color from constants
-    textDecorationLine: "underline", // Underline the read more/read less text
-    marginTop: 5, // Spacing between bio and read-more text
-    fontSize: 14,
-    fontFamily: "poppins-semibold", // Consistent font for read more
+    color: Colors.secondaryColor,
+    textDecorationLine: "underline",
+  },
+  icon: {
+    width: 20,
+    height: 20,
+    marginLeft: 10,
   },
 });
 

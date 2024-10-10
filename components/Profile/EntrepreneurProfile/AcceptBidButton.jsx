@@ -15,6 +15,7 @@ import { db } from "../../../config/FirebaseConfig";
 import { Colors } from "../../../constants/Colors"; // Assuming you have a Colors file for your theme
 import Loading from "../../Loading";
 import { View } from "react-native";
+import { RFValue } from "react-native-responsive-fontsize";
 
 export default function AcceptBidButton({ entrepeneurid }) {
   const [loading, setLoading] = useState(false); // Add loading state
@@ -167,7 +168,6 @@ const styles = StyleSheet.create({
   },
   fabText: {
     color: "white",
-    fontSize: 16,
-    fontWeight: "bold",
-  },
+    fontSize: RFValue(14),
+    fontFamily: "lato-bold",},
 });

@@ -55,7 +55,7 @@ export const AuthContextProvider = ({ children }) => {
             ...userData,
             ...specificData, // Merge data from 'entrepreneurs' or 'buyers' collection
           });
-          console.log("User data retrieved from Firestore:", specificData);
+          // console.log("User data retrieved from Firestore:", specificData);
         } else {
           console.log(
             `No data found in Firestore for UID: ${uid} in ${collectionName}`
@@ -96,7 +96,7 @@ export const AuthContextProvider = ({ children }) => {
         ...dataToUpdate,
       }));
 
-      console.log("Profile updated successfully");
+      // console.log("Profile updated successfully");
       return { success: true };
     } catch (error) {
       console.error("Error updating profile:", error);
