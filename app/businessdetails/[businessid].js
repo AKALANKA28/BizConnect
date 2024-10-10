@@ -46,10 +46,11 @@ export default function BusinessDetail() {
             <View>
               {/* Intro */}
               <Intro business={business} />
-               {/* Action Button */}
-               <ActionButton />
                 {/* AboutSection */}
-                <About />
+                <About business={business} />
+               {/* Action Button */}
+               <ActionButton business={business} />
+              
              
             
             </View>
