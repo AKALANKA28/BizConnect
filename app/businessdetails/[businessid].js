@@ -41,18 +41,21 @@ export default function BusinessDetail() {
       {loading ? (
         <LoadingScreen />
       ) : (
-        <ScrollView>
+        <View>
           {business && (
             <View>
               {/* Intro */}
               <Intro business={business} />
-              {/* Action Button */}
-              <ActionButton />
-              {/* AboutSection */}
-              <About />
+                {/* AboutSection */}
+                <About business={business} />
+               {/* Action Button */}
+               <ActionButton business={business} />
+              
+             
+            
             </View>
           )}
-        </ScrollView>
+        </View>
       )}
     </>
   );
