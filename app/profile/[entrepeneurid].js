@@ -10,8 +10,7 @@ import {
 import { db } from "../../config/FirebaseConfig";
 import { doc, getDoc } from "firebase/firestore";
 import { useLocalSearchParams } from "expo-router";
-import ProfileHeader from "../../components/Profile/EntrepreneurProfile/ProfileHeader";
-import ProfileStats from "../../components/Profile/EntrepreneurProfile/ProfileStats";
+import ProfileHeader from "./EntrepreneurProfile/ProfileHeader";
 import ProfileInfo from "../../components/Profile/EntrepreneurProfile/ProfileInfo";
 import ContactDetails from "../../components/Profile/EntrepreneurProfile/ContactDetails";
 import PreviousWorks from "../../components/Profile/EntrepreneurProfile/PreviousWorks";
@@ -58,11 +57,17 @@ export default function EntrepreneurProfile() {
         <>
           <ScrollView style={styles.container}>
             <View style={styles.content}>
-              <ProfileHeader />
-              <ProfileInfo />
-              <ContactDetails />
+              <ProfileHeader entrepreneurId={entrepeneurid} />
+              <ProfileInfo entrepreneurId={entrepeneurid} />
+              <ContactDetails entrepreneurId={entrepeneurid} />
             </View>
-            <PreviousWorks />
+            <View>
+              {entrepeneurid ? (
+                <PreviousWorks entrepreneurId={entrepeneurid} />
+              ) : (
+                <Text>No Entrepreneur ID available</Text>
+              )}
+            </View>
           </ScrollView>
           <AcceptBidButton entrepeneurid={entrepeneurid} />
         </>
