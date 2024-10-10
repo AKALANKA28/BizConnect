@@ -6,6 +6,7 @@ import BusinessListCard from "../../components/BusinessList/BusinessListCard";
 import Header from "../../components/Header";
 import { db } from "../../config/FirebaseConfig";
 import { Colors } from "../../constants/Colors";
+import LoadingScreen from "../../components/LoadingScreen";
 
 export default function BusinessListByCategory() {
   const navigation = useNavigation();
@@ -35,11 +36,7 @@ export default function BusinessListByCategory() {
   return (
     <>
       {loading ? (
-        <View
-          style={{ flex: 1, justifyContent: "center", alignItems: "center" }}
-        >
-          <ActivityIndicator size={"large"} color={Colors.secondaryColor} />
-        </View>
+        <LoadingScreen/>
       ) : (
         <>
           <Header title={category} />

@@ -1,4 +1,4 @@
-import { router } from "expo-router";
+import { useRouter } from "expo-router"; // Changed to useRouter, not router
 import React, { useEffect, useState } from "react";
 import {
   View,
@@ -13,55 +13,58 @@ import { useAuth } from "../../../context/authContext"; // Import useAuth hook
 import { doc, getDoc } from "firebase/firestore";
 import { db } from "../../../config/FirebaseConfig"; // Firestore instance
 
-const ProfileHeader = () => {
+const ProfileHeader = ({ buyerId }) => {
   const [dropdownVisible, setDropdownVisible] = useState(false);
-  const { user } = useAuth(); // Get the currently logged-in user
+  const { user, signout } = useAuth(); // Get the currently logged-in user
   const [profileData, setProfileData] = useState({
     firstName: "Loading...",
+    lastName: "Loading...",
     title: "Loading...",
     profileImage: "https://via.placeholder.com/150", // Default placeholder image
   });
+  const router = useRouter(); // Correct use of useRouter
 
   // Function to fetch profile data from Firestore
   const fetchProfileData = async () => {
-    if (user) {
-      try {
+    try {
+      const idToFetch = buyerId || user?.uid; // Use buyerId or fallback to the current user
+      if (idToFetch) {
         // Reference to the user's document in Firestore
-        const userDocRef = doc(db, "buyers", user.uid);
+        const userDocRef = doc(db, "buyers", idToFetch); // Corrected to use `idToFetch` (dynamic ID)
         const userDocSnap = await getDoc(userDocRef);
-  
+
         if (userDocSnap.exists()) {
           const userData = userDocSnap.data();
           setProfileData({
             firstName: userData.firstName || "No first name provided",
             lastName: userData.lastName || "No last name provided",
-            title: userData.title || "No title available",  // Use bio as title if it's the description
-            profileImage: userData.profileImage || "https://via.placeholder.com/150",  // Fallback to placeholder
+            title: userData.title || "No title available",
+            profileImage:
+              userData.profileImage || "https://via.placeholder.com/150", // Fallback to placeholder
           });
         } else {
           console.log("No such user document!");
         }
-      } catch (error) {
-        console.error("Error fetching profile data: ", error);
       }
+    } catch (error) {
+      console.error("Error fetching profile data: ", error);
     }
   };
-  
 
-  console.log("profile", profileData);
-  
-  // Fetch profile data when component mounts
+  // Fetch profile data when the component mounts
   useEffect(() => {
-    fetchProfileData();
-  }, [user]);
+    if (buyerId || user) {
+      fetchProfileData();
+    }
+  }, [buyerId, user]); // Updated dependency to include both buyerId and user
 
   const handleEditProfile = () => {
     router.push("/profile/BuyerProfile/EditProfileScreen");
     setDropdownVisible(false); // Hide dropdown after selecting an option
   };
 
-  const handleLogout = () => {
-    // Add logout logic here
+  const handleLogout = async () => {
+    await signout(); // Call the signout function
     setDropdownVisible(false);
   };
 
@@ -86,8 +89,10 @@ const ProfileHeader = () => {
           style={styles.profileImage}
         />
         <View style={styles.infoContainer}>
-          <Text style={styles.name}>{profileData.firstName} {profileData.lastName}</Text>
-          <Text style={styles.title}>{profileData.title}</Text> 
+          <Text style={styles.name}>
+            {profileData.firstName} {profileData.lastName}
+          </Text>
+          <Text style={styles.title}>{profileData.title}</Text>
 
           <View style={styles.buttonContainer}>
             <TouchableOpacity
