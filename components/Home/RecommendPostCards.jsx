@@ -3,10 +3,10 @@ import React from "react";
 import { Colors } from "../../constants/Colors";
 import { useRouter } from "expo-router";
 
-export default function PopularBusinessCards({ business }) {
+export default function RecommendPostCards({ business }) {
   const router = useRouter();
 
-  return ( 
+  return (
     <TouchableOpacity
       onPress={() => router.push("/businessdetails/" + business?.id)}
       style={styles.card}
@@ -19,8 +19,8 @@ export default function PopularBusinessCards({ business }) {
         <Text style={styles.name}>{business?.name}</Text>
         <Text style={styles.address}>{business?.address}</Text>
 
-        <View style={styles.ratingContainer}>
-          <View style={styles.rating}>
+        {/* <View style={styles.ratingContainer}>
+          <View style={styles.rating}> */}
             {/* <Image
               source={require("../../assets/images/star.png")}
               style={{ width: 15, height: 15 }}
@@ -28,8 +28,8 @@ export default function PopularBusinessCards({ business }) {
             <Text style={styles.ratingText}>4.5</Text> */}
           </View>
           <Text style={styles.category}>{business?.category}</Text>
-        </View>
-      </View>
+        {/* </View>
+      </View> */}
     </TouchableOpacity>
   );
 }
@@ -38,16 +38,18 @@ const styles = StyleSheet.create({
   card: {
     padding: 10,
     marginLeft: 20,
+    marginRight: 20,
+    marginBottom: 2,
     backgroundColor: "#fff",
-    borderRadius: 15,
+    borderRadius: 10,
     borderColor: "#F8F9FA",
     borderWidth: 1,
-    width: 256,
-    height: 222,
+    width: 340,
+    height: 230,
     alignItems: "center", // Center image
   },
   image: {
-    width: 240,
+    width: 300,
     height: 152,
     borderRadius: 15,
     marginBottom: 10,
@@ -67,23 +69,23 @@ const styles = StyleSheet.create({
     textTransform: "capitalize",
     color: Colors.text,
   },
-  ratingContainer: {
-    display: "flex",
-    flexDirection: "row",
-    justifyContent: "space-between",
-    marginTop: 5,
-    width: "100%",
-  },
-  rating: {
-    display: "flex",
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 5,
-  },
-  ratingText: {
-    color: Colors.text,
-    fontFamily: "roboto-bold",
-  },
+//   ratingContainer: {
+//     display: "flex",
+//     flexDirection: "row",
+//     justifyContent: "space-between",
+//     marginTop: 5,
+//     width: "100%",
+//   },
+//   rating: {
+//     display: "flex",
+//     flexDirection: "row",
+//     alignItems: "center",
+//     gap: 5,
+//   },
+//   ratingText: {
+//     color: Colors.text,
+//     fontFamily: "roboto-bold",
+//   },
   category: {
     fontFamily: "roboto-medium",
     backgroundColor: Colors.primaryColor,

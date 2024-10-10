@@ -11,7 +11,6 @@ import {
   ScrollView,
   KeyboardAvoidingView,
 } from "react-native";
-import { router, useNavigation } from "expo-router";
 import { Colors } from "../../constants/Colors";
 import RNPickerSelect from "react-native-picker-select";
 import { db, storage } from "../../config/FirebaseConfig";
@@ -29,10 +28,9 @@ import {
 import * as ImagePicker from "expo-image-picker";
 import Header from "../../components/Header";
 import { getAuth } from "firebase/auth";
-import { ref, uploadBytes, getDownloadURL } from "firebase/storage"; // Import necessary storage functions
+import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
 
 export default function AddBid() {
-  const navigation = useNavigation();
   const [categoryList, setCategoryList] = useState([]);
   const [name, setName] = useState("");
   const [address, setAddress] = useState("");
@@ -40,13 +38,14 @@ export default function AddBid() {
   const [contact, setContact] = useState("");
   const [category, setCategory] = useState("");
   const [image, setImage] = useState(null);
+  const [loading, setLoading] = useState(false); 
+  const [successMessage, setSuccessMessage] = useState(null); 
   const auth = getAuth();
   const user = auth.currentUser;
   const [title, setTitle] = useState();
-  const [loading, setLoading] = useState(false); // Add a loading state
 
   useEffect(() => {
-    setTitle("Add New Post"); // Update title dynamically as required
+    setTitle("Add New Post");
     fetchCategoryList();
     requestCameraPermission();
   }, []);
@@ -89,12 +88,12 @@ export default function AddBid() {
   const uploadImage = async (uri) => {
     const response = await fetch(uri);
     const blob = await response.blob();
-    const fileName = `profile-images/${user.uid}-${Date.now()}.jpg`; // Create a unique file name
-    const storageRef = ref(storage, fileName); // Create a reference to the storage location
+    const fileName = `profile-images/${user.uid}-${Date.now()}.jpg`;
+    const storageRef = ref(storage, fileName);
 
-    await uploadBytes(storageRef, blob); // Upload the blob to Firebase Storage
-    const downloadURL = await getDownloadURL(storageRef); // Get the download URL for the uploaded image
-    return downloadURL; // Return the URL
+    await uploadBytes(storageRef, blob);
+    const downloadURL = await getDownloadURL(storageRef);
+    return downloadURL;
   };
 
   const onAddPost = async () => {
@@ -104,32 +103,30 @@ export default function AddBid() {
     }
 
     if (loading) {
-      return; // Prevent additional calls while loading
+      return;
     }
 
-    setLoading(true); // Set loading to true when starting
+    setLoading(true);
 
     try {
       if (name && address && about && contact && category) {
         let imageUrl = null;
 
         if (image) {
-          imageUrl = await uploadImage(image); // Upload the image and get the download URL
+          imageUrl = await uploadImage(image);
         }
 
-        // Add new post to BusinessList
         const postRef = await addDoc(collection(db, "BusinessList"), {
-          name, // Test name
-          address, // Address (e.g., Homagama)
-          about, // Description or about (e.g., test2)
-          contact, // Contact info (e.g., "number 2")
-          category, // Category (e.g., Wicker)
-          imageUrl: imageUrl || null, // Use the uploaded image URL or null
-          userId: user.uid, // Add userId
-          userEmail: user.email, // Add userEmail
+          name,
+          address,
+          about,
+          contact,
+          category,
+          imageUrl: imageUrl || null,
+          userId: user.uid,
+          userEmail: user.email,
         });
 
-        // Fetch entrepreneur's existing posts
         const entrepreneurRef = doc(db, "entrepreneurs", user.uid);
         const entrepreneurSnap = await getDoc(entrepreneurRef);
 
@@ -137,7 +134,6 @@ export default function AddBid() {
           const entrepreneurData = entrepreneurSnap.data();
           const existingPosts = entrepreneurData.posts || [];
 
-          // Check if the post already exists
           const postExists = existingPosts.some(
             (post) => post.postId === postRef.id
           );
@@ -154,7 +150,6 @@ export default function AddBid() {
             });
           }
         } else {
-          // Handle if the entrepreneur's document does not exist
           await setDoc(entrepreneurRef, {
             posts: [
               {
@@ -168,8 +163,14 @@ export default function AddBid() {
           });
         }
 
-        ToastAndroid.show("Post Added Successfully", ToastAndroid.BOTTOM);
-        router.push("posts");
+        setSuccessMessage("Post Added Successfully");
+
+        setName("");
+        setAddress("");
+        setAbout("");
+        setContact("");
+        setCategory("");
+        setImage(null);
       } else {
         ToastAndroid.show("Please fill all the fields.", ToastAndroid.BOTTOM);
       }
@@ -177,9 +178,10 @@ export default function AddBid() {
       console.error("Error adding document: ", error);
       ToastAndroid.show("Error adding post", ToastAndroid.BOTTOM);
     } finally {
-      setLoading(false); // Reset loading state after completion
+      setLoading(false);
     }
   };
+
   return (
     <KeyboardAvoidingView
       style={styles.container}
@@ -187,6 +189,18 @@ export default function AddBid() {
     >
       <Header title={title} />
       <ScrollView contentContainerStyle={styles.scrollContainer}>
+        {successMessage && (
+          <View style={styles.successMessageContainer}>
+            <Text style={styles.successMessage}>{successMessage}</Text>
+            <TouchableOpacity
+              style={styles.okButton}
+              onPress={() => setSuccessMessage(null)} 
+            >
+              <Text style={styles.okButtonText}>OK</Text>
+            </TouchableOpacity>
+          </View>
+        )}
+
         <Text style={styles.label}>Image</Text>
         <TouchableOpacity
           onPress={pickImage}
@@ -205,6 +219,7 @@ export default function AddBid() {
         <TextInput
           placeholder="Name"
           onChangeText={setName}
+          value={name} 
           style={styles.input}
         />
 
@@ -212,6 +227,7 @@ export default function AddBid() {
         <TextInput
           placeholder="Address"
           onChangeText={setAddress}
+          value={address} 
           style={styles.input}
         />
 
@@ -219,6 +235,7 @@ export default function AddBid() {
         <TextInput
           placeholder="About"
           onChangeText={setAbout}
+          value={about} 
           style={styles.input}
         />
 
@@ -226,12 +243,17 @@ export default function AddBid() {
         <TextInput
           placeholder="Contact"
           onChangeText={setContact}
+          value={contact} 
           style={styles.input}
         />
 
         <Text style={styles.label}>Category</Text>
         <View style={styles.pickerContainer}>
-          <RNPickerSelect onValueChange={setCategory} items={categoryList} />
+          <RNPickerSelect
+            onValueChange={setCategory}
+            items={categoryList}
+            value={category}
+          />
         </View>
 
         <TouchableOpacity onPress={onAddPost} style={styles.button}>
@@ -292,5 +314,30 @@ const styles = StyleSheet.create({
   },
   buttonText: {
     color: "#fff",
+  },
+  successMessageContainer: {
+    backgroundColor: Colors.primaryColor,
+    padding: 60,
+    borderRadius: 10,
+    position: "absolute",
+    top: "40%",
+    left: "10%",
+    right: "10%",
+    zIndex: 9999,
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  successMessage: {
+    color: Colors.WHITE,
+    fontSize: 18,
+  },
+  okButton: {
+    backgroundColor: Colors.WHITE,
+    borderRadius: 5,
+    marginTop: 20,
+    padding: 10,
+  },
+  okButtonText: {
+    color: Colors.BLACK,
   },
 });
