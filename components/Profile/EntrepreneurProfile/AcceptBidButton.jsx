@@ -1,5 +1,5 @@
-import React, { useState } from "react";
-import { TouchableOpacity, Text, Alert, StyleSheet } from "react-native";
+import React, { useState, useEffect } from "react";
+import { TouchableOpacity, Text, Alert, StyleSheet, View } from "react-native";
 import {
   collection,
   query,
@@ -14,20 +14,57 @@ import {
 import { db } from "../../../config/FirebaseConfig";
 import { Colors } from "../../../constants/Colors"; // Assuming you have a Colors file for your theme
 import Loading from "../../Loading";
-import { View } from "react-native";
+import { RFValue } from "react-native-responsive-fontsize";
 
 export default function AcceptBidButton({ entrepeneurid }) {
-  const [loading, setLoading] = useState(false); // Add loading state
+  const [loading, setLoading] = useState(false);
+  const [bidAccepted, setBidAccepted] = useState(false); // New state for bid status
+
+  useEffect(() => {
+    // Check if the bid is already accepted when the component mounts
+    const checkBidStatus = async () => {
+      try {
+        if (!entrepeneurid) {
+          console.error("Entrepreneur ID is undefined");
+          return;
+        }
+
+        // Query to get the bidId from PlacedBids collection where entrepreneurId matches
+        const q = query(
+          collection(db, "PlacedBids"),
+          where("entrepreneurId", "==", entrepeneurid)
+        );
+
+        const querySnapshot = await getDocs(q);
+
+        if (querySnapshot.empty) {
+          console.error("No bids found for this entrepreneur.");
+          return;
+        }
+
+        const bidDoc = querySnapshot.docs[0];
+        const bidData = bidDoc.data();
+
+        // Check the status of the bid
+        if (bidData.status === "accepted") {
+          setBidAccepted(true); // If the bid is already accepted, update the state
+        }
+      } catch (error) {
+        console.error("Error checking bid status: ", error);
+      }
+    };
+
+    checkBidStatus();
+  }, [entrepeneurid]);
 
   const acceptBid = async () => {
     try {
-      // console.log("Entrepreneur ID: ", entrepeneurid);
-      setLoading(true); // Set loading to true when bid is being processed
+      setLoading(true);
 
       if (!entrepeneurid) {
         console.error("Entrepreneur ID is undefined");
         Alert.alert("Error", "Entrepreneur ID is missing.");
-        setLoading(false); // Reset loading
+        setLoading(false);
         return;
       }
 
@@ -38,21 +75,17 @@ export default function AcceptBidButton({ entrepeneurid }) {
       );
 
       const querySnapshot = await getDocs(q);
-      // console.log("Query Snapshot: ", querySnapshot.docs); // Log the query result
 
       if (querySnapshot.empty) {
         console.error("No bids found for this entrepreneur.");
         Alert.alert("Error", "No bids found for this entrepreneur.");
-        setLoading(false); // Reset loading
+        setLoading(false);
         return;
       }
 
-      // Assuming you want the first bid found
       const bidDoc = querySnapshot.docs[0];
       const bidData = bidDoc.data();
       const bidId = bidData.bidId;
-
-      console.log("Fetched Bid ID: ", bidId);
 
       // Fetch the owner's name using the ownerId (which is the uid in this case)
       const ownerId = bidData.ownerId; // Owner ID from bid data
@@ -72,13 +105,6 @@ export default function AcceptBidButton({ entrepeneurid }) {
         timestamp: new Date(),
       });
 
-      // console.log(
-      //   "Checking for notifications with Bid ID: ",
-      //   bidId,
-      //   " and Owner ID: ",
-      //   bidData.ownerId
-      // );
-
       // Find and delete the corresponding notification from `BuyerNotifications`
       const buyerNotificationQuery = query(
         collection(db, "BuyerNotifications"),
@@ -94,37 +120,44 @@ export default function AcceptBidButton({ entrepeneurid }) {
 
         // Delete the notification
         await deleteDoc(doc(db, "BuyerNotifications", notificationId));
-        // console.log("Notification deleted for Buyer: ", notificationId);
       } else {
         console.log("No matching notification found in BuyerNotifications.");
       }
+console.log(" ownerId: ",bidData.ownerId);
 
       // Add a new notification to the `EntrepreneurNotifications` collection
       const entrepreneurNotification = {
         entrepreneurId: entrepeneurid,
+        buyerId: bidData.ownerId,
+        
         bidId: bidId,
         message: `Your bid has been accepted by ${ownerName}`, // Using the ownerName variable
         timestamp: new Date(),
         status: "unread", // Optionally track the read/unread status
       };
 
-      // console.log("Preparing to add notification: ", entrepreneurNotification); // Log the notification data
-
       await addDoc(
         collection(db, "EntrepreneurNotifications"),
         entrepreneurNotification
       );
-      // console.log("Notification sent to Entrepreneur.");
 
       // Notify the entrepreneur
       Alert.alert("Bid Accepted", "The bid has been successfully accepted!");
+
+      // Set the bidAccepted state to true after accepting
+      setBidAccepted(true);
     } catch (error) {
-      // console.error("Error in acceptBid: ", error); // Log any error
+      console.error("Error in acceptBid: ", error);
       Alert.alert("Error", "An error occurred while processing your request.");
-    }finally {
-      setLoading(false); // Reset loading state after the bid is processed
+    } finally {
+      setLoading(false);
     }
   };
+
+  // If the bid has been accepted, hide the button
+  if (bidAccepted) {
+    return null; // Hide the button if the bid is already accepted
+  }
 
   return (
     <View>
@@ -167,7 +200,7 @@ const styles = StyleSheet.create({
   },
   fabText: {
     color: "white",
-    fontSize: 16,
-    fontWeight: "bold",
+    fontSize: RFValue(14),
+    fontFamily: "lato-bold",
   },
 });

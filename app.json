@@ -14,14 +14,28 @@
       "backgroundColor": "#ffffff"
     },
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "bundleIdentifier": "com.akalankadias.BizConnect",
+      "infoPlist": {
+        "NSCameraUsageDescription": "This app uses the camera for uploading photos.",
+        "NSLocationWhenInUseUsageDescription": "This app needs access to your location."
+      }
     },
     "android": {
       "adaptiveIcon": {
         "foregroundImage": "./assets/images/adaptive-icon.png",
         "backgroundColor": "#ffffff"
       },
-      "package": "com.akalankadias.BizConnect"
+      "package": "com.akalankadias.BizConnect",
+      "permissions": [
+        "CAMERA",
+        "ACCESS_FINE_LOCATION",
+        "NOTIFICATIONS"
+      ],
+      "notification": {
+        "icon": "./assets/images/notification-icon.png",
+        "color": "#000000" 
+      }
     },
     "web": {
       "bundler": "metro",

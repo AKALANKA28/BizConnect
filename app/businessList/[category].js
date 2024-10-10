@@ -1,4 +1,4 @@
-import { View, FlatList, ActivityIndicator, Text, } from "react-native";
+import { View, FlatList, ActivityIndicator, Text } from "react-native";
 import React, { useEffect, useState } from "react";
 import { useLocalSearchParams, useNavigation } from "expo-router";
 import { collection, getDocs, query, where } from "firebase/firestore";
@@ -6,6 +6,7 @@ import BusinessListCard from "../../components/BusinessList/BusinessListCard";
 import Header from "../../components/Header";
 import { db } from "../../config/FirebaseConfig";
 import { Colors } from "../../constants/Colors";
+import LoadingScreen from "../../components/LoadingScreen";
 
 export default function BusinessListByCategory() {
   const navigation = useNavigation();
@@ -27,7 +28,7 @@ export default function BusinessListByCategory() {
     );
     const querySnapshot = await getDocs(q);
     querySnapshot.forEach((doc) => {
-      setBusinessList(prev => [...prev, {id:doc?.id, ...doc.data()}]);
+      setBusinessList((prev) => [...prev, { id: doc?.id, ...doc.data() }]);
     });
     setLoading(false);
   };
@@ -35,9 +36,7 @@ export default function BusinessListByCategory() {
   return (
     <>
       {loading ? (
-        <View style={{flex: 1, justifyContent: "center", alignItems: "center"}}>
-          <ActivityIndicator size={'large'} color={Colors.secondaryColor} />
-        </View>
+        <LoadingScreen/>
       ) : (
         <>
           <Header title={category} />
@@ -51,7 +50,13 @@ export default function BusinessListByCategory() {
               )}
             />
           ) : (
-            <View style={{flex: 1, justifyContent: "center", alignItems: "center"}}>
+            <View
+              style={{
+                flex: 1,
+                justifyContent: "center",
+                alignItems: "center",
+              }}
+            >
               <Text
                 style={{
                   fontSize: 20,
@@ -69,4 +74,3 @@ export default function BusinessListByCategory() {
     </>
   );
 }
-
