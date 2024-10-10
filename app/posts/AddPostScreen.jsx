@@ -15,7 +15,15 @@ import { router, useNavigation } from "expo-router";
 import { Colors } from "../../constants/Colors";
 import RNPickerSelect from "react-native-picker-select";
 import { db, storage } from "../../config/FirebaseConfig";
-import { addDoc, collection, getDocs, query, doc, updateDoc,arrayUnion  } from "firebase/firestore";
+import {
+  addDoc,
+  collection,
+  getDocs,
+  query,
+  doc,
+  updateDoc,
+  arrayUnion,
+} from "firebase/firestore";
 import * as ImagePicker from "expo-image-picker";
 import Header from "../../components/Header";
 import { getAuth } from "firebase/auth";
@@ -33,6 +41,7 @@ export default function AddBid() {
   const auth = getAuth();
   const user = auth.currentUser;
   const [title, setTitle] = useState();
+  const [loading, setLoading] = useState(false); // Add a loading state
 
   useEffect(() => {
     setTitle("Add New Post"); // Update title dynamically as required
@@ -88,53 +97,87 @@ export default function AddBid() {
 
   const onAddPost = async () => {
     if (!user) {
-        ToastAndroid.show("User not authenticated.", ToastAndroid.BOTTOM);
-        return;
+      ToastAndroid.show("User not authenticated.", ToastAndroid.BOTTOM);
+      return;
     }
+
+    if (loading) {
+      return; // Prevent additional calls while loading
+    }
+
+    setLoading(true); // Set loading to true when starting
 
     try {
-        if (name && address && about && contact && category) {
-            let imageUrl = null; // Initialize imageUrl as null
+      if (name && address && about && contact && category) {
+        let imageUrl = null;
 
-            if (image) {
-                imageUrl = await uploadImage(image); // Upload the image and get the download URL
-            }
-
-            // Add new post to BusinessList
-            const postRef = await addDoc(collection(db, "BusinessList"), {
-                name, // Test name
-                address, // Address (e.g., Homagama)
-                about, // Description or about (e.g., test2)
-                contact, // Contact info (e.g., "number 2")
-                category, // Category (e.g., Wicker)
-                imageUrl: imageUrl || null, // Use the uploaded image URL or null
-                userId: user.uid, // Add userId
-                userEmail: user.email, // Add userEmail
-            });
-
-            // Update the corresponding entrepreneur document with the new post
-            const entrepreneurRef = doc(db, "entrepreneurs", user.uid); // Assuming user.uid corresponds to the entrepreneur's document ID
-            await updateDoc(entrepreneurRef, {
-                posts: arrayUnion({ // Use arrayUnion directly
-                    postId: postRef.id,
-                    name,
-                    about,
-                    category,
-                    imageUrl: imageUrl || null,
-                }),
-            });
-
-            ToastAndroid.show("Post Added Successfully", ToastAndroid.BOTTOM);
-            router.push("posts");
-        } else {
-            ToastAndroid.show("Please fill all the fields.", ToastAndroid.BOTTOM);
+        if (image) {
+          imageUrl = await uploadImage(image); // Upload the image and get the download URL
         }
-    } catch (error) {
-        console.error("Error adding document: ", error);
-        ToastAndroid.show("Error adding post", ToastAndroid.BOTTOM);
-    }
-};
 
+        // Add new post to BusinessList
+        const postRef = await addDoc(collection(db, "BusinessList"), {
+          name, // Test name
+          address, // Address (e.g., Homagama)
+          about, // Description or about (e.g., test2)
+          contact, // Contact info (e.g., "number 2")
+          category, // Category (e.g., Wicker)
+          imageUrl: imageUrl || null, // Use the uploaded image URL or null
+          userId: user.uid, // Add userId
+          userEmail: user.email, // Add userEmail
+        });
+
+        // Fetch entrepreneur's existing posts
+        const entrepreneurRef = doc(db, "entrepreneurs", user.uid);
+        const entrepreneurSnap = await getDoc(entrepreneurRef);
+
+        if (entrepreneurSnap.exists()) {
+          const entrepreneurData = entrepreneurSnap.data();
+          const existingPosts = entrepreneurData.posts || [];
+
+          // Check if the post already exists
+          const postExists = existingPosts.some(
+            (post) => post.postId === postRef.id
+          );
+
+          if (!postExists) {
+            await updateDoc(entrepreneurRef, {
+              posts: arrayUnion({
+                postId: postRef.id,
+                name,
+                about,
+                category,
+                imageUrl: imageUrl || null,
+              }),
+            });
+          }
+        } else {
+          // Handle if the entrepreneur's document does not exist
+          await setDoc(entrepreneurRef, {
+            posts: [
+              {
+                postId: postRef.id,
+                name,
+                about,
+                category,
+                imageUrl: imageUrl || null,
+              },
+            ],
+          });
+        }
+
+        ToastAndroid.show("Post Added Successfully", ToastAndroid.BOTTOM);
+        router.push("posts");
+      } else {
+        ToastAndroid.show("Please fill all the fields.", ToastAndroid.BOTTOM);
+      }
+    } catch (error) {
+      console.error("Error adding document: ", error);
+      ToastAndroid.show("Error adding post", ToastAndroid.BOTTOM);
+    } finally {
+      setLoading(false); // Reset loading state after completion
+    }
+  };
   return (
     <KeyboardAvoidingView
       style={styles.container}
