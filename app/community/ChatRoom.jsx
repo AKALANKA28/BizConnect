@@ -1,9 +1,20 @@
-import React, { useState, useEffect, useRef } from "react";
-import { View, TextInput, FlatList, Text, TouchableOpacity, StyleSheet, KeyboardAvoidingView, Platform } from "react-native";
+import React, { useEffect, useState, useRef } from "react";
+import {
+  View,
+  TextInput,
+  FlatList,
+  Text,
+  TouchableOpacity,
+  StyleSheet,
+  KeyboardAvoidingView,
+  Platform,
+} from "react-native";
 import { collection, query, where, onSnapshot, addDoc, orderBy } from "firebase/firestore";
 import { db } from "../../config/FirebaseConfig";
 import { useAuth } from "../../context/authContext";
 import { useLocalSearchParams } from 'expo-router'; // Access route params
+import Header from "./Header"; // Importing the existing Header component
+import { Ionicons } from "@expo/vector-icons"; // For the back button
 
 export default function ChatScreen() {
   const { chatRoomId } = useLocalSearchParams();
@@ -53,15 +64,14 @@ export default function ChatScreen() {
     <KeyboardAvoidingView
       style={styles.container}
       behavior={Platform.OS === "ios" ? "padding" : "height"}
-      keyboardVerticalOffset={90}
+      keyboardVerticalOffset={80} // Adjusted to reduce gap with the input field
     >
-      {/* Header */}
-      <View style={styles.header}>
-        <Text style={styles.headerTitle}>Chat</Text>
-        <TouchableOpacity style={styles.headerButton}>
-          <Text style={styles.headerButtonText}>Info</Text>
+      {/* Header with back button */}
+      <Header title="Chat">
+        <TouchableOpacity onPress={() => router.back()}>
+          <Ionicons name="arrow-back" size={24} color="black" />
         </TouchableOpacity>
-      </View>
+      </Header>
 
       {/* Message list */}
       <FlatList
@@ -72,6 +82,9 @@ export default function ChatScreen() {
             styles.messageContainer,
             item.userId === user.uid ? styles.sentMessage : styles.receivedMessage
           ]}>
+            {item.userId !== user.uid && (
+              <Text style={styles.usernameText}>{item.userName}</Text>
+            )}
             <Text style={styles.messageText}>{item.message}</Text>
             <Text style={styles.timestamp}>{new Date(item.createdAt.seconds * 1000).toLocaleTimeString()}</Text>
           </View>
@@ -101,31 +114,6 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: "#f5f5f5",
   },
-  header: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
-    padding: 16,
-    backgroundColor: "#FF8C00", // Change to your accent color
-    elevation: 5, // Shadow effect for Android
-    shadowColor: "#000", // Shadow effect for iOS
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.2,
-    shadowRadius: 2,
-  },
-  headerTitle: {
-    fontSize: 20,
-    fontWeight: "bold",
-    color: "#fff",
-  },
-  headerButton: {
-    backgroundColor: "transparent",
-    padding: 10,
-  },
-  headerButtonText: {
-    color: "#fff",
-    fontWeight: "bold",
-  },
   messageList: {
     padding: 10,
     flexGrow: 1, // Ensure the FlatList takes full height
@@ -143,6 +131,12 @@ const styles = StyleSheet.create({
   receivedMessage: {
     backgroundColor: "#ffffff",
     alignSelf: "flex-start",
+  },
+  usernameText: {
+    fontSize: 12,
+    fontWeight: "bold",
+    color: "#333",
+    marginBottom: 2,
   },
   messageText: {
     fontSize: 16,

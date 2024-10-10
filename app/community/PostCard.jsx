@@ -8,7 +8,7 @@ export default function PostCard({ post }) {
   const handleViewDetails = () => {
     router.push({
       pathname: '/community/CollabSpace',
-      params: { postId: post.id }, // Pass only the post ID
+      params: { postId: post.id, proPic: post.profileImage}, // Pass only the post ID
     });
   };
 

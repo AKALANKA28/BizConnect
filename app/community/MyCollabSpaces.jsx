@@ -1,9 +1,10 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState,useCallback } from 'react';
 import { View, FlatList, StyleSheet, Text } from 'react-native';
 import PostCard from './PostCard'; // Assuming PostCard is imported correctly
 import { db, auth } from '../../config/FirebaseConfig'; // Firebase and Auth config import
 import { getDocs, collection, query, where } from 'firebase/firestore';
 import { onAuthStateChanged } from 'firebase/auth'; // To detect the logged-in user
+import { useFocusEffect } from '@react-navigation/native'; // For automatic refresh
 
 export default function MyCollabSpaces() {
   const [posts, setPosts] = useState([]);
@@ -46,6 +47,7 @@ export default function MyCollabSpaces() {
       console.error('Error fetching posts: ', error);
     }
   };
+
 
   const renderPost = ({ item }) => <PostCard post={item} />;
 

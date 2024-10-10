@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import {
   View,
   Text,
@@ -10,6 +10,7 @@ import {
   StyleSheet,
   KeyboardAvoidingView,
   Platform,
+  Animated,
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import * as ImagePicker from "expo-image-picker";
@@ -22,7 +23,6 @@ import { useAuth } from "../../context/authContext";
 import { v4 as uuidv4 } from "uuid"; // For generating unique image names
 import 'react-native-get-random-values';
 
-
 export default function CollabSpaceForm() {
   const { user } = useAuth();
   const [title, setTitle] = useState("");
@@ -31,6 +31,8 @@ export default function CollabSpaceForm() {
   const [goals, setGoals] = useState([""]);
   const [featuredImage, setFeaturedImage] = useState(null);
   const [moreImages, setMoreImages] = useState([]);
+  const [showSuccess, setShowSuccess] = useState(false); // Success message state
+  const fadeAnim = useRef(new Animated.Value(0)).current; // Animation for success message
 
   useEffect(() => {
     requestMediaLibraryPermission();
@@ -93,6 +95,12 @@ export default function CollabSpaceForm() {
     setGoals([...goals, ""]);
   };
 
+  const removeGoalInput = (index) => {
+    const updatedGoals = [...goals];
+    updatedGoals.splice(index, 1);
+    setGoals(updatedGoals);
+  };
+
   const handleGoalChange = (index, value) => {
     const newGoals = [...goals];
     newGoals[index] = value;
@@ -130,7 +138,29 @@ export default function CollabSpaceForm() {
           chatRoomId: chatRoomDoc.id,
         });
 
-        ToastAndroid.show("CollabSpace Added Successfully", ToastAndroid.BOTTOM);
+        // Clear input fields
+        setTitle("");
+        setDescription("");
+        setLocation("");
+        setGoals([""]);
+        setFeaturedImage(null);
+        setMoreImages([]);
+
+        // Show success message with animation
+        setShowSuccess(true);
+        Animated.timing(fadeAnim, {
+          toValue: 1,
+          duration: 1000,
+          useNativeDriver: true,
+        }).start(() => {
+          setTimeout(() => {
+            Animated.timing(fadeAnim, {
+              toValue: 0,
+              duration: 1000,
+              useNativeDriver: true,
+            }).start(() => setShowSuccess(false));
+          }, 2000);
+        });
       } else {
         ToastAndroid.show("Please fill all fields", ToastAndroid.BOTTOM);
       }
@@ -147,6 +177,14 @@ export default function CollabSpaceForm() {
     >
       <Header title="Create New CollabSpace" />
       <ScrollView contentContainerStyle={styles.scrollContainer}>
+        {/* Success Message */}
+        {showSuccess && (
+          <Animated.View style={[styles.successMessage, { opacity: fadeAnim }]}>
+            <Ionicons name="checkmark-circle" size={80} color="green" />
+            <Text style={styles.successMessageText}>CollabSpace Added Successfully</Text>
+          </Animated.View>
+        )}
+
         {/* Form Fields */}
         <Text style={styles.label}>Title</Text>
         <TextInput
@@ -168,18 +206,21 @@ export default function CollabSpaceForm() {
           placeholder="Location"
           value={location}
           onChangeText={setLocation}
-          style={[styles.input]}
-          multiline
+          style={styles.input}
         />
         <Text style={styles.label}>Goals</Text>
         {goals.map((goal, index) => (
-          <TextInput
-            key={index}
-            placeholder="Goal"
-            value={goal}
-            onChangeText={(text) => handleGoalChange(index, text)}
-            style={styles.input}
-          />
+          <View key={index} style={styles.goalContainer}>
+            <TextInput
+              placeholder="Goal"
+              value={goal}
+              onChangeText={(text) => handleGoalChange(index, text)}
+              style={styles.goalInput}
+            />
+            <TouchableOpacity onPress={() => removeGoalInput(index)} style={styles.removeButton}>
+              <Ionicons name="remove-circle-outline" size={20} color="red" />
+            </TouchableOpacity>
+          </View>
         ))}
         <TouchableOpacity onPress={addGoalInput} style={styles.addButton}>
           <Ionicons name="add-outline" size={20} color={Colors.secondaryColor} />
@@ -230,6 +271,20 @@ const styles = StyleSheet.create({
     backgroundColor: Colors.GRAY,
     marginTop: 10,
   },
+  goalContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+    marginTop: 10,
+  },
+  goalInput: {
+    flex: 1,
+    padding: 15,
+    borderRadius: 10,
+    backgroundColor: Colors.GRAY,
+  },
+  removeButton: {
+    marginLeft: 10,
+  },
   addButton: {
     marginTop: 10,
     alignItems: "center",
@@ -259,5 +314,23 @@ const styles = StyleSheet.create({
   },
   submitButtonText: {
     color: "#fff",
+  },
+  successMessage: {
+    position: "absolute",
+    top: "50%",
+    left: "50%",
+    transform: [{ translateX: -150 }, { translateY: -100 }],
+    backgroundColor: "rgba(0, 255, 0, 0.8)",
+    padding: 20,
+    borderRadius: 10,
+    zIndex: 10,
+    alignItems: "center",
+    width: 300,
+  },
+  successMessageText: {
+    color: "#fff",
+    fontSize: 18,
+    fontWeight: "bold",
+    marginTop: 10,
   },
 });
