@@ -14,6 +14,13 @@ import { doc, getDoc, updateDoc, arrayRemove } from "firebase/firestore";
 import { useAuth } from "../../../context/authContext";
 import { useRouter } from "expo-router";
 import { MaterialIcons } from "@expo/vector-icons"; // For small icons
+import { db } from "../../../config/FirebaseConfig"; // Import your Firebase config
+import { doc, getDoc } from "firebase/firestore"; // Importing the necessary Firestore methods
+import { getAuth } from "firebase/auth";
+import { router } from "expo-router";
+import { useAuth } from "../../../context/authContext"; // Import useAuth hook
+import { RFValue } from "react-native-responsive-fontsize";
+import { Colors } from "../../../constants/Colors";
 
 const screenWidth = Dimensions.get("window").width;
 
@@ -34,6 +41,9 @@ const WorkImage = ({ source, style, onEdit, onDelete, onPress }) => (
 
 const PreviousWorks = ({ entrepreneurId }) => {
   const { user } = useAuth();
+const PreviousWorks = ({ entrepreneurId }) => {
+  // Accept entrepreneurId prop
+  const { user } = useAuth(); // Get the currently logged-in user
   const [workImages, setWorkImages] = useState([]);
   const [loading, setLoading] = useState(true);
   const router = useRouter();
@@ -46,6 +56,7 @@ const PreviousWorks = ({ entrepreneurId }) => {
     try {
       const entrepreneurDocRef = doc(db, "entrepreneurs", entrepreneurId || user.uid);
       const entrepreneurDocSnap = await getDoc(entrepreneurDocRef);
+
       if (entrepreneurDocSnap.exists()) {
         const entrepreneurData = entrepreneurDocSnap.data();
         const images = entrepreneurData.posts?.map((post) => ({
@@ -53,6 +64,14 @@ const PreviousWorks = ({ entrepreneurId }) => {
           source: post.imageUrl,
           height: 250,
         })) || [];
+        console.log("Entrepreneur Data:", entrepreneurData);
+
+        const images =
+          entrepreneurData.posts?.map((post) => ({
+            source: post.imageUrl, // Ensure this is the correct property
+            height: 250,
+          })) || [];
+
         setWorkImages(images);
       }
     } catch (error) {
@@ -154,9 +173,9 @@ const styles = StyleSheet.create({
   },
   title: {
     color: "rgba(0, 0, 0, 1)",
-    fontFamily: "poppins-semibold",
-    fontSize: 17,
-    marginLeft: 16,
+    fontFamily: "lato-bold",
+    fontSize: RFValue(15),
+    marginLeft: 1,
     marginBottom: 14,
     textAlign: "left",
   },
@@ -189,13 +208,17 @@ const styles = StyleSheet.create({
     marginLeft: 5,
   },
   addNewButton: {
-    backgroundColor: "rgba(170, 106, 28, 1)",
+    backgroundColor: Colors.secondaryColor, // Brown color for the button
+    paddingVertical: 8,
+    padding: 8,
+    paddingHorizontal: 20,
     borderRadius: 50,
-    padding: 7,
+    marginBottom: 10,
   },
   addNewText: {
     color: "#FFF",
-    fontSize: 12,
+    fontSize: RFValue(12),
+    fontFamily: "lato-bold",
   },
 });
 

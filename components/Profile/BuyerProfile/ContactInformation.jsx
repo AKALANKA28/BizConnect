@@ -15,42 +15,50 @@ const ContactItem = ({ icon, label, value }) => (
   </View>
 );
 
-const ContactInformation = () => {
+const ContactInformation = ({ buyerId }) => {
   const { user } = useAuth(); // Get the currently logged-in user
   const [contactInfo, setContactInfo] = useState({
     email: "",
     phoneNumber: "",
     address: "",
   }); // State to hold contact information
+  const [loading, setLoading] = useState(true); // Loading state
 
   // Function to fetch contact information from Firestore
   const fetchContactInfo = async () => {
-    if (user) {
-      try {
-        // Reference to the user's document in Firestore
-        const userDocRef = doc(db, "buyers", user.uid);
-        const userDocSnap = await getDoc(userDocRef);
+    try {
+      const idToFetch = buyerId || user?.uid; // Use provided buyerId or current user's ID
+      const userDocRef = doc(db, "buyers", idToFetch); // Reference to buyer's document
+      const userDocSnap = await getDoc(userDocRef); // Fetch document snapshot
 
-        if (userDocSnap.exists()) {
-          const userData = userDocSnap.data();
-          setContactInfo({
-            email: userData.email || "No email available",
-            phoneNumber: userData.phoneNumber || "No phone number available",
-            address: userData.address || "No address available",
-          });
-        } else {
-          console.log("No such user document!");
-        }
-      } catch (error) {
-        console.error("Error fetching contact information: ", error);
+      if (userDocSnap.exists()) {
+        const userData = userDocSnap.data();
+        setContactInfo({
+          email: userData.email || "No email available",
+          phoneNumber: userData.phoneNumber || "No phone number available",
+          address: userData.address || "No address available",
+        });
+      } else {
+        console.log("No document found for this UID:", idToFetch); // Log if no document is found
+        setContactInfo({
+          email: "No email available",
+          phoneNumber: "No phone number available",
+          address: "No address available",
+        });
       }
+    } catch (error) {
+      console.error("Error fetching contact information from Firestore:", error); // Log errors
+    } finally {
+      setLoading(false); // Set loading to false after data fetch
     }
   };
 
-  // Fetch contact information when the component mounts
+  // Fetch contact information when the component mounts or buyerId changes
   useEffect(() => {
-    fetchContactInfo();
-  }, [user]);
+    if (buyerId || user) {
+      fetchContactInfo(); // Fetch contact info if buyerId is provided or user is logged in
+    }
+  }, [buyerId, user]);
 
   const contactData = [
     {
@@ -74,14 +82,18 @@ const ContactInformation = () => {
     <View style={styles.container}>
       <Text style={styles.title}>CONTACT INFORMATION</Text>
       <Text style={styles.subtitle}>Business Contact Details:</Text>
-      {contactData.map((item, index) => (
-        <ContactItem
-          key={index}
-          icon={item.icon}
-          label={item.label}
-          value={item.value}
-        />
-      ))}
+      {loading ? (
+        <Text>Loading...</Text>
+      ) : (
+        contactData.map((item, index) => (
+          <ContactItem
+            key={index}
+            icon={item.icon}
+            label={item.label}
+            value={item.value}
+          />
+        ))
+      )}
     </View>
   );
 };

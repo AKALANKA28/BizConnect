@@ -6,6 +6,7 @@ import { AuthContextProvider, useAuth } from "../context/authContext";
 import { useFonts } from "expo-font";
 import { NotificationProvider } from "../context/notificationContext"; // Import the NotificationProvider
 import { GestureHandlerRootView } from "react-native-gesture-handler";
+import LoadingScreen from "../components/LoadingScreen";
 
 const MainLayout = () => {
   const { isAuthenticated, user } = useAuth();
@@ -48,7 +49,7 @@ const MainLayout = () => {
   useEffect(() => {
     if (isAuthenticated) {
       console.log("User is authenticated.");
-      console.log("User details:", user);
+      // console.log("User details:", user);
     } else {
       console.log("User is not authenticated.");
     }
@@ -74,15 +75,14 @@ export default function RootLayout() {
     "poppins-bold": require("../assets/fonts/Poppins-Bold.ttf"),
 
     "lato": require("../assets/fonts/Lato-Regular.ttf"),
+    "lato-bold": require("../assets/fonts/Lato-Bold.ttf"),
 
 
   });
 
   if (!fontsLoaded) {
     return (
-      <View style={{ flex: 1, alignItems: "center", justifyContent: "center" }}>
-        <Text>Loading...</Text>
-      </View>
+     <LoadingScreen/>
     );
   }
 

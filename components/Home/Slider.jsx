@@ -3,6 +3,7 @@ import React, { useEffect, useState, useRef } from "react";
 import { collection, getDocs, query } from "firebase/firestore";
 import { db } from "../../config/FirebaseConfig";
 import { Colors } from "../../constants/Colors";
+import { RFValue } from "react-native-responsive-fontsize";
 
 export default function Slider() {
   const [sliderList, setSliderList] = useState([]);
@@ -49,15 +50,14 @@ export default function Slider() {
     <View style={{ backgroundColor: Colors.background }}>
       <Text
         style={{
-          fontSize: 20,
+          fontSize: RFValue(17),
           fontFamily: "roboto-bold",
           paddingLeft: 20,
           paddingTop: 40,
-          marginBottom: 5,
           color: Colors.text,
         }}
       >
-        #Special for you
+        #SpecialForYou
       </Text>
       <FlatList
         ref={flatListRef}

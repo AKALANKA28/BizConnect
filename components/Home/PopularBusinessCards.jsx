@@ -2,6 +2,8 @@ import { View, Text, Image, TouchableOpacity, StyleSheet } from "react-native";
 import React from "react";
 import { Colors } from "../../constants/Colors";
 import { useRouter } from "expo-router";
+import { RFValue } from "react-native-responsive-fontsize";
+import { Ionicons } from "@expo/vector-icons"; // Import Ionicons for location icon
 
 export default function PopularBusinessCards({ business }) {
   const router = useRouter();
@@ -17,7 +19,11 @@ export default function PopularBusinessCards({ business }) {
       />
       <View style={styles.infoContainer}>
         <Text style={styles.name}>{business?.name}</Text>
-        <Text style={styles.address}>{business?.address}</Text>
+        <View style={styles.addressContainer}>
+          {/* Add the location icon before the address */}
+          <Ionicons name="location-outline" size={16} color="#6D4C41" style={styles.locationIcon} />
+          <Text style={styles.address}>{business?.address}</Text>
+        </View>
 
         <View style={styles.ratingContainer}>
           <View style={styles.rating}>
@@ -36,20 +42,22 @@ export default function PopularBusinessCards({ business }) {
 
 const styles = StyleSheet.create({
   card: {
-    padding: 10,
+    paddingHorizontal: 8,
+    paddingBottom: 12,
     marginLeft: 20,
     backgroundColor: "#fff",
-    borderRadius: 15,
-    borderColor: "#F8F9FA",
-    borderWidth: 1,
+    borderRadius: 12,
+    borderColor: "#EFEFF0",
+    borderWidth: 0.5,
+    elevation: 0.4,
     width: 256,
     height: 222,
     alignItems: "center", // Center image
   },
   image: {
-    width: 240,
+    width: 255,
     height: 152,
-    borderRadius: 15,
+    borderRadius: 10,
     marginBottom: 10,
   },
   infoContainer: {
@@ -57,15 +65,21 @@ const styles = StyleSheet.create({
     width: "100%", // Ensure it uses full width
   },
   name: {
-    fontFamily: "roboto-bold",
+    fontFamily: "lato-bold",
     textTransform: "capitalize",
-    fontSize: 17,
+    fontSize: RFValue(15),
+  },
+  addressContainer: {
+    flexDirection: "row", // Align icon and text horizontally
+    alignItems: "center", // Center icon with text
+    marginTop: 5,
   },
   address: {
-    fontFamily: "roboto-bold",
-    fontSize: 13,
+    fontFamily: "lato",
+    fontSize: RFValue(11),
     textTransform: "capitalize",
-    color: Colors.text,
+    color: "#6D4C41",
+    marginLeft: 0, // Add some space between icon and text
   },
   ratingContainer: {
     display: "flex",
@@ -93,5 +107,8 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     fontSize: 10,
     textTransform: "capitalize",
+  },
+  locationIcon: {
+    marginRight: 5, // Space between icon and address text
   },
 });

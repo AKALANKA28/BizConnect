@@ -1,25 +1,43 @@
 import React, { useState, useEffect } from "react";
-import { View, FlatList, StyleSheet, Text, ActivityIndicator } from "react-native";
+import {
+  View,
+  FlatList,
+  StyleSheet,
+  Text,
+  Alert,
+  Vibration,
+  ActivityIndicator,
+} from "react-native";
 import { db } from "../../config/FirebaseConfig";
-import { collection, getDocs, query, where } from "firebase/firestore";
+import {
+  collection,
+  getDocs,
+  query,
+  where,
+  deleteDoc,
+  doc,
+} from "firebase/firestore";
 import NotificationItem from "../../components/Notifications/NotificationItem";
 import Header from "../../components/Header";
 import { getAuth, onAuthStateChanged } from "firebase/auth";
-import { useRouter } from "expo-router"; // Import useRouter hook
+import { useRouter } from "expo-router";
+import LoadingScreen from "../../components/LoadingScreen"; // Reuse LoadingScreen for consistency
 
 export default function EntrepreneurNotifications() {
-  const [notifications, setNotifications] = useState([]); // State for entrepreneur notifications
-  const [notificationCount, setNotificationCount] = useState(0); // State for notification count
-  const [userId, setUserId] = useState(null);
-  const [isLoading, setIsLoading] = useState(true); // State for loading status
-
-  const router = useRouter(); // Get router object
+  const [notifications, setNotifications] = useState([]); // State for notifications
+  const [isLoading, setIsLoading] = useState(true); // Loading state
+  const [selectedNotifications, setSelectedNotifications] = useState([]); // Selected notifications for deletion
+  const [showDeleteButton, setShowDeleteButton] = useState(false); // Control delete button visibility
+  const [longPressTimer, setLongPressTimer] = useState(null); // Timer for long press detection
+  const router = useRouter();
+  const [userId, setUserId] = useState(null); // Store authenticated user ID
 
   useEffect(() => {
     const auth = getAuth();
     const unsubscribe = onAuthStateChanged(auth, (user) => {
       if (user) {
         setUserId(user.uid);
+        fetchNotifications(user.uid); // Fetch notifications after getting the user ID
       } else {
         console.log("No user is signed in");
       }
@@ -28,77 +46,138 @@ export default function EntrepreneurNotifications() {
     return () => unsubscribe();
   }, []);
 
-  useEffect(() => {
-    const fetchNotifications = async () => {
-      try {
-        if (!userId) {
-          console.log("No userId provided");
-          setIsLoading(false); // Stop loading if no user
-          return;
-        }
+  // Fetch entrepreneur notifications
+  const fetchNotifications = async (entrepreneurId) => {
+    try {
+      const notificationsSnapshot = await getDocs(
+        query(
+          collection(db, "EntrepreneurNotifications"),
+          where("entrepreneurId", "==", entrepreneurId)
+        )
+      );
 
-        const notificationsCollection = collection(db, "EntrepreneurNotifications");
-        const q = query(notificationsCollection, where("entrepreneurId", "==", userId));
-        const notificationsSnapshot = await getDocs(q);
-        const notificationsList = notificationsSnapshot.docs.map((doc) => ({
-          id: doc.id,
-          ...doc.data(),
-        }));
+      const notificationsList = notificationsSnapshot.docs.map((doc) => ({
+        id: doc.id,
+        ...doc.data(),
+      }));
 
-        if (notificationsList.length === 0) {
-          console.log("No notifications found for this user.");
-        }
-
-        setNotifications(notificationsList);
-        setNotificationCount(notificationsList.length); // Update count based on the fetched notifications
-      } catch (error) {
-        console.error("Error fetching notifications: ", error);
-      } finally {
-        setIsLoading(false); // Stop loading once data is fetched
-      }
-    };
-
-    if (userId) {
-      fetchNotifications();
+      setNotifications(notificationsList);
+    } catch (error) {
+      console.error("Error fetching notifications: ", error);
+    } finally {
+      setIsLoading(false);
     }
-  }, [userId]);
-
-  const handleNotificationPress = (bidId) => {
-    router.push(`/bid/${bidId}`); // Change this based on how you handle notifications
   };
 
+  // Handle long press start to show delete option
+  const handleLongPressStart = (notificationId) => {
+    Vibration.vibrate(100); // Provide vibration feedback
+    setLongPressTimer(
+      setTimeout(() => {
+        toggleNotificationSelection(notificationId);
+      }, 100)
+    );
+  };
+
+  // Clear long press timer
+  const handleLongPressEnd = () => {
+    clearTimeout(longPressTimer);
+    setLongPressTimer(null);
+  };
+
+  // Toggle notification selection for deletion
+  const toggleNotificationSelection = (notificationId) => {
+    setSelectedNotifications((prevSelected) => {
+      if (prevSelected.includes(notificationId)) {
+        return prevSelected.filter((id) => id !== notificationId);
+      } else {
+        return [...prevSelected, notificationId];
+      }
+    });
+    setShowDeleteButton(true); // Show delete button when an item is selected
+  };
+
+  // Confirm and delete selected notifications
+  const handleDeleteNotifications = async () => {
+    Alert.alert(
+      "Delete Notifications",
+      "Are you sure you want to delete the selected notifications?",
+      [
+        { text: "Cancel", style: "cancel" },
+        {
+          text: "Delete",
+          onPress: async () => {
+            await Promise.all(selectedNotifications.map(deleteNotification));
+            setSelectedNotifications([]); // Clear selection after deletion
+            setShowDeleteButton(false); // Hide delete button after deletion
+          },
+        },
+      ]
+    );
+  };
+
+  // Delete a specific notification
+  const deleteNotification = async (notificationId) => {
+    try {
+      await deleteDoc(doc(db, "EntrepreneurNotifications", notificationId));
+      setNotifications((prevNotifications) =>
+        prevNotifications.filter((notification) => notification.id !== notificationId)
+      );
+    } catch (error) {
+      console.error("Error deleting notification: ", error);
+    }
+  };
+
+  // Navigate to the buyer's profile when a notification is clicked
+  const handleNotificationPress = (buyerId) => {
+    router.push(`/profile/BuyerProfile/${buyerId}`);
+  };
+
+  // Render each notification item
   const renderNotificationItem = ({ item }) => (
     <NotificationItem
       notification={item}
-      onPress={() => handleNotificationPress(item.bidId)} // Ensure this ID is correct
+      onPress={() => handleNotificationPress(item.buyerId)} // Navigate to buyer profile on press
+      onLongPress={() => handleLongPressStart(item.id)} // Start long press
+      onPressOut={handleLongPressEnd} // End long press
+      isSelected={selectedNotifications.includes(item.id)} // Pass selection state to NotificationItem
+      showDeleteIcon={
+        showDeleteButton && selectedNotifications.includes(item.id)
+      } // Show delete icon if selected
     />
   );
 
   return (
-    <>
-      <Header title="Notifications" />
-      <View style={styles.screen}>
-        {isLoading ? (
-          <ActivityIndicator size="large" color="#0000ff" style={styles.loading} />
-        ) : notifications.length === 0 ? (
-          <Text style={styles.emptyText}>No notifications available.</Text>
-        ) : (
-          <FlatList
-            data={notifications}
-            renderItem={renderNotificationItem}
-            keyExtractor={(item) => item.id}
-            contentContainerStyle={styles.list}
+    <View style={styles.screen}>
+      {isLoading ? (
+        <LoadingScreen /> // Show loading screen while fetching data
+      ) : (
+        <>
+          <Header
+            title="Notifications"
+            onDeletePress={handleDeleteNotifications} // Handle delete button press
+            showDelete={showDeleteButton && selectedNotifications.length > 0} // Show delete button only if notifications are selected
           />
-        )}
-      </View>
-    </>
+          {notifications.length === 0 ? (
+            <Text style={styles.emptyText}>No notifications available.</Text>
+          ) : (
+            <FlatList
+              data={notifications}
+              renderItem={renderNotificationItem}
+              keyExtractor={(item) => item.id}
+              contentContainerStyle={styles.list}
+            />
+          )}
+        </>
+      )}
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
   screen: {
     flex: 1,
-    backgroundColor: "#f5f5f5",
+    backgroundColor: "#fff",
     justifyContent: "center",
   },
   list: {
@@ -111,3 +190,4 @@ const styles = StyleSheet.create({
     marginTop: 20,
   },
 });
+

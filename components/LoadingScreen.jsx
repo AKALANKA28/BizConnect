@@ -1,10 +1,12 @@
 // LoadingScreen.js
+import { StatusBar } from "expo-status-bar";
 import React from "react";
 import { View, StyleSheet, ActivityIndicator, Image } from "react-native";
 
 const LoadingScreen = () => {
   return (
     <View style={styles.container}>
+      <StatusBar style="dark" translucent />
       <Image
         source={require("../assets/Bizconnect_Logo.png")} // Replace with your logo's path
         style={styles.logo}

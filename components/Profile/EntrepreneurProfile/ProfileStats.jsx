@@ -3,6 +3,7 @@ import { View, StyleSheet, Text } from "react-native";
 import { useAuth } from "../../../context/authContext"; // Importing useAuth hook
 import { doc, getDoc } from "firebase/firestore";
 import { db } from "../../../config/FirebaseConfig"; // Firestore instance
+import { RFValue } from "react-native-responsive-fontsize";
 
 const StatItem = ({ label, value }) => (
   <View style={styles.statItem}>
@@ -42,7 +43,7 @@ const ProfileStats = () => {
   }, [user]);
 
   const stats = [
-    { label: "On Going Orders", value: "5" },
+    { label: "Orders", value: "5" },
     { label: "Connectors", value: "10" },
     { label: "Post Count", value: postCount.toString() }, // Dynamic post count (image URL count)
   ];
@@ -60,22 +61,24 @@ const styles = StyleSheet.create({
   container: {
     flexDirection: "row",
     justifyContent: "space-between",
-    gap: 7,
+    flex: 1,
   },
   statItem: {
     alignItems: "center",
   },
   statLabel: {
     color: "#A8A8A8",
-    fontSize: 12,
-    fontFamily: "poppins",
+    fontSize: RFValue(12),
+    fontFamily: "lato",
+    textTransform: "uppercase",
   },
   statValue: {
     color: "#262626",
-    fontSize: 22,
+    fontSize: RFValue(16),
     fontFamily: "poppins-bold",
     marginTop: 4,
   },
 });
+
 
 export default ProfileStats;

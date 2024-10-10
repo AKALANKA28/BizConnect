@@ -14,6 +14,7 @@ import avatarPlaceholder from "../../assets/images/avatar.png"; // Default avata
 import { router } from "expo-router";
 import { NotificationContext } from "../../context/notificationContext"; // Import the context
 import AntDesign from "@expo/vector-icons/AntDesign";
+import { RFValue } from "react-native-responsive-fontsize";
 export default function Header({ notificationCount }) {
   const { user } = useAuth(); // Access the authenticated user from context
   const { unreadCount } = useContext(NotificationContext); // Access the notification count
@@ -128,10 +129,12 @@ export const styles = StyleSheet.create({
   },
   greetingText: {
     color: "#000",
+    fontSize: RFValue(14),
+
   },
   usernameText: {
-    fontSize: 19,
-    fontWeight: "bold",
+    fontSize: RFValue(18),
+    fontFamily: "lato-bold",
     color: "#000",
   },
   notificationIconWrapper: {
@@ -175,7 +178,7 @@ export const styles = StyleSheet.create({
     marginTop: 15,
   },
   searchInput: {
-    fontSize: 16,
+    fontSize: RFValue(13),
     color: "#BCBCBC",
   },
   filterButton: {

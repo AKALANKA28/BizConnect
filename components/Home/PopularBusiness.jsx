@@ -4,6 +4,7 @@ import { collection, getDocs, query, limit } from "firebase/firestore";
 import { db } from "../../config/FirebaseConfig";
 import { Colors } from "../../constants/Colors";
 import PopularBusinessCards from "./PopularBusinessCards";
+import { RFValue } from "react-native-responsive-fontsize";
 
 export default function PopularBusiness() {
   const [businessList, setBusinessList] = useState([]);
@@ -51,13 +52,15 @@ const styles = StyleSheet.create({
     marginTop: 10,
   },
   headerTitle: {
-    fontSize: 20,
+    fontSize: RFValue(17),
     fontFamily: "roboto-bold",
     color: Colors.text,
   },
   viewAll: {
-    color: Colors.secondaryColor,
-    fontFamily: "roboto",
+    color: "#6D4C41",
+    fontFamily: "lato-bold",
+    fontSize: RFValue(11),
+
   },
   flatList: {
     marginLeft: 0,
