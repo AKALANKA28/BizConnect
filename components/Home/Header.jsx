@@ -1,17 +1,29 @@
 import React, { useContext } from "react";
-import { View, Text, Image, TextInput, TouchableOpacity, StyleSheet } from "react-native";
+import {
+  View,
+  Text,
+  Image,
+  TextInput,
+  TouchableOpacity,
+  StyleSheet,
+} from "react-native";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import { useAuth } from "../../context/authContext"; // Assuming AuthContext is in this path
 import { Colors } from "../../constants/Colors";
 import avatarPlaceholder from "../../assets/images/avatar.png"; // Default avatar
 import { router } from "expo-router";
-import { NotificationContext } from '../../context/notificationContext'; // Import the context
-
+import { NotificationContext } from "../../context/notificationContext"; // Import the context
+import AntDesign from "@expo/vector-icons/AntDesign";
+import { RFValue } from "react-native-responsive-fontsize";
 export default function Header({ notificationCount }) {
   const { user } = useAuth(); // Access the authenticated user from context
   const { unreadCount } = useContext(NotificationContext); // Access the notification count
 
-  
+  const handleImagePress = () => {
+    // Navigate to the user's profile using the userId
+    router.push(`/profile?userId=${user.id}`); // Use the user's ID as a query parameter
+  };
+
   const handleNotificationPress = () => {
     // Check user role and navigate to the corresponding notifications screen
     if (user?.role === "entrepreneur") {
@@ -27,22 +39,32 @@ export default function Header({ notificationCount }) {
     <View style={styles.headerContainer}>
       <View style={styles.userInfoContainer}>
         <View style={styles.userProfile}>
-          <Image
-            source={user?.photoURL ? { uri: user.photoURL } : avatarPlaceholder}
-            style={styles.avatar}
-          />
+          <TouchableOpacity onPress={handleImagePress}>
+            <Image
+              source={
+                user?.profileImage
+                  ? { uri: user.profileImage }
+                  : avatarPlaceholder
+              }
+              style={styles.avatar}
+            />
+          </TouchableOpacity>
           <View>
             <Text style={styles.greetingText}>Good Day,</Text>
-            <Text style={styles.usernameText}>{user?.username || "Guest"}</Text>
+            <Text style={styles.usernameText}>{user?.firstName || "Guest"}</Text>
           </View>
         </View>
 
         {/* Notifications */}
-        <TouchableOpacity activeOpacity={0.5} onPress={handleNotificationPress} style={styles.notificationIconWrapper}>
+        <TouchableOpacity
+          activeOpacity={0.5}
+          onPress={handleNotificationPress}
+          style={styles.notificationIconWrapper}
+        >
           <Ionicons
             name="notifications-outline"
             size={24}
-            color={Colors.secondaryColor}
+            color={"#6D4C41"}
             style={styles.notificationIcon}
           />
           {/* Notification Badge */}
@@ -54,17 +76,24 @@ export default function Header({ notificationCount }) {
         </TouchableOpacity>
       </View>
 
-      <View style={styles.searchBar}>
-        <Ionicons name="search" size={24} color="black" />
-        <TextInput
-          placeholder="Search..."
-          style={styles.searchInput}
-        />
+      <View style={styles.searchContainer}>
+        <View style={styles.searchBar}>
+          <Ionicons name="search" size={20} color="#6D4C41" />
+          <TextInput placeholder="What products you need?" style={styles.searchInput} />
+        </View>
+        {/* Filter Button with Icon */}
+        <TouchableOpacity
+          onPress={() => {
+            /* Handle filter button click */
+          }}
+          style={styles.filterButton}
+        >
+          <AntDesign name="filter" size={20} color="#6D4C41" />
+        </TouchableOpacity>
       </View>
     </View>
   );
 }
-
 
 export const styles = StyleSheet.create({
   headerContainer: {
@@ -75,6 +104,9 @@ export const styles = StyleSheet.create({
     backgroundColor: "#fff",
     borderBottomLeftRadius: 0,
     borderBottomRightRadius: 0,
+    borderBottomWidth: 0.5,
+    borderBottomColor: "#cccccc",
+
   },
   userInfoContainer: {
     display: "flex",
@@ -97,10 +129,12 @@ export const styles = StyleSheet.create({
   },
   greetingText: {
     color: "#000",
+    fontSize: RFValue(14),
+
   },
   usernameText: {
-    fontSize: 19,
-    fontWeight: "bold",
+    fontSize: RFValue(18),
+    fontFamily: "lato-bold",
     color: "#000",
   },
   notificationIconWrapper: {
@@ -124,19 +158,32 @@ export const styles = StyleSheet.create({
     color: "#fff",
     fontSize: 12,
   },
-  searchBar: {
+  searchContainer: {
     display: "flex",
     flexDirection: "row",
     alignItems: "center",
+    alignContent: "center",
+    justifyContent: "space-between",
     gap: 10,
-    backgroundColor: "#EFEFEF",
+  },
+  searchBar: {
+    flex: 1,
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 10,
+    backgroundColor: "#EFEFF0",
     padding: 10,
-    borderRadius: 99,
+    borderRadius: 90,
     marginVertical: 10,
     marginTop: 15,
   },
   searchInput: {
-    fontSize: 16,
+    fontSize: RFValue(13),
     color: "#BCBCBC",
+  },
+  filterButton: {
+    backgroundColor: "#EFEFF0", // Blue color for the filter button
+    padding: 14,
+    borderRadius: 90,
   },
 });

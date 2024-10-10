@@ -48,9 +48,9 @@ export default function Home() {
         <PopularBusiness /> */}
 
         {/* Logout Button */}
-        <View>
+        {/* <View>
           <Button title="Logout" onPress={handleLogout} />
-        </View>
+        </View> */}
       </ScrollView>
     </View>
   );
@@ -72,6 +72,6 @@ const styles = StyleSheet.create({
     marginTop: 100,
     paddingTop: 80, // Adjust this based on your header height to prevent overlapping
     paddingBottom: 160,
-    backgroundColor: Colors.background,
+    backgroundColor: Colors.primaryColor,
   },
 });

@@ -9,13 +9,14 @@ import {
   Image,
   StatusBar,
   Alert,
-  KeyboardAvoidingView,
   ScrollView,
   Platform,
+  KeyboardAvoidingView,
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons"; // Import Ionicons from expo
 import Loading from "../../components/Loading";
 import { useAuth } from "../../context/authContext";
+import { RFValue } from "react-native-responsive-fontsize";
 
 export default function SignIn() {
   const router = useRouter();
@@ -86,8 +87,11 @@ export default function SignIn() {
           </TouchableOpacity>
         </View>
 
-        <Text style={styles.orText}>Or</Text>
-
+        <View style={styles.orContainer}>
+          <View style={styles.hr} />
+          <Text style={styles.orText}>Or</Text>
+          <View style={styles.hr} />
+        </View>
         {/* Email Input */}
         <TextInput
           onChangeText={(value) => setEmail(value)}
@@ -95,6 +99,8 @@ export default function SignIn() {
           value={email}
           style={styles.input}
           placeholderTextColor="#61677d"
+          keyboardType="email-address" // Set keyboard type to email address
+          autoCapitalize="none" // Disable auto-capitalization for email addresses
         />
 
         {/* Password Input */}
@@ -153,16 +159,16 @@ const styles = StyleSheet.create({
   container: {
     flexGrow: 1,
     padding: 24,
-    marginTop: 160,
     backgroundColor: "#fff",
-    justifyContent: "flex-start",
+    // justifyContent: "center",
   },
   title: {
-    fontSize: 36,
-    fontWeight: "bold",
+    fontSize: RFValue(36),
+    fontFamily: "poppins-semibold",
     color: "#AA6A1C",
     textAlign: "left",
-    marginBottom: 20,
+    marginTop: 80,
+    marginBottom: 85,
   },
   socialContainer: {
     flexDirection: "row",
@@ -174,33 +180,44 @@ const styles = StyleSheet.create({
     height: 50,
     flexDirection: "row",
     alignItems: "center",
-    justifyContent: "center",
-    backgroundColor: "#f0f0f0",
+    gap: 10,
+    backgroundColor: "#FAFAFA",
     borderRadius: 8,
-    borderWidth: 1,
+    borderWidth: 0.2,
     borderColor: "#e0e0e0",
   },
   socialIcon: {
     width: 24,
     height: 24,
     marginRight: 8,
+    marginLeft: 15,
   },
   socialButtonText: {
-    fontSize: 16,
+    fontSize: RFValue(13),
     color: "#000",
+    fontFamily: "poppins",
+  },
+  orContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+    marginVertical: 20, // Adjust margin as needed
+  },
+  hr: {
+    flex: 1,
+    height: 1,
+    backgroundColor: "#e0e0e0", // Line color
+    marginHorizontal: 10, // Space between line and text
   },
   orText: {
-    textAlign: "center",
-    marginVertical: 10,
     color: "#61677d",
   },
   input: {
     height: 50,
     borderColor: "#e0e0e0",
-    borderWidth: 1,
-    borderRadius: 8,
+    borderWidth: 0.4,
+    borderRadius: 14,
     paddingLeft: 10,
-    marginBottom: 10,
+    marginBottom: 16,
     backgroundColor: "#FAFAFA",
     fontSize: 16,
   },
@@ -216,30 +233,36 @@ const styles = StyleSheet.create({
   forgotPasswordText: {
     fontSize: 14,
     color: "#AA6A1C",
+    textAlign: "right",
   },
   loginButton: {
     backgroundColor: "#AA6A1C",
     height: 50,
-    borderRadius: 8,
+    borderRadius: 14,
     justifyContent: "center",
     alignItems: "center",
     marginTop: 20,
+    elevation: 5,
   },
   loginButtonText: {
     color: "#fff",
-    fontSize: 18,
-    fontWeight: "bold",
+    fontSize: RFValue(14),
+    fontFamily: "poppins-semibold",
   },
   signUpContainer: {
     flexDirection: "row",
-    justifyContent: "center",
+    justifyContent: "left",
+    alignItems: "center",
     marginTop: 20,
   },
   signUpText: {
     color: "#61677d",
+    fontSize: RFValue(11),
+    fontFamily: "poppins",
   },
   signUpLink: {
     color: "#AA6A1C",
-    fontWeight: "bold",
+    fontSize: RFValue(11),
+    fontFamily: "poppins",
   },
 });

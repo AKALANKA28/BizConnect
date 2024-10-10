@@ -44,7 +44,7 @@ export default function Home() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: Colors.background,
+    backgroundColor: Colors.primaryColor,
   },
   headerContainer: {
     position: "absolute",
@@ -57,6 +57,6 @@ const styles = StyleSheet.create({
     marginTop: 100,
     paddingTop: 80, // Adjust this based on your header height to prevent overlapping
     paddingBottom: 160,
-    backgroundColor: Colors.background,
+    backgroundColor: Colors.primaryColor,
   },
 });

@@ -7,6 +7,7 @@ import { Colors } from "../../constants/Colors";
 import Intro from "../../components/BusinessDetails/Intro";
 import ActionButton from "../../components/BusinessDetails/ActionButton";
 import About from "../../components/BusinessDetails/About";
+import LoadingScreen from "../../components/LoadingScreen";
 
 export default function BusinessDetail() {
   const { businessid } = useLocalSearchParams();
@@ -36,25 +37,23 @@ export default function BusinessDetail() {
   };
 
   return (
-    <ScrollView>
+    <>
       {loading ? (
-        <ActivityIndicator
-          size={"large"}
-          color={Colors.primaryColor}
-          style={{ marginTop: "70%" }}
-        />
+        <LoadingScreen />
       ) : (
-        business && (
-          <View>
-            {/* Intro */}
-            <Intro business={business} />
-            {/* Action Button */}
-            <ActionButton/>
-            {/* AboutSection */}
-            <About/>
-          </View>
-        )
+        <ScrollView>
+          {business && (
+            <View>
+              {/* Intro */}
+              <Intro business={business} />
+              {/* Action Button */}
+              <ActionButton />
+              {/* AboutSection */}
+              <About />
+            </View>
+          )}
+        </ScrollView>
       )}
-    </ScrollView>
+    </>
   );
 }
