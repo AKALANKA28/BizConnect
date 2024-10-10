@@ -86,7 +86,12 @@ export default function ChatScreen() {
               <Text style={styles.usernameText}>{item.userName}</Text>
             )}
             <Text style={styles.messageText}>{item.message}</Text>
-            <Text style={styles.timestamp}>{new Date(item.createdAt.seconds * 1000).toLocaleTimeString()}</Text>
+            <Text style={styles.timestamp}>
+  {new Date(item.createdAt.seconds * 1000).toLocaleTimeString([], {
+    hour: '2-digit',
+    minute: '2-digit',
+  })}
+</Text>
           </View>
         )}
         ref={flatListRef}
