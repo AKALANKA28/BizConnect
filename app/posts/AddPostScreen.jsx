@@ -24,6 +24,7 @@ import {
   updateDoc,
   arrayUnion,
   getDoc,
+  setDoc,
 } from "firebase/firestore";
 import * as ImagePicker from "expo-image-picker";
 import Header from "../../components/Header";
