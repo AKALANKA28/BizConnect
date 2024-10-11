@@ -14,58 +14,58 @@ import { useAuth } from "../context/authContext"; // Assuming AuthContext is in 
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 import { RFValue } from "react-native-responsive-fontsize";
 import { Colors } from "../constants/Colors";
+
 export default function Header({
   title,
   onDeletePress,
   showDelete,
   showNotification,
+  showBackButton = true, 
 }) {
   const router = useRouter();
   const navigation = useNavigation();
   const { user } = useAuth(); // Access the authenticated user from context
-
   const { unreadCount } = useContext(NotificationContext); // Access the notification count
 
   const handleNotificationPress = () => {
-    // Check user role and navigate to the corresponding notifications screen
     if (user?.role === "entrepreneur") {
-      router.push("notifications/EntrepreneurNotifications"); // Navigate to EntrepreneurNotifications
+      router.push("notifications/EntrepreneurNotifications");
     } else if (user?.role === "buyer") {
-      router.push("notifications/BuyerNotifications"); // Navigate to BuyerNotifications
+      router.push("notifications/BuyerNotifications");
     } else {
       console.warn("No notifications available for this role.");
     }
   };
+
   return (
     <View style={styles.header}>
       <StatusBar style="dark" translucent backgroundColor="white" />
-
-      <TouchableOpacity onPress={() => navigation.goBack()}>
-        <Ionicons name="arrow-back" size={24} color="black" />
-      </TouchableOpacity>
+      {/* Conditionally render the back button */}
+      {showBackButton && (
+        <TouchableOpacity onPress={() => navigation.goBack()}>
+          <Ionicons name="arrow-back" size={24} color="black" />
+        </TouchableOpacity>
+      )}
       <Text style={styles.headerTitle}>{title}</Text>
       <View style={{ width: 24 }} />
-      {/* Notification Icon */}
-      {/* Conditionally render the notification icon */}
       {showNotification && (
         <TouchableOpacity
-        activeOpacity={0.5}
-        onPress={handleNotificationPress}
-        style={styles.notificationIconWrapper}
-      >
-        <Ionicons
-          name="notifications-outline"
-          size={24}
-          color={"#6D4C41"}
-          style={styles.notificationIcon}
-        />
-        {/* Notification Badge */}
-        {unreadCount > 0 && (
-          <View style={styles.notificationBadge}>
-            <Text style={styles.notificationBadgeText}>{unreadCount}</Text>
-          </View>
-        )}
-      </TouchableOpacity>
+          activeOpacity={0.5}
+          onPress={handleNotificationPress}
+          style={styles.notificationIconWrapper}
+        >
+          <Ionicons
+            name="notifications-outline"
+            size={24}
+            color={"#6D4C41"}
+            style={styles.notificationIcon}
+          />
+          {unreadCount > 0 && (
+            <View style={styles.notificationBadge}>
+              <Text style={styles.notificationBadgeText}>{unreadCount}</Text>
+            </View>
+          )}
+        </TouchableOpacity>
       )}
       {showDelete && (
         <TouchableOpacity onPress={onDeletePress} style={styles.deleteButton}>
@@ -94,14 +94,10 @@ const styles = StyleSheet.create({
     textAlign: "left",
     marginLeft: 30,
     fontSize: RFValue(14),
-    fontFamily: "poppins-semibold", // Font family for consistency
+    fontFamily: "poppins-semibold",
   },
   deleteButton: {
     padding: 10,
-  },
-  deleteButtonText: {
-    color: "red", // Change color as needed
-    fontSize: 16,
   },
   notificationIconWrapper: {
     position: "relative",

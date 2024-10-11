@@ -54,7 +54,7 @@ export default function BuyerProfile() {
       <View style={styles.container}>
         {buyer ? (
           <>
-            <ScrollView style={styles.container}>
+            <ScrollView>
               <View style={styles.content}>
                 <ProfileHeader buyerId={buyerid} />
                 <View style={styles.divider} />
@@ -81,7 +81,7 @@ const styles = StyleSheet.create({
     backgroundColor: Colors.primaryColor,
   },
   content: {
-    marginTop: 25,
+    marginTop: 0,
     paddingHorizontal: 16,
   },
   divider: {

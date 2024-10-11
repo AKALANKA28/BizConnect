@@ -3,80 +3,132 @@ import {
   View,
   StyleSheet,
   Text,
-  Image,
-  Dimensions,
   ScrollView,
   TouchableOpacity,
-  ActivityIndicator,
-} from "react-native";
-import { db } from "../../../config/FirebaseConfig"; // Import your Firebase config
-import { doc, getDoc } from "firebase/firestore"; // Importing the necessary Firestore methods
+  Alert,
+  ToastAndroid,
+} from "react-native"; // Import ToastAndroid for toast messages
+import { db } from "../../../config/FirebaseConfig";
+import {
+  doc,
+  updateDoc,
+  deleteDoc,
+  collection,
+  getDoc,
+} from "firebase/firestore"; // Import necessary Firestore functions
 import { getAuth } from "firebase/auth";
 import { router } from "expo-router";
-import { useAuth } from "../../../context/authContext"; // Import useAuth hook
+import { useAuth } from "../../../context/authContext";
 import { RFValue } from "react-native-responsive-fontsize";
 import { Colors } from "../../../constants/Colors";
-
-const screenWidth = Dimensions.get("window").width;
-
-const WorkImage = ({ source, style }) => (
-  <Image
-    resizeMode="cover"
-    source={{ uri: source }}
-    style={[styles.workImage, style]} // Apply both default and dynamic styles
-    onError={(e) => console.error("Image loading error: ", e)} // Log image load errors
-  />
-);
+import Loading from "../../Loading";
+import WorkImage from "./WorkImage";
 
 const PreviousWorks = ({ entrepreneurId }) => {
-  // Accept entrepreneurId prop
-  const { user } = useAuth(); // Get the currently logged-in user
+  const { user } = useAuth();
   const [workImages, setWorkImages] = useState([]);
-  const [loading, setLoading] = useState(true); // Loading state
+  const [loading, setLoading] = useState(true);
   const auth = getAuth();
   const currentUser = auth.currentUser;
 
   useEffect(() => {
-    console.log("Entrepreneur ID:", entrepreneurId); // Debugging line
-    fetchUserImages(); // Fetch images when the component mounts or entrepreneurId changes
-  }, [entrepreneurId]); // Fetch images when entrepreneurId changes
+    fetchUserImages();
+  }, [entrepreneurId]);
 
   const fetchUserImages = async () => {
     try {
-      const idToFetch = entrepreneurId || currentUser?.uid; // Use provided entrepreneurId or current user's ID
+      const idToFetch = entrepreneurId || currentUser?.uid;
       const entrepreneurDocRef = doc(db, "entrepreneurs", idToFetch);
       const entrepreneurDocSnap = await getDoc(entrepreneurDocRef);
 
       if (entrepreneurDocSnap.exists()) {
         const entrepreneurData = entrepreneurDocSnap.data();
-        console.log("Entrepreneur Data:", entrepreneurData);
-
         const images =
           entrepreneurData.posts?.map((post) => ({
-            source: post.imageUrl, // Ensure this is the correct property
-            height: 250,
+            source: post.imageUrl,
+            businessId: post.postId,
+            height: 150,
           })) || [];
-
         setWorkImages(images);
       } else {
         console.log("No entrepreneur found with the provided ID:", idToFetch);
       }
     } catch (error) {
-      console.error("Error fetching images: ", error);
+      console.error("Error fetching images:", error);
     } finally {
       setLoading(false);
     }
   };
 
-  // Split images into two columns
-  const column1Images = workImages.filter((_, index) => index % 2 === 0); // Even index images
-  const column2Images = workImages.filter((_, index) => index % 2 !== 0); // Odd index images
+  const handleDeletePost = async (postId) => {
+    // Check if the user role is not entrepreneur
+    if (user?.role !== "entrepreneur") {
+      Alert.alert(
+        "Permission Denied",
+        "You do not have permission to delete this post.",
+        [{ text: "OK" }]
+      );
+      return; // Exit the function if user is not an entrepreneur
+    }
+
+    Alert.alert(
+      "Confirm Deletion",
+      "Are you sure you want to delete this post?",
+      [
+        {
+          text: "Cancel",
+          onPress: () => console.log("Deletion cancelled"),
+          style: "cancel",
+        },
+        {
+          text: "Delete",
+          onPress: async () => {
+            try {
+              const idToFetch = entrepreneurId || currentUser?.uid;
+
+              // Step 1: Delete the corresponding document in the `BusinessList` collection
+              const businesslistRef = collection(db, "BusinessList");
+              const postDocRef = doc(businesslistRef, postId); // Use the postId as the document ID
+              await deleteDoc(postDocRef); // Delete the matching business post
+
+              // Step 2: Now delete the post from the `entrepreneurs` collection
+              const entrepreneurDocRef = doc(db, "entrepreneurs", idToFetch);
+              const entrepreneurDocSnap = await getDoc(entrepreneurDocRef);
+
+              if (entrepreneurDocSnap.exists()) {
+                const entrepreneurData = entrepreneurDocSnap.data();
+                // Filter out the post with the specified postId
+                const updatedPosts = entrepreneurData.posts.filter(
+                  (post) => post.postId !== postId
+                );
+
+                // Update the Firestore document with the new posts array
+                await updateDoc(entrepreneurDocRef, { posts: updatedPosts });
+
+                // Update local state to reflect the changes
+                setWorkImages(workImages.filter((image) => image.businessId !== postId));
+
+                ToastAndroid.show("Post deleted successfully!", ToastAndroid.SHORT);
+              }
+            } catch (error) {
+              console.error("Error deleting post:", error);
+              ToastAndroid.show("Error deleting post.", ToastAndroid.SHORT);
+            }
+          },
+        },
+      ],
+      { cancelable: false }
+    );
+  };
+
+  const splitIntoColumns = (columnNumber) =>
+    workImages.filter((_, index) => index % 3 === columnNumber);
 
   return (
     <View style={styles.container}>
       <View style={styles.titleContainer}>
         <Text style={styles.title}>Previous Works</Text>
-        {user?.role === "entrepreneur" && ( // Show the button only for entrepreneurs
+        {user?.role === "entrepreneur" && (
           <TouchableOpacity
             style={styles.addNewButton}
             onPress={() => router.push("/posts/AddPostScreen")}
@@ -86,38 +138,30 @@ const PreviousWorks = ({ entrepreneurId }) => {
         )}
       </View>
 
-      {loading ? ( // Show loading spinner while fetching images
-        <ActivityIndicator size="large" color="#000" />
+      {loading ? (
+        <Loading />
       ) : (
         <ScrollView>
           <View style={styles.imageGrid}>
-            <View style={styles.imageColumn}>
-              {column1Images.length > 0 ? ( // Check if there are images to display
-                column1Images.map((item, index) => (
-                  <WorkImage
-                    key={index}
-                    source={item.source}
-                    style={{ height: item.height, width: "100%" }} // Set dynamic height, full width
-                  />
-                ))
-              ) : (
-                <Text style={styles.noPostsText}>No posts available</Text> // Show message if no posts
-              )}
-            </View>
-
-            <View style={styles.imageColumn}>
-              {column2Images.length > 0 ? ( // Check if there are images to display
-                column2Images.map((item, index) => (
-                  <WorkImage
-                    key={index}
-                    source={item.source}
-                    style={{ height: item.height, width: "100%" }} // Set dynamic height, full width
-                  />
-                ))
-              ) : (
-                <Text style={styles.noPostsText}>No posts available</Text> // Show message if no posts
-              )}
-            </View>
+            {[0, 1, 2].map((col) => (
+              <View style={styles.imageColumn} key={col}>
+                {splitIntoColumns(col).length > 0 ? (
+                  splitIntoColumns(col).map((item, index) => (
+                    <WorkImage
+                      key={index}
+                      source={item.source}
+                      style={{ height: item.height, width: "100%" }}
+                      onPress={() =>
+                        router.push("/businessdetails/" + item.businessId)
+                      }
+                      onDelete={() => handleDeletePost(item.businessId)} // Pass handleDeletePost to delete the post
+                    />
+                  ))
+                ) : (
+                  <Text style={styles.noPostsText}></Text>
+                )}
+              </View>
+            ))}
           </View>
         </ScrollView>
       )}
@@ -139,16 +183,15 @@ const styles = StyleSheet.create({
     color: "rgba(0, 0, 0, 1)",
     fontFamily: "lato-bold",
     fontSize: RFValue(15),
-    marginLeft: 1,
     marginBottom: 14,
-    textAlign: "left",
   },
   imageGrid: {
-    flexDirection: "row", // Keep two columns side by side
-    justifyContent: "space-between", // Space between the columns
+    flexDirection: "row",
+    justifyContent: "space-between",
+    marginTop: 10,
   },
   imageColumn: {
-    width: "49%", // Each column takes up 49% of the width to leave space between columns
+    width: "32.8%",
   },
   workImage: {
     borderRadius: 8,
@@ -157,12 +200,10 @@ const styles = StyleSheet.create({
     marginBottom: 10,
   },
   addNewButton: {
-    backgroundColor: Colors.secondaryColor, // Brown color for the button
+    backgroundColor: Colors.secondaryColor,
     paddingVertical: 8,
-    padding: 8,
     paddingHorizontal: 20,
     borderRadius: 50,
-    marginBottom: 10,
   },
   addNewText: {
     color: "#FFF",
@@ -175,6 +216,13 @@ const styles = StyleSheet.create({
     color: "#555",
     textAlign: "center",
     marginTop: 20,
+  },
+  confirmationMessage: {
+    fontFamily: "poppins",
+    fontSize: 16,
+    color: Colors.successColor, // Change to your desired success color
+    textAlign: "center",
+    marginVertical: 10,
   },
 });
 

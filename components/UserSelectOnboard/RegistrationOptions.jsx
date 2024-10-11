@@ -30,7 +30,7 @@ const styles = StyleSheet.create({
   optionsContainer: {
     marginTop: 30,
     flexDirection: "row",
-    gap: 12,
+    gap: 14,
   },
   optionButton: {
     borderRadius: 34,

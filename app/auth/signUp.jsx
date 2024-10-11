@@ -143,14 +143,12 @@ export default function SignUp() {
           </TouchableOpacity>
         </View>
         {/* Sign Up Button */}
-        <View>
+        <View style={styles.buttonContainer}>
           {loading ? (
-            <View styles={styles.loadingContainer}>
-              <Loading />
-            </View>
+            <Loading />
           ) : (
             <TouchableOpacity style={styles.loginButton} onPress={handleSubmit}>
-              <Text style={styles.loginButtonText}>Create Account</Text>
+              <Text style={styles.loginButtonText}>Log In</Text>
             </TouchableOpacity>
           )}
         </View>
@@ -245,9 +243,14 @@ const styles = StyleSheet.create({
     alignItems: "center",
     marginTop: 20,
   },
+  buttonContainer: {
+    marginTop: 20,
+    alignItems: "center", // Centering the button or loading spinner
+  },
   loginButton: {
     backgroundColor: "#AA6A1C",
     height: 50,
+    width: "100%",
     borderRadius: 14,
     justifyContent: "center",
     alignItems: "center",

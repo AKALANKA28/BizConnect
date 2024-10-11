@@ -43,7 +43,7 @@ export default function PopularBusiness() {
 
 const styles = StyleSheet.create({
   container: {
-    marginBottom: 20,
+    // marginBottom: 20,
   },
   header: {
     padding: 20,

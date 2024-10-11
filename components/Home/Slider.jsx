@@ -57,7 +57,7 @@ export default function Slider() {
           color: Colors.text,
         }}
       >
-        #SpecialForYou
+        Special For You
       </Text>
       <FlatList
         ref={flatListRef}
