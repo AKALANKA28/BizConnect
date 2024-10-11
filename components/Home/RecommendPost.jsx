@@ -1,9 +1,10 @@
-import { View, Text, FlatList, StyleSheet } from "react-native";
+import { View, Text, StyleSheet } from "react-native";
 import React, { useEffect, useState } from "react";
-import { collection, getDocs, query, limit } from "firebase/firestore"; 
+import { collection, getDocs, query } from "firebase/firestore"; 
 import { db } from "../../config/FirebaseConfig";
 import { Colors } from "../../constants/Colors";
 import RecommendPostCards from "./RecommendPostCards";
+import { RFValue } from "react-native-responsive-fontsize";
 
 export default function RecommendPost() {
   const [businessList, setBusinessList] = useState([]);
@@ -24,42 +25,43 @@ export default function RecommendPost() {
   return (
     <View style={styles.container}>
       <View style={styles.header}>
-        <Text style={styles.headerTitle}>Recommended Posts</Text>
+        <Text style={styles.headerTitle}>Discover More</Text>
         {/* <Text style={styles.viewAll}>View All</Text> */}
       </View>
-      <FlatList
-        data={businessList}
-        showsHorizontalScrollIndicator={false}
-        verticle={true}
-        renderItem={({ item, index }) => (
+
+      {/* Use flexWrap to allow items to wrap into two columns */}
+      <View style={styles.listContainer}>
+        {businessList.map((item, index) => (
           <RecommendPostCards business={item} key={index} />
-        )}
-        style={styles.flatList}
-      />
+        ))}
+      </View>
     </View>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
-    marginBottom: 20,
+    // marginBottom: 20,
   },
   header: {
     padding: 20,
     flexDirection: "row",
     justifyContent: "space-between",
-    marginTop: 10,
+    marginTop: 0,
   },
   headerTitle: {
-    fontSize: 20,
+    fontSize: RFValue(14),
     fontFamily: "roboto-bold",
     color: Colors.text,
   },
   viewAll: {
-    color: Colors.secondaryColor,
+    color: Colors.primaryColor,
     fontFamily: "roboto",
   },
-  flatList: {
-    marginLeft: 0,
+  listContainer: {
+    flexDirection: "row",  // Align items in rows
+    flexWrap: "wrap",      // Allow wrapping to create two columns
+    justifyContent: "space-between", // Space between columns
+    paddingHorizontal: 8, // Add horizontal padding for layout
   },
 });

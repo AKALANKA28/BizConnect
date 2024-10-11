@@ -31,7 +31,6 @@ export default function EntrepreneurTabLayout() {
         <Tabs.Screen
           name="explore"
           options={{
-            headerShown: true, // hide the header
             title: "Explore",
             tabBarLabel: "Explore",
             tabBarIcon: ({ color }) => (
@@ -54,7 +53,7 @@ export default function EntrepreneurTabLayout() {
           options={{
             title: "bids",
             headerShown: true, // hide the header
-            title: "Place Bids",
+            title: "Bids",
             tabBarIcon: ({ color }) => (
               <Ionicons name="briefcase-outline" size={24} color={color} />
             ),

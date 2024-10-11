@@ -69,7 +69,7 @@ export default function MyCollabSpaces() {
 const styles = StyleSheet.create({
   feedContainer: {
     padding: 10,
-    backgroundColor: '#f5f5f5',
+    backgroundColor: '#fff',
     flex: 1,
   },
   noPostsText: {

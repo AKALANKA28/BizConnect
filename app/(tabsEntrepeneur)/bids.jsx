@@ -44,7 +44,7 @@ export default function Bids() {
     };
 
   return (
-    <View style={{ flex: 1 }}>
+    <View style={{ flex: 1, backgroundColor: "#fff" }}>
       <FlatList
         data={bids}
         renderItem={renderBidItem}

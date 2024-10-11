@@ -98,12 +98,10 @@ export default function Header({ notificationCount }) {
 export const styles = StyleSheet.create({
   headerContainer: {
     padding: 20,
-    paddingTop: 50,
+    paddingTop: 45,
     height: 200,
     marginBottom: 9,
     backgroundColor: "#fff",
-    borderBottomLeftRadius: 0,
-    borderBottomRightRadius: 0,
     borderBottomWidth: 0.5,
     borderBottomColor: "#cccccc",
 

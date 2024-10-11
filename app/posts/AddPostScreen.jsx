@@ -29,8 +29,10 @@ import * as ImagePicker from "expo-image-picker";
 import Header from "../../components/Header";
 import { getAuth } from "firebase/auth";
 import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
+import { useRouter } from "expo-router"; // Import useRouter
+import Loading from "../../components/Loading"; // Import your loading component
 
-export default function AddBid() {
+export default function AddBid({ onPostAdded }) {
   const [categoryList, setCategoryList] = useState([]);
   const [name, setName] = useState("");
   const [address, setAddress] = useState("");
@@ -38,11 +40,11 @@ export default function AddBid() {
   const [contact, setContact] = useState("");
   const [category, setCategory] = useState("");
   const [image, setImage] = useState(null);
-  const [loading, setLoading] = useState(false); 
-  const [successMessage, setSuccessMessage] = useState(null); 
+  const [loading, setLoading] = useState(false);
   const auth = getAuth();
   const user = auth.currentUser;
   const [title, setTitle] = useState();
+  const router = useRouter(); // Initialize router
 
   useEffect(() => {
     setTitle("Add New Post");
@@ -163,8 +165,18 @@ export default function AddBid() {
           });
         }
 
-        setSuccessMessage("Post Added Successfully");
+        // Show Toast message instead of success message state
+        ToastAndroid.show("Post added successfully!", ToastAndroid.BOTTOM);
 
+        // Callback to refresh previous works
+        if (onPostAdded) {
+          onPostAdded(); // Call the function to refresh previous works
+        }
+
+        // Navigate to the user's profile
+        router.push("/(tabsEntrepeneur)/profile"); // Adjust the path as necessary
+
+        // Clear form fields
         setName("");
         setAddress("");
         setAbout("");
@@ -189,18 +201,6 @@ export default function AddBid() {
     >
       <Header title={title} />
       <ScrollView contentContainerStyle={styles.scrollContainer}>
-        {successMessage && (
-          <View style={styles.successMessageContainer}>
-            <Text style={styles.successMessage}>{successMessage}</Text>
-            <TouchableOpacity
-              style={styles.okButton}
-              onPress={() => setSuccessMessage(null)} 
-            >
-              <Text style={styles.okButtonText}>OK</Text>
-            </TouchableOpacity>
-          </View>
-        )}
-
         <Text style={styles.label}>Image</Text>
         <TouchableOpacity
           onPress={pickImage}
@@ -219,7 +219,7 @@ export default function AddBid() {
         <TextInput
           placeholder="Name"
           onChangeText={setName}
-          value={name} 
+          value={name}
           style={styles.input}
         />
 
@@ -227,7 +227,7 @@ export default function AddBid() {
         <TextInput
           placeholder="Address"
           onChangeText={setAddress}
-          value={address} 
+          value={address}
           style={styles.input}
         />
 
@@ -235,7 +235,7 @@ export default function AddBid() {
         <TextInput
           placeholder="About"
           onChangeText={setAbout}
-          value={about} 
+          value={about}
           style={styles.input}
         />
 
@@ -243,7 +243,7 @@ export default function AddBid() {
         <TextInput
           placeholder="Contact"
           onChangeText={setContact}
-          value={contact} 
+          value={contact}
           style={styles.input}
         />
 
@@ -256,9 +256,16 @@ export default function AddBid() {
           />
         </View>
 
-        <TouchableOpacity onPress={onAddPost} style={styles.button}>
-          <Text style={styles.buttonText}>Post</Text>
-        </TouchableOpacity>
+        {/* Loading or Button */}
+        <View style={styles.buttonContainer}>
+          {loading ? (
+            <Loading />
+          ) : (
+            <TouchableOpacity onPress={onAddPost} style={styles.button}>
+              <Text style={styles.buttonText}>Post</Text>
+            </TouchableOpacity>
+          )}
+        </View>
       </ScrollView>
     </KeyboardAvoidingView>
   );
@@ -271,6 +278,7 @@ const styles = StyleSheet.create({
   },
   scrollContainer: {
     padding: 20,
+    marginTop: -20,
   },
   imagePreviewContainer: {
     borderRadius: 10,
@@ -279,6 +287,7 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     borderStyle: "dashed",
     borderWidth: 2,
+    overflow: "hidden", // Ensures padding does not affect image size
   },
   imagePreview: {
     width: "100%",
@@ -287,57 +296,63 @@ const styles = StyleSheet.create({
     resizeMode: "cover",
   },
   imagePlaceholderContainer: {
-    padding: 40,
+    padding: 20, // Apply padding only when showing the placeholder
     alignItems: "center",
     justifyContent: "center",
   },
   imagePlaceholder: {
     color: "#888",
+    fontFamily: "roboto",
   },
   input: {
-    padding: 15,
+    padding: 11,
+    paddingStart: 15,
     borderRadius: 10,
-    backgroundColor: Colors.GRAY,
-    marginVertical: 10,
+    borderWidth: 1,
+    borderColor: Colors.GRAY,
+    // backgroundColor: "rgba(211, 113, 69, 0.03)",
+    fontFamily: "roboto",
+  },
+  textarea: {
+    height: 100,
   },
   pickerContainer: {
-    padding: 10,
+    padding: 0,
     borderRadius: 10,
-    backgroundColor: Colors.GRAY,
+    borderWidth: 1,
+    borderColor: Colors.GRAY,
+    // backgroundColor: "rgba(211, 113, 69, 0.03)",
+    fontFamily: "roboto",
+  },
+  label: {
+    color: "#000",
+    fontSize: 14,
+    marginTop: 20,
+    letterSpacing: 0.4,
+    fontFamily: "poppins-semibold",
+  },
+  buttonContainer: {
+    marginTop: 20,
+    alignItems: "center", // Centering the button or loading spinner
+
   },
   button: {
-    padding: 15,
+    padding: 20,
+    width: "100%",
     backgroundColor: Colors.secondaryColor,
     borderRadius: 10,
-    marginTop: 20,
     alignItems: "center",
+    shadowColor: "#000",
+    shadowOffset: { width: 1, height: 3 },
+    shadowOpacity: 0.75,
+    shadowRadius: 3.84,
+    elevation: 5,
   },
   buttonText: {
+    textAlign: "center",
     color: "#fff",
-  },
-  successMessageContainer: {
-    backgroundColor: Colors.primaryColor,
-    padding: 60,
-    borderRadius: 10,
-    position: "absolute",
-    top: "40%",
-    left: "10%",
-    right: "10%",
-    zIndex: 9999,
-    justifyContent: "center",
-    alignItems: "center",
-  },
-  successMessage: {
-    color: Colors.WHITE,
-    fontSize: 18,
-  },
-  okButton: {
-    backgroundColor: Colors.WHITE,
-    borderRadius: 5,
-    marginTop: 20,
-    padding: 10,
-  },
-  okButtonText: {
-    color: Colors.BLACK,
+    fontFamily: "roboto-bold",
+    textTransform: "uppercase",
+    fontSize: 16,
   },
 });

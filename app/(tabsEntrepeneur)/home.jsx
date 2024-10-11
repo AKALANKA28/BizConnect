@@ -9,7 +9,7 @@ import { Colors } from "../../constants/Colors";
 import { useAuth } from "../../context/authContext";
 
 export default function Home() {
-  const { signout } = useAuth(); // Get signout function from Auth context
+  const { signout, user } = useAuth(); // Get signout function from Auth context
 
   const handleLogout = async () => {
     await signout(); // Call the signout function
@@ -33,7 +33,6 @@ export default function Home() {
         {/* <PopularBusiness />
         <PopularBusiness /> */}
         <RecommendPost />
-        {/* Logout Button */}
         <View>
           <Button title="Logout" onPress={handleLogout} />
         </View>

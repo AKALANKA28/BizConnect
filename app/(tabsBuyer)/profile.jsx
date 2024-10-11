@@ -1,17 +1,35 @@
-import React from "react";
-import { View, StyleSheet, Image, Text, ScrollView } from "react-native";
+import React, { useEffect, useState } from "react";
+import { View, StyleSheet, ScrollView } from "react-native";
+import { useIsFocused, useRoute } from "@react-navigation/native"; // Import useRoute to access route params
 import ProfileHeader from "../profile/BuyerProfile/ProfileHeader";
 import AboutMe from "../../components/Profile/BuyerProfile/AboutMe";
 import ContactInformation from "../../components/Profile/BuyerProfile/ContactInformation";
 import SocialMediaLinks from "../../components/Profile/BuyerProfile/SocialMediaLinks";
 import { Colors } from "../../constants/Colors";
 
-export default function profile() {
+export default function Profile() {
+  const isFocused = useIsFocused(); // Check if the screen is focused
+  const route = useRoute(); // Access route parameters
+  const { buyerId } = route.params || {}; // Destructure buyerId from route params
+
+  // You can implement your fetch function here
+  const fetchData = () => {
+    // Fetch the necessary data to refresh your components
+    // This function could be defined in each component (e.g. AboutMe, ContactInformation)
+    // and called here to update their states as needed.
+  };
+
+  useEffect(() => {
+    if (isFocused) {
+      fetchData(); // Call the fetch function when the screen is focused
+    }
+  }, [isFocused]);
 
   return (
     <ScrollView style={styles.container}>
       <View style={styles.content}>
-        <ProfileHeader />
+        {/* Pass buyerId to ProfileHeader */}
+        <ProfileHeader buyerId={buyerId} />
         <View style={styles.divider} />
         <AboutMe />
         <ContactInformation />
@@ -20,7 +38,7 @@ export default function profile() {
       </View>
     </ScrollView>
   );
-};
+}
 
 const styles = StyleSheet.create({
   container: {
@@ -34,11 +52,8 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
   },
   divider: {
-    // borderColor: "#E0E0E0",
-    // borderWidth: 0.5,
     backgroundColor: "#E0E0E0",
     marginVertical: 19,
     height: 1,
   },
-
 });

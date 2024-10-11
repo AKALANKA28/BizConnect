@@ -131,11 +131,9 @@ export default function SignIn() {
         </TouchableOpacity>
 
         {/* Log In Button */}
-        <View>
+        <View style={styles.buttonContainer}>
           {loading ? (
-            <View>
-              <Loading />
-            </View>
+            <Loading />
           ) : (
             <TouchableOpacity style={styles.loginButton} onPress={handleSubmit}>
               <Text style={styles.loginButtonText}>Log In</Text>
@@ -235,9 +233,14 @@ const styles = StyleSheet.create({
     color: "#AA6A1C",
     textAlign: "right",
   },
+  buttonContainer: {
+    marginTop: 20,
+    alignItems: "center", // Centering the button or loading spinner
+  },
   loginButton: {
     backgroundColor: "#AA6A1C",
     height: 50,
+    width: "100%",
     borderRadius: 14,
     justifyContent: "center",
     alignItems: "center",
