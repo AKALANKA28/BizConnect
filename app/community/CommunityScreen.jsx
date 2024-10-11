@@ -58,7 +58,7 @@ const CommunityScreen = () => {
 
   return (
     <View style={styles.container}>
-      <SearchBar />
+      {/* <SearchBar /> */}
       <TabBar
         tabs={['My feed', 'My CollabSpaces', 'Joined']}
         activeTab={activeTab}
