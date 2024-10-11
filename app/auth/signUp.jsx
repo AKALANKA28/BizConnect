@@ -11,7 +11,7 @@ import {
   KeyboardAvoidingView,
   Platform,
   ScrollView,
-  ToastAndroid, // Import ToastAndroid for Android
+  ToastAndroid,
 } from "react-native";
 import Loading from "../../components/Loading";
 import { useAuth } from "../../context/authContext";
@@ -181,7 +181,8 @@ export default function SignUp() {
         {/* Sign In Link */}
         <View style={styles.signUpContainer}>
           <Text style={styles.signUpText}>Have an account? </Text>
-          <TouchableOpacity onPress={() => router.push("/auth/signIn")}>
+          {/* Pass role as a parameter to the Sign In screen */}
+          <TouchableOpacity onPress={() => router.push(`/auth/signIn?role=${role}`)}>
             <Text style={styles.signUpLink}>Sign In</Text>
           </TouchableOpacity>
         </View>
