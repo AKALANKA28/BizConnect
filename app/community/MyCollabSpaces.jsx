@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { View, FlatList, StyleSheet, Text } from 'react-native';
+import { View, FlatList, StyleSheet, Text, ActivityIndicator } from 'react-native';
 import PostCard from './PostCard'; // Assuming PostCard is imported correctly
 import { db, auth } from '../../config/FirebaseConfig'; // Firebase and Auth config import
 import { getDocs, collection, query, where, doc as firestoreDoc, getDoc } from 'firebase/firestore';
@@ -8,6 +8,7 @@ import { onAuthStateChanged } from 'firebase/auth'; // To detect the logged-in u
 export default function MyCollabSpaces() {
   const [posts, setPosts] = useState([]);
   const [userId, setUserId] = useState(null); // To store the current user's UID
+  const [isLoading, setIsLoading] = useState(true); // Loading state
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (user) => {
@@ -26,6 +27,7 @@ export default function MyCollabSpaces() {
   }, [userId]); // Fetch posts when userId is available
 
   const fetchUserCollabSpaces = async (userId) => {
+    setIsLoading(true); // Start loading
     try {
       const q = query(collection(db, 'CollabSpaces'), where('userId', '==', userId)); // Fetch only posts by the logged-in user
       const querySnapshot = await getDocs(q);
@@ -53,6 +55,8 @@ export default function MyCollabSpaces() {
       setPosts(postsData);
     } catch (error) {
       console.error('Error fetching posts: ', error);
+    } finally {
+      setIsLoading(false); // Stop loading after data is fetched
     }
   };
 
@@ -60,14 +64,20 @@ export default function MyCollabSpaces() {
 
   return (
     <View style={styles.feedContainer}>
-      {posts.length > 0 ? (
-        <FlatList
-          data={posts}
-          keyExtractor={(item) => item.id}
-          renderItem={renderPost}
-        />
+      {isLoading ? (
+        // Show loading spinner while fetching posts
+        <ActivityIndicator size="large" color="#FF8C00" style={styles.loader} />
       ) : (
-        <Text style={styles.noPostsText}>No posts available</Text>
+        // Render posts once loading is finished
+        posts.length > 0 ? (
+          <FlatList
+            data={posts}
+            keyExtractor={(item) => item.id}
+            renderItem={renderPost}
+          />
+        ) : (
+          <Text style={styles.noPostsText}>No posts available</Text>
+        )
       )}
     </View>
   );
@@ -84,5 +94,10 @@ const styles = StyleSheet.create({
     marginTop: 20,
     fontSize: 16,
     color: '#888',
+  },
+  loader: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
   },
 });

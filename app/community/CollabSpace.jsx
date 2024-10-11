@@ -265,13 +265,13 @@ const styles = StyleSheet.create({
     marginBottom: 15,
   },
   joinButton: {
-    backgroundColor: '#B98539',
+    backgroundColor: '#FF8C00',
     paddingVertical: 10,
     paddingHorizontal: 20,
     borderRadius: 20,
   },
   updateButton: {
-    backgroundColor: '#B98539',
+    backgroundColor: '#FF8C00',
     paddingVertical: 10,
     paddingHorizontal: 20,
     borderRadius: 20,
@@ -290,10 +290,10 @@ const styles = StyleSheet.create({
     borderBottomWidth: 2,
   },
   activeTab: {
-    borderBottomColor: '#B98539',
+    borderBottomColor: '#FF8C00',
   },
   activeTabText: {
-    color: '#B98539',
+    color: '#FF8C00',
     fontWeight: 'bold',
     textAlign: 'center',
   },
@@ -333,7 +333,7 @@ const styles = StyleSheet.create({
     position: 'absolute',
     right: 20,
     bottom: 20,
-    backgroundColor: '#B98539',
+    backgroundColor: '#FF8C00',
     borderRadius: 50,
     padding: 20,
     shadowColor: '#000',

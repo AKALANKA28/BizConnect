@@ -106,7 +106,7 @@ const styles = StyleSheet.create({
     marginBottom: 10, // Spacing between title and button
   },
   detailsButton: {
-    backgroundColor: "#e3b04b", // Button color matches the image
+    backgroundColor: "#FF8C00", // Button color matches the image
     paddingVertical: 10,
     paddingHorizontal: 25,
     borderRadius: 25, // Fully rounded button as per design

@@ -111,6 +111,7 @@ export default function CollabSpaceForm() {
     try {
       if (title && description && goals.length && featuredImage) {
         // Save the CollabSpace document
+        const formattedDate = new Date().toISOString().split('T')[0];
         const collabSpaceDoc = await addDoc(collection(db, "CollabSpaces"), {
           title,
           description,
@@ -121,7 +122,7 @@ export default function CollabSpaceForm() {
           userId: user.uid,
           userEmail: user.email,
           userName: user.username,
-          createdAt: new Date().toISOString(),
+          createdAt: formattedDate,
         });
 
         // Create a chat room document
