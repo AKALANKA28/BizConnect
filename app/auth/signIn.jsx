@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { useRouter } from "expo-router";
+import { useRouter,useLocalSearchParams } from "expo-router";
 import {
   View,
   Text,
@@ -20,6 +20,7 @@ import { RFValue } from "react-native-responsive-fontsize";
 
 export default function SignIn() {
   const router = useRouter();
+  const { role } = useLocalSearchParams(); // Retrieve the role parameter
 
   // States
   const [email, setEmail] = useState("");
@@ -53,26 +54,34 @@ export default function SignIn() {
     if (!validateInputs()) {
       return; // Exit if validation fails
     }
-
+  
     setLoading(true);
     const response = await signin(email, password);
     setLoading(false);
-
+  
     if (!response.success) {
-      showToast(response.message); // Show error message as a Toast
+      showToast(response.data); // Show error message as a Toast
       return;
     }
-
-    // Conditional navigation based on user role
-    if (response.role === "buyer") {
+  
+    // Log the response for debugging purposes
+    console.log("Response:", response); 
+  
+    const { role } = response;
+  
+    if (role === "buyer") {
+      // Navigate to buyer's home only if role is fetched
       router.push("/(tabsBuyer)/home");
-    } else if (response.role === "entrepreneur") {
+    } else if (role === "entrepreneur") {
+      // Navigate to entrepreneur's home only if role is fetched
       router.push("/(tabsEntrepreneur)/home");
     } else {
-      // showToast("Invalid user role");
+      showToast("Invalid user role");
     }
   };
-
+  
+  
+  
   return (
     <KeyboardAvoidingView
       style={{ flex: 1 }}

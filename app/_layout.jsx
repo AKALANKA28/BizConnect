@@ -10,49 +10,54 @@ import { Stack } from "expo-router";
 
 const MainLayout = () => {
   const { isAuthenticated } = useAuth();
-  const segments = useSegments();
   const router = useRouter();
   const [hasOnboarded, setHasOnboarded] = useState(null); 
-  const [isLoading, setIsLoading] = useState(true); // Add loading state
+  const [isLoading, setIsLoading] = useState(true); // Add loading state for initialization
 
+  // Function to check if the user has completed onboarding
+  const checkOnboardingStatus = async () => {
+    try {
+      const onboarded = await AsyncStorage.getItem("hasOnboarded");
+      setHasOnboarded(onboarded === "true");
+    } catch (error) {
+      console.error("Failed to check onboarding status:", error);
+    } finally {
+      setIsLoading(false); // Loading is done after checking onboarding status
+    }
+  };
+
+  // Check onboarding status once authentication status is resolved
   useEffect(() => {
-    const checkOnboardingStatus = async () => {
-      try {
-        const onboarded = await AsyncStorage.getItem("hasOnboarded");
-        setHasOnboarded(onboarded === "true");
-      } catch (error) {
-        console.error("Failed to check onboarding status:", error);
-      } finally {
-        setIsLoading(false); // Set loading to false once the check is done
-      }
-    };
-
     if (typeof isAuthenticated !== "undefined") {
       checkOnboardingStatus(); 
     }
   }, [isAuthenticated]);
 
+  // Handle navigation based on authentication and onboarding
   useEffect(() => {
-    if (isLoading || isAuthenticated === undefined || hasOnboarded === null) return; // Wait for loading and checks
+    if (isLoading || isAuthenticated === undefined || hasOnboarded === null) {
+      return; // Wait until loading is done
+    }
 
-    // Navigation logic based on authentication and onboarding status
+    // Navigation logic after loading is complete
     if (isAuthenticated && !hasOnboarded) {
-      router.replace("/Index"); // Redirect to onboarding
-    } 
-    else if (isAuthenticated) {
-      router.replace("/Index"); // Redirect to home
+      router.replace("/onboarding"); // Navigate to onboarding screen
+    } else if (isAuthenticated) {
+      router.replace("/onboarding"); // Navigate to home screen (use appropriate home screen path)
     } else {
-      router.replace("/Index"); // Redirect to login
+      router.replace("/onboarding"); // Navigate to login if not authenticated
     }
   }, [isAuthenticated, hasOnboarded, isLoading]);
 
-  // Prevent rendering the stack until loading is complete
-  if (isLoading) return <LoadingScreen />; 
+  // Prevent rendering until loading is complete
+  if (isLoading) {
+    return <LoadingScreen />;
+  }
 
   return (
     <Stack
       screenOptions={{
-        headerShown: false, // Hide header globally
+        headerShown: false, // Hide headers globally
       }}
     />
   );
@@ -71,6 +76,7 @@ export default function RootLayout() {
     "lato-bold": require("../assets/fonts/Lato-Bold.ttf"),
   });
 
+  // Wait until fonts are loaded
   if (!fontsLoaded) {
     return <LoadingScreen />;
   }

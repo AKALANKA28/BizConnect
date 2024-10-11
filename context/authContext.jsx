@@ -8,32 +8,32 @@ import {
   RecaptchaVerifier,
 } from "firebase/auth";
 import { auth, db } from "../config/FirebaseConfig";
-import { doc, setDoc, getDoc, query, where, getDocs } from "firebase/firestore";
-import { StyleSheet, Text, View } from "react-native";
-import { Image } from "react-native";
+import { doc, setDoc, getDoc } from "firebase/firestore";
+import { StyleSheet, Text, View, Image } from "react-native";
+import { StatusBar } from "expo-status-bar";
 
 export const AuthContext = createContext();
 
 export const AuthContextProvider = ({ children }) => {
   const [user, setUser] = useState(null);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
-  const [loading, setLoading] = useState(true); // To handle loading state while fetching user data
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const unsub = onAuthStateChanged(auth, async (currentUser) => {
       if (currentUser) {
-        await fetchUserRoleAndData(currentUser.uid);
-        setIsAuthenticated(true);
+        const role = await fetchUserRoleAndData(currentUser.uid);
+        if (role) setIsAuthenticated(true); // Only authenticate if a role is found
       } else {
         setUser(null);
         setIsAuthenticated(false);
       }
-      setLoading(false); // Finished loading when auth state changes
+      setLoading(false);
     });
     return unsub;
   }, []);
 
-  // Function to fetch user data from either the 'entrepreneurs' or 'buyers' collection based on role
+  // Function to fetch user role and data from Firestore
   const fetchUserRoleAndData = async (uid) => {
     try {
       const usersRef = doc(db, "users", uid);
@@ -43,30 +43,31 @@ export const AuthContextProvider = ({ children }) => {
         const userData = userDocSnap.data();
         const role = userData.role;
 
-        // Now fetch the data from the relevant collection
-        const collectionName =
-          role === "entrepreneur" ? "entrepreneurs" : "buyers";
-        const specificUserDocRef = doc(db, collectionName, uid);
-        const specificUserDocSnap = await getDoc(specificUserDocRef);
+        if (role) {
+          const collectionName =
+            role === "entrepreneur" ? "entrepreneurs" : "buyers";
+          const specificUserDocRef = doc(db, collectionName, uid);
+          const specificUserDocSnap = await getDoc(specificUserDocRef);
 
-        if (specificUserDocSnap.exists()) {
-          const specificData = specificUserDocSnap.data();
-          setUser({
-            ...userData,
-            ...specificData, // Merge data from 'entrepreneurs' or 'buyers' collection
-          });
-          // console.log("User data retrieved from Firestore:", specificData);
+          if (specificUserDocSnap.exists()) {
+            const specificData = specificUserDocSnap.data();
+            setUser({ ...userData, ...specificData }); // Merge the common and role-specific data
+            return role; // Return role after fetching data
+          } else {
+            console.error(
+              `No specific data found for UID: ${uid} in ${collectionName}`
+            );
+          }
         } else {
-          console.log(
-            `No data found in Firestore for UID: ${uid} in ${collectionName}`
-          );
+          console.error(`No role found for UID: ${uid}`);
         }
       } else {
-        console.log(`No user data found in Firestore for UID: ${uid}`);
+        console.error(`No user document found for UID: ${uid}`);
       }
     } catch (error) {
-      console.error("Error fetching user data:", error);
+      console.error("Error fetching user role and data:", error);
     }
+    return null; // Return null if no role found
   };
 
   // Update profile function
@@ -74,29 +75,21 @@ export const AuthContextProvider = ({ children }) => {
     try {
       if (!user) throw new Error("No user is currently logged in");
 
-      // Determine which collection to update based on the role
       const collectionName =
         user.role === "entrepreneur" ? "entrepreneurs" : "buyers";
       const userRef = doc(db, collectionName, user.uid);
 
-      // Create an object to hold the data to update
       const dataToUpdate = { ...updatedData };
+      if (imageUri) dataToUpdate.profileImage = imageUri;
 
-      // If imageUri is provided, add it to the update object
-      if (imageUri) {
-        dataToUpdate.profileImage = imageUri;
-      }
-
-      // Update Firestore with the new profile data
       await setDoc(userRef, dataToUpdate, { merge: true });
 
-      // Optionally update the in-memory user state
+      // Update the in-memory user state
       setUser((prevUser) => ({
         ...prevUser,
         ...dataToUpdate,
       }));
 
-      // console.log("Profile updated successfully");
       return { success: true };
     } catch (error) {
       console.error("Error updating profile:", error);
@@ -104,9 +97,11 @@ export const AuthContextProvider = ({ children }) => {
     }
   };
 
-  // Sign In function (supports both email and phone number)
+  // Sign In function
   const signin = async (identifier, password) => {
     try {
+      let user;
+
       if (identifier.includes("@")) {
         // Sign in with email and password
         const response = await signInWithEmailAndPassword(
@@ -114,20 +109,37 @@ export const AuthContextProvider = ({ children }) => {
           identifier,
           password
         );
-        await fetchUserRoleAndData(response.user.uid); // Fetch user data after sign-in
-        return { success: true, data: response.user };
+        user = response.user;
       } else {
-        // Sign in with phone number (phone authentication flow required)
-        await signInWithPhoneNumber(auth, identifier, password);
-        // Phone number sign-in does not need password
+        // Sign in with phone number
+        user = await signInWithPhoneNumber(auth, identifier, password);
+      }
+
+      // Fetch the user's role
+      const userRole = await fetchUserRoleAndData(user.uid); // Make sure this returns the role
+
+      if (userRole) {
+        return {
+          success: true,
+          data: user,
+          role: userRole, // Add role to response
+        };
+      } else {
+        return {
+          success: false,
+          data: "User role not found",
+        };
       }
     } catch (e) {
       const errorMsg = handleFirebaseError(e.code);
-      return { success: false, data: errorMsg };
+      return {
+        success: false,
+        data: errorMsg,
+      };
     }
   };
 
-  // Sign Up function with email, username, and phone number
+  // Sign Up function
   const signup = async (email, password, username, phoneNumber, role) => {
     try {
       const response = await createUserWithEmailAndPassword(
@@ -136,34 +148,32 @@ export const AuthContextProvider = ({ children }) => {
         password
       );
 
-      // Create user document in the main "users" collection
+      // Create user in main "users" collection
       const userDocRef = doc(db, "users", response.user.uid);
       await setDoc(userDocRef, {
         uid: response.user.uid,
-        email: response.user.email,
-        username: username,
-        phoneNumber: phoneNumber,
-        role: role,
+        email,
+        username,
+        phoneNumber,
+        role,
         createdAt: new Date(),
       });
 
-      // Create document in either "entrepreneurs" or "buyers" collection based on role
+      // Create document in role-specific collection
       const collectionName =
         role === "entrepreneur" ? "entrepreneurs" : "buyers";
       const specificUserDocRef = doc(db, collectionName, response.user.uid);
       await setDoc(specificUserDocRef, {
         uid: response.user.uid,
-        email: response.user.email,
-        username: username,
-        phoneNumber: phoneNumber,
-        // Additional specific data related to the user role
+        email,
+        username,
+        phoneNumber,
       });
 
-      await fetchUserRoleAndData(response.user.uid); // Fetch the newly created user data
-      return { success: true, data: response.user };
+      const userRole = await fetchUserRoleAndData(response.user.uid);
+      return { success: true, data: response.user, role: userRole };
     } catch (e) {
-      let msg = e.message || "An error occurred";
-      return { success: false, data: msg };
+      return { success: false, data: e.message };
     }
   };
 
@@ -174,11 +184,11 @@ export const AuthContextProvider = ({ children }) => {
       setUser(null);
       setIsAuthenticated(false);
     } catch (e) {
-      console.error(e);
+      console.error("Error during sign out:", e);
     }
   };
 
-  // Handle Firebase authentication errors
+  // Handle Firebase errors
   const handleFirebaseError = (code) => {
     switch (code) {
       case "auth/invalid-email":
@@ -195,15 +205,16 @@ export const AuthContextProvider = ({ children }) => {
   };
 
   if (loading) {
-    return  (
+    return (
       <View style={styles.container}>
+        <StatusBar style="dark" translucent />
         <Image
           source={require("../assets/Bizconnect_Logo.png")} // Replace with your logo's path
           style={styles.logo}
           resizeMode="contain"
         />
       </View>
-    );; // You can replace this with a loading spinner or similar UI
+    ); // Loading spinner can be added here
   }
 
   return (
@@ -218,12 +229,10 @@ export const AuthContextProvider = ({ children }) => {
 // Hook to use the AuthContext
 export const useAuth = () => {
   const value = useContext(AuthContext);
-  if (!value) {
+  if (!value)
     throw new Error("useAuth must be used within an AuthContextProvider");
-  }
   return value;
 };
-
 
 const styles = StyleSheet.create({
   container: {
@@ -236,8 +245,5 @@ const styles = StyleSheet.create({
     width: 100, // Adjust the size according to your logo dimensions
     height: 100, // Adjust the size according to your logo dimensions
     marginBottom: 20, // Space between the logo and spinner
-  },
-  spinner: {
-    marginTop: 20,
   },
 });
