@@ -4,6 +4,7 @@ import { Colors } from "../../constants/Colors";
 
 import Ionicons from "@expo/vector-icons/Ionicons";
 import { useRouter } from "expo-router";
+import { RFValue } from "react-native-responsive-fontsize";
 export default function Intro({ business }) {
   const router = useRouter();
   return (
@@ -30,7 +31,7 @@ export default function Intro({ business }) {
       </View>
       <Image
         source={{ uri: business.imageUrl }}
-        style={{ width: "100%", height: 350 }}
+        style={{ width: "100%", height: 600 }}
       />
 
       <View
@@ -40,21 +41,20 @@ export default function Intro({ business }) {
           backgroundColor: "#fff",
           borderTopLeftRadius: 22,
           borderTopRightRadius: 22,
-
         }}
       >
         <Text
           style={{
-            fontSize: 26,
-            fontFamily: "roboto-bold",
+            fontSize: RFValue(24),
+            fontFamily: "lato-bold",
             textTransform: "capitalize",
           }}
         >
           {business.name}
         </Text>
-        <Text style={{ fontSize: 18, fontFamily: "roboto" }}>
+        {/* <Text style={{ fontSize: 18, fontFamily: "roboto" }}>
           {business.address}
-        </Text>
+        </Text> */}
       </View>
 
       {/* Display other business data here */}

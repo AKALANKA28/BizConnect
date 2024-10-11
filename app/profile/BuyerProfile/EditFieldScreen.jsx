@@ -4,9 +4,9 @@ import {
   TextInput,
   TouchableOpacity,
   StyleSheet,
-  Alert,
   Text,
   StatusBar,
+  ToastAndroid, // Import ToastAndroid
 } from "react-native";
 import { useNavigation, useRoute } from "@react-navigation/native";
 import { useAuth } from "../../../context/authContext";
@@ -27,23 +27,20 @@ const EditFieldScreen = () => {
       const result = await updateProfile(updatedData);
 
       if (result.success) {
-        Alert.alert("Field updated successfully!");
+        ToastAndroid.show("Field updated successfully!", ToastAndroid.SHORT); // Success message
         navigation.goBack();
       } else {
-        Alert.alert("Error updating field. Please try again.");
+        ToastAndroid.show("Error updating field. Please try again.", ToastAndroid.SHORT); // Error message
       }
     } catch (error) {
       console.error("Error updating field:", error);
-      Alert.alert("Error updating field. Please try again.");
+      ToastAndroid.show("Error updating field. Please try again.", ToastAndroid.SHORT); // Error message
     }
   };
 
   return (
     <>
-      <StatusBar
-        barStyle="dark-content"
-        backgroundColor={Colors.primaryColor}
-      />
+      <StatusBar barStyle="dark-content" backgroundColor={Colors.primaryColor} />
       <View style={styles.header}>
         <TouchableOpacity onPress={() => navigation.goBack()}>
           <Ionicons name="close" size={24} color="black" />
@@ -55,7 +52,7 @@ const EditFieldScreen = () => {
         </TouchableOpacity>
       </View>
       <View style={styles.container}>
-        <Text style={styles.label}>{`Edit ${field.charAt(0).toUpperCase() + field.slice(1)}`}</Text>
+        <Text style={styles.label}>{`${field.charAt(0).toUpperCase() + field.slice(1)}`}</Text>
         <TextInput
           style={styles.input}
           value={value}
@@ -74,7 +71,7 @@ const styles = StyleSheet.create({
     flex: 1,
     padding: 20,
     backgroundColor: Colors.primaryColor, // Use your primary color here
-    marginTop: -18,
+    marginTop: -24,
   },
   header: {
     height: 70,
@@ -85,6 +82,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
     borderBottomWidth: 1,
     borderBottomColor: "#ccc",
+    backgroundColor: "#fff",
   },
   headerTitle: {
     fontSize: 18,
@@ -93,11 +91,10 @@ const styles = StyleSheet.create({
     flex: 1, // This allows the title to take up available space
     textAlign: "left", // Centers the header title
     fontFamily: "poppins-semibold", // Font family for consistency
-    marginLeft: 20,
+    marginLeft: 10,
   },
   label: {
-    fontSize: 16,
-    fontWeight: "600",
+    fontSize: 14,
     color: "#000",
     fontFamily: "poppins-semibold", // Font family for consistency
   },

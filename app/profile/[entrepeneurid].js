@@ -10,13 +10,14 @@ import {
 import { db } from "../../config/FirebaseConfig";
 import { doc, getDoc } from "firebase/firestore";
 import { useLocalSearchParams } from "expo-router";
-import ProfileHeader from "../../components/Profile/EntrepreneurProfile/ProfileHeader";
-import ProfileStats from "../../components/Profile/EntrepreneurProfile/ProfileStats";
+import ProfileHeader from "./EntrepreneurProfile/ProfileHeader";
 import ProfileInfo from "../../components/Profile/EntrepreneurProfile/ProfileInfo";
 import ContactDetails from "../../components/Profile/EntrepreneurProfile/ContactDetails";
 import PreviousWorks from "../../components/Profile/EntrepreneurProfile/PreviousWorks";
 import { StatusBar } from "expo-status-bar";
 import AcceptBidButton from "../../components/Profile/EntrepreneurProfile/AcceptBidButton"; // Import the new component
+import LoadingScreen from "../../components/LoadingScreen";
+import Header from "../../components/Header";
 
 export default function EntrepreneurProfile() {
   const { entrepeneurid } = useLocalSearchParams(); // Get the entrepreneur ID
@@ -47,32 +48,36 @@ export default function EntrepreneurProfile() {
   }, [entrepeneurid]);
 
   if (loading) {
-    return (
-      <View style={styles.loadingContainer}>
-        <ActivityIndicator size="large" color="#0000ff" />
-        <Text>Loading entrepreneur profile...</Text>
-      </View>
-    );
+    return <LoadingScreen />;
   }
 
   return (
-    <View style={styles.container}>
-      <StatusBar style="dark" translucent />
-      {entrepreneur ? (
-        <ScrollView style={styles.container}>
-          <View style={styles.content}>
-            <ProfileHeader />
-            <ProfileInfo />
-            <ContactDetails />
-          </View>
-          <PreviousWorks />
-          {/* Use the AcceptBidButton component here */}
-          <AcceptBidButton entrepeneurid={entrepeneurid} />
-        </ScrollView>
-      ) : (
-        <Text>No entrepreneur found.</Text>
-      )}
-    </View>
+    <>
+      <Header title={`${entrepreneur?.username}'s Profile`} showNotification={true} />
+      <View style={styles.container}>
+        {entrepreneur ? (
+          <>
+            <ScrollView style={styles.container}>
+              <View style={styles.content}>
+                <ProfileHeader entrepreneurId={entrepeneurid} />
+                <ProfileInfo entrepreneurId={entrepeneurid} />
+                <ContactDetails entrepreneurId={entrepeneurid} />
+              </View>
+              <View>
+                {entrepeneurid ? (
+                  <PreviousWorks entrepreneurId={entrepeneurid} />
+                ) : (
+                  <Text>No Entrepreneur ID available</Text>
+                )}
+              </View>
+            </ScrollView>
+            <AcceptBidButton entrepeneurid={entrepeneurid} />
+          </>
+        ) : (
+          <Text>No entrepreneur found.</Text>
+        )}
+      </View>
+    </>
   );
 }
 
@@ -80,7 +85,8 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: "rgba(255, 255, 255, 1)",
-    // paddingHorizontal: 16,
+    // paddingHorizontal: 19,
+    marginTop: -20,
   },
   coverImage: {
     borderRadius: 20,

@@ -5,6 +5,7 @@ import { collection, getDocs, query } from "firebase/firestore";
 import { db } from "../../config/FirebaseConfig";
 import CategoryItem from "./CategoryItem";
 import { useRouter } from "expo-router";
+import { RFValue } from "react-native-responsive-fontsize";
 
 export default function Category() {
   const [categories, setCategories] = useState([]);
@@ -54,10 +55,10 @@ const styles = StyleSheet.create({
     display: "flex",
     flexDirection: "row",
     justifyContent: "space-between",
-    marginTop: 10,
+    marginTop: 5,
   },
   title: {
-    fontSize: 20,
+    fontSize: RFValue(17),
     fontFamily: "roboto-bold",
     color: Colors.text,
   },

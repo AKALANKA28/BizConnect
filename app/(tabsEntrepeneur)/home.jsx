@@ -4,11 +4,12 @@ import Header from "../../components/Home/Header";
 import Slider from "../../components/Home/Slider";
 import Category from "../../components/Home/Category";
 import PopularBusiness from "../../components/Home/PopularBusiness";
+import RecommendPost from "../../components/Home/RecommendPost";
 import { Colors } from "../../constants/Colors";
 import { useAuth } from "../../context/authContext";
 
 export default function Home() {
-  const { signout } = useAuth(); // Get signout function from Auth context
+  const { signout, user } = useAuth(); // Get signout function from Auth context
 
   const handleLogout = async () => {
     await signout(); // Call the signout function
@@ -31,8 +32,7 @@ export default function Home() {
         <PopularBusiness />
         {/* <PopularBusiness />
         <PopularBusiness /> */}
-
-        {/* Logout Button */}
+        <RecommendPost />
         <View>
           <Button title="Logout" onPress={handleLogout} />
         </View>
@@ -44,7 +44,7 @@ export default function Home() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: Colors.background,
+    backgroundColor: Colors.primaryColor,
   },
   headerContainer: {
     position: "absolute",
@@ -57,6 +57,6 @@ const styles = StyleSheet.create({
     marginTop: 100,
     paddingTop: 80, // Adjust this based on your header height to prevent overlapping
     paddingBottom: 160,
-    backgroundColor: Colors.background,
+    backgroundColor: Colors.primaryColor,
   },
 });

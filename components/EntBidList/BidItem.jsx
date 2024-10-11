@@ -25,7 +25,7 @@ const BidItem = ({ item }) => {
 }, [item.image]);
 
   return (
-    <TouchableWithoutFeedback onPress={toggleExpand}>
+    <TouchableOpacity onPress={toggleExpand}>
       <View style={styles.card}>
         <View style={styles.imageContainer}>
           {item.image && (
@@ -63,7 +63,7 @@ const BidItem = ({ item }) => {
           )}
         </View>
       </View>
-    </TouchableWithoutFeedback>
+    </TouchableOpacity>
   );
 };
 

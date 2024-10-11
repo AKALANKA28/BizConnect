@@ -1,51 +1,133 @@
-import { router } from "expo-router";
-import React, { useState } from "react";
-import { View, StyleSheet, Image, Text, TouchableOpacity } from "react-native";
+import { useRouter } from "expo-router"; // Changed to useRouter, not router
+import React, { useEffect, useState } from "react";
+import {
+  View,
+  StyleSheet,
+  Image,
+  Text,
+  TouchableOpacity,
+  TouchableWithoutFeedback,
+} from "react-native";
 import Icon from "react-native-vector-icons/MaterialIcons";
+import { useAuth } from "../../../context/authContext"; // Import useAuth hook
+import { doc, getDoc } from "firebase/firestore";
+import { db } from "../../../config/FirebaseConfig"; // Firestore instance
 
-const ProfileHeader = () => {
-  const handleEditProfile = () => {
-    router.push("/profile/BuyerProfile/EditProfileScreen"); // Navigate to EditProfileScreen
+const ProfileHeader = ({ buyerId }) => {
+  const [dropdownVisible, setDropdownVisible] = useState(false);
+  const { user, signout } = useAuth(); // Get the currently logged-in user
+  const [profileData, setProfileData] = useState({
+    firstName: "Loading...",
+    lastName: "Loading...",
+    title: "Loading...",
+    profileImage: "https://via.placeholder.com/150", // Default placeholder image
+  });
+  const router = useRouter(); // Correct use of useRouter
+
+  // Function to fetch profile data from Firestore
+  const fetchProfileData = async () => {
+    try {
+      const idToFetch = buyerId || user?.uid; // Use buyerId or fallback to the current user
+      if (idToFetch) {
+        // Reference to the user's document in Firestore
+        const userDocRef = doc(db, "buyers", idToFetch); // Corrected to use `idToFetch` (dynamic ID)
+        const userDocSnap = await getDoc(userDocRef);
+
+        if (userDocSnap.exists()) {
+          const userData = userDocSnap.data();
+          setProfileData({
+            firstName: userData.firstName || "No first name provided",
+            lastName: userData.lastName || "No last name provided",
+            title: userData.title || "No title available",
+            profileImage:
+              userData.profileImage || "https://via.placeholder.com/150", // Fallback to placeholder
+          });
+        } else {
+          console.log("No such user document!");
+        }
+      }
+    } catch (error) {
+      console.error("Error fetching profile data: ", error);
+    }
   };
 
-  const handleShareProfile = () => {
-    // Add functionality to share the profile
-    // You can use Share API from React Native
-    // Example: Share.share({ message: "Check out my profile!" });
+  // Fetch profile data when the component mounts
+  useEffect(() => {
+    if (buyerId || user) {
+      fetchProfileData();
+    }
+  }, [buyerId, user]); // Updated dependency to include both buyerId and user
+
+  const handleEditProfile = () => {
+    router.push("/profile/BuyerProfile/EditProfileScreen");
+    setDropdownVisible(false); // Hide dropdown after selecting an option
+  };
+
+  const handleLogout = async () => {
+    await signout(); // Call the signout function
+    setDropdownVisible(false);
+  };
+
+  const toggleDropdown = () => {
+    setDropdownVisible(!dropdownVisible);
+  };
+
+  const closeDropdown = () => {
+    if (dropdownVisible) {
+      setDropdownVisible(false); // Close the dropdown if it is visible
+    }
   };
 
   return (
-    <View style={styles.container}>
-      <Image
-        resizeMode="contain"
-        source={{
-          uri: "https://cdn.builder.io/api/v1/image/assets/TEMP/7feb1d78bbd74a0e82a54e5a174ea8bd65e5a74faf472397fb3e761e36fab16a?placeholderIfAbsent=true&apiKey=59e835da8ea04b80ab8ace77cb34d866",
-        }}
-        style={styles.profileImage}
-      />
-      <View style={styles.infoContainer}>
-        <Text style={styles.name}>Arun Perera</Text>
-        <Text style={styles.title}>Handloom Product Exporter</Text>
+    <TouchableWithoutFeedback onPress={closeDropdown}>
+      <View style={styles.container}>
+        <Image
+          resizeMode="contain"
+          source={{
+            uri: profileData.profileImage, // Use dynamic profile image from Firestore
+          }}
+          style={styles.profileImage}
+        />
+        <View style={styles.infoContainer}>
+          <Text style={styles.name}>
+            {profileData.firstName} {profileData.lastName}
+          </Text>
+          <Text style={styles.title}>{profileData.title}</Text>
 
-        {/* Action Buttons: Edit Profile and Share Profile */}
-        <View style={styles.buttonContainer}>
-          <TouchableOpacity
-            style={styles.editProfileButton}
-            onPress={handleEditProfile}
-          >
-            <Icon name="edit" size={17} color="#333" />
-            <Text style={styles.buttonText}>Edit Profile</Text>
-          </TouchableOpacity>
-          <TouchableOpacity
-            style={styles.shareProfileButton}
-            onPress={handleShareProfile}
-          >
-            <Icon name="share" size={17} color="#333" />
-            <Text style={styles.buttonText}>Share Profile</Text>
-          </TouchableOpacity>
+          <View style={styles.buttonContainer}>
+            <TouchableOpacity
+              style={styles.editProfileButton}
+              onPress={handleEditProfile}
+            >
+              <Icon name="edit" size={17} color="#333" />
+              <Text style={styles.buttonText}>Edit Profile</Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+              style={styles.shareProfileButton}
+              onPress={() => {}}
+            >
+              <Icon name="share" size={17} color="#333" />
+              <Text style={styles.buttonText}>Share Profile</Text>
+            </TouchableOpacity>
+          </View>
         </View>
+
+        {/* Three dots menu */}
+        <TouchableOpacity style={styles.menuButton} onPress={toggleDropdown}>
+          <Icon name="more-vert" size={24} color="#333" />
+        </TouchableOpacity>
+
+        {/* Dropdown menu */}
+        {dropdownVisible && (
+          <View style={styles.dropdown}>
+            <TouchableOpacity style={styles.dropdownItem} onPress={handleLogout}>
+              <Icon name="logout" size={20} color="red" style={styles.dropdownIcon} />
+              <Text style={[styles.dropdownText, styles.logoutText]}>Logout</Text>
+            </TouchableOpacity>
+          </View>
+        )}
       </View>
-    </View>
+    </TouchableWithoutFeedback>
   );
 };
 
@@ -57,9 +139,12 @@ const styles = StyleSheet.create({
     padding: 10,
   },
   profileImage: {
-    width: 110,
+    width: 100,
+    height: 100,
     aspectRatio: 1,
     marginTop: 15,
+    borderRadius: 55, // Make the image circular
+    resizeMode: "cover",
   },
   infoContainer: {
     flex: 1,
@@ -104,6 +189,47 @@ const styles = StyleSheet.create({
     fontSize: 14,
     fontFamily: "poppins",
     color: "#333",
+  },
+  menuButton: {
+    padding: 10,
+    position: "absolute",
+    right: 10,
+    top: 10,
+  },
+  dropdown: {
+    position: "absolute",
+    top: 50,
+    right: 10,
+    backgroundColor: "#fff",
+    borderRadius: 8,
+    borderWidth: 1,
+    borderColor: "#e0e0e0",
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.2,
+    shadowRadius: 4,
+    elevation: 4,
+    width: 200,
+  },
+  dropdownItem: {
+    flexDirection: "row",
+    alignItems: "center",
+    paddingVertical: 12,
+    paddingHorizontal: 16,
+    borderBottomWidth: 0.5,
+    borderBottomColor: "#e0e0e0",
+  },
+  dropdownIcon: {
+    marginRight: 10,
+  },
+  dropdownText: {
+    fontSize: 16,
+    color: "#333",
+    fontFamily: "poppins",
+  },
+  logoutText: {
+    color: "red",
+    fontWeight: "bold",
   },
 });
 

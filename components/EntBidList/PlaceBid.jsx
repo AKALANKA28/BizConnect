@@ -16,6 +16,7 @@ import {
 } from "firebase/firestore";
 import { Colors } from "../../constants/Colors";
 import { getAuth } from "firebase/auth"; // Import Firebase Auth
+import { RFValue } from "react-native-responsive-fontsize";
 
 const PlaceBid = ({ item }) => {
   const [bidAmount, setBidAmount] = useState("");
@@ -39,7 +40,7 @@ const PlaceBid = ({ item }) => {
 
   const handlePlaceBid = async () => {
     if (!bidAmount || isNaN(bidAmount)) {
-      Alert.alert("Invalid Bid", "Please enter a valid bid amount.");
+      Alert.alert("Invalid Bid", "Please enter a  bid amount.");
       return;
     }
   
@@ -108,7 +109,11 @@ const styles = StyleSheet.create({
     borderRadius: 26,
     padding: 10,
     marginTop: 10,
+    paddingLeft: 20,
     flex: 3,
+    fontFamily: "poppins",
+    fontSize: RFValue(12),
+
   },
   placeBidButton: {
     backgroundColor: Colors.secondaryColor,
@@ -122,7 +127,7 @@ const styles = StyleSheet.create({
   placeBidButtonText: {
     color: "white",
     fontFamily: "poppins",
-    fontWeight: "bold",
+    fontSize: RFValue(12),
   },
 });
 

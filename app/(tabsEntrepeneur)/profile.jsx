@@ -1,11 +1,11 @@
 // EntrepreneurProfile.js
 import React from "react";
 import { View, StyleSheet, ScrollView } from "react-native";
-import ProfileHeader from "../../components/Profile/EntrepreneurProfile/ProfileHeader";
 import ProfileInfo from "../../components/Profile/EntrepreneurProfile/ProfileInfo";
 import ContactDetails from "../../components/Profile/EntrepreneurProfile/ContactDetails";
 import PreviousWorks from "../../components/Profile/EntrepreneurProfile/PreviousWorks";
 import { StatusBar } from "expo-status-bar";
+import ProfileHeader from "../profile/EntrepreneurProfile/ProfileHeader";
 
 export default function profile() {
   return (

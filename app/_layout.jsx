@@ -1,17 +1,19 @@
-import { View, Text } from "react-native";
 import React, { useEffect, useState } from "react";
-import { Slot, useRouter, useSegments } from "expo-router";
+import { GestureHandlerRootView } from "react-native-gesture-handler";
+import { useRouter, useSegments } from "expo-router";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { AuthContextProvider, useAuth } from "../context/authContext";
 import { useFonts } from "expo-font";
-import { NotificationProvider } from "../context/notificationContext"; // Import the NotificationProvider
-import { GestureHandlerRootView } from 'react-native-gesture-handler';
+import { AuthContextProvider, useAuth } from "../context/authContext";
+import { NotificationProvider } from "../context/notificationContext"; 
+import LoadingScreen from "../components/LoadingScreen";
+import { Stack } from "expo-router";
 
 const MainLayout = () => {
-  const { isAuthenticated, user } = useAuth();
+  const { isAuthenticated } = useAuth();
   const segments = useSegments();
   const router = useRouter();
-  const [hasOnboarded, setHasOnboarded] = useState(null); // Local state to track onboarding status
+  const [hasOnboarded, setHasOnboarded] = useState(null); 
+  const [isLoading, setIsLoading] = useState(true); // Add loading state
 
   useEffect(() => {
     const checkOnboardingStatus = async () => {
@@ -20,65 +22,62 @@ const MainLayout = () => {
         setHasOnboarded(onboarded === "true");
       } catch (error) {
         console.error("Failed to check onboarding status:", error);
+      } finally {
+        setIsLoading(false); // Set loading to false once the check is done
       }
     };
 
     if (typeof isAuthenticated !== "undefined") {
-      checkOnboardingStatus(); // Check if user has completed onboarding
+      checkOnboardingStatus(); 
     }
   }, [isAuthenticated]);
 
   useEffect(() => {
-    if (typeof isAuthenticated === "undefined" || hasOnboarded === null) return; // Wait for both isAuthenticated and hasOnboarded to load
+    if (isLoading || isAuthenticated === undefined || hasOnboarded === null) return; // Wait for loading and checks
 
-    const inApp = segments[0] === "(tabsBuyer)";
-
-    // Handle navigation logic
+    // Navigation logic based on authentication and onboarding status
     if (isAuthenticated && !hasOnboarded) {
-      // Redirect to onboarding if user hasn't completed it
-      router.replace("/Index");
-    } else if (isAuthenticated && !inApp) {
-      // Redirect to home if the user is authenticated and has completed onboarding
-      router.replace("/home"); // Adjust to your home route
-    } else if (isAuthenticated === false) {
-      // Redirect to login
-      router.replace("/Index");
-    }
-  }, [isAuthenticated, hasOnboarded]);
-  useEffect(() => {
-    if (isAuthenticated) {
-      console.log("User is authenticated.");
-      console.log("User details:", user);
+      router.replace("/Index"); // Redirect to onboarding
+    } 
+    else if (isAuthenticated) {
+      router.replace("/Index"); // Redirect to home
     } else {
-      console.log("User is not authenticated.");
+      router.replace("/Index"); // Redirect to login
     }
-  }, [isAuthenticated, user]);
-  return <Slot />;
+  }, [isAuthenticated, hasOnboarded, isLoading]);
+
+  // Prevent rendering the stack until loading is complete
+  if (isLoading) return <LoadingScreen />; 
+
+  return (
+    <Stack
+      screenOptions={{
+        headerShown: false, // Hide header globally
+      }}
+    />
+  );
 };
 
 export default function RootLayout() {
   const [fontsLoaded] = useFonts({
-    roboto: require("../assets/fonts/Roboto-Regular.ttf"),
+    "roboto": require("../assets/fonts/Roboto-Regular.ttf"),
     "roboto-medium": require("../assets/fonts/Roboto-Medium.ttf"),
     "roboto-bold": require("../assets/fonts/Roboto-Bold.ttf"),
     "roboto-black": require("../assets/fonts/Roboto-Black.ttf"),
-
-    poppins: require("../assets/fonts/Poppins-Regular.ttf"),
+    "poppins": require("../assets/fonts/Poppins-Regular.ttf"),
     "poppins-semibold": require("../assets/fonts/Poppins-SemiBold.ttf"),
     "poppins-bold": require("../assets/fonts/Poppins-Bold.ttf"),
+    "lato": require("../assets/fonts/Lato-Regular.ttf"),
+    "lato-bold": require("../assets/fonts/Lato-Bold.ttf"),
   });
 
   if (!fontsLoaded) {
-    return (
-      <View style={{ flex: 1, alignItems: "center", justifyContent: "center" }}>
-        <Text>Loading...</Text>
-      </View>
-    );
+    return <LoadingScreen />;
   }
 
   return (
     <AuthContextProvider>
-      <GestureHandlerRootView >
+      <GestureHandlerRootView style={{ flex: 1 }}>
         <NotificationProvider>
           <MainLayout />
         </NotificationProvider>
