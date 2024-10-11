@@ -39,8 +39,8 @@ const ProfileHeader = ({ entrepreneurId }) => {
         if (userDocSnap.exists()) {
           const userData = userDocSnap.data();
           setProfileData({
-            firstName: userData.firstName || "No first name provided",
-            lastName: userData.lastName || "No last name provided",
+            firstName: userData.firstName || userData.username || "Guest User", // Use username if firstName is not available
+            lastName: userData.lastName || "", // Leave last name blank if not provided
             title: userData.title || "No title available", // Use bio as title if it's the description
             profileImage:
               userData.profileImage || "https://via.placeholder.com/150", // Fallback to placeholder

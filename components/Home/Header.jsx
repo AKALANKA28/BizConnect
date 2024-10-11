@@ -51,7 +51,9 @@ export default function Header({ notificationCount }) {
           </TouchableOpacity>
           <View>
             <Text style={styles.greetingText}>Good Day,</Text>
-            <Text style={styles.usernameText}>{user?.firstName || "Guest"}</Text>
+            <Text style={styles.usernameText}>
+              {user?.firstName ? user.firstName : user?.username || "Guest"}
+            </Text>
           </View>
         </View>
 
@@ -79,7 +81,10 @@ export default function Header({ notificationCount }) {
       <View style={styles.searchContainer}>
         <View style={styles.searchBar}>
           <Ionicons name="search" size={20} color="#6D4C41" />
-          <TextInput placeholder="What products you need?" style={styles.searchInput} />
+          <TextInput
+            placeholder="What products you need?"
+            style={styles.searchInput}
+          />
         </View>
         {/* Filter Button with Icon */}
         <TouchableOpacity
@@ -104,7 +109,6 @@ export const styles = StyleSheet.create({
     backgroundColor: "#fff",
     borderBottomWidth: 0.5,
     borderBottomColor: "#cccccc",
-
   },
   userInfoContainer: {
     display: "flex",
@@ -128,7 +132,6 @@ export const styles = StyleSheet.create({
   greetingText: {
     color: "#000",
     fontSize: RFValue(14),
-
   },
   usernameText: {
     fontSize: RFValue(18),
