@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, FlatList } from 'react-native';
+import { View, Text, FlatList,StyleSheet } from 'react-native';
 import { collection, getDocs } from 'firebase/firestore';
-import { db } from './firebaseConfig';
+import { db } from '../../config/FirebaseConfig';
 
 const StatusScreen = () => {
   const [statuses, setStatuses] = useState([]);

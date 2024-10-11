@@ -10,7 +10,7 @@ const FundSystemScreen = () => {
     <View style={styles.container}>
       {/* Image Background */}
       <ImageBackground 
-        source={require('../assets/images/uuunion.svg')} 
+        source={require('../../assets/images/uuunion.svg')} 
         style={styles.imageBackground}
       >
         <Text style={styles.titleText}>Let's understand about the Fund System</Text>

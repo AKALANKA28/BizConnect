@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
-import { View, TextInput, Button, Alert } from 'react-native';
+import { View, TextInput, Button, Alert, StyleSheet } from 'react-native';
 import * as ImagePicker from 'expo-image-picker';
 import { getStorage, ref, uploadBytes } from 'firebase/storage';
-import { db } from './firebaseConfig';
+import { db } from '../../config/FirebaseConfig';
 import { addDoc, collection } from 'firebase/firestore';
 
 const UploadSlipForm = () => {
@@ -156,5 +156,4 @@ const styles = StyleSheet.create({
     },
   });
   
-
 export default UploadSlipForm;

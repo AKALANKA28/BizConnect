@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
-import { View, TextInput, Button, Alert } from 'react-native';
+import { View, TextInput, Button, Alert,StyleSheet } from 'react-native';
 import { addDoc, collection } from 'firebase/firestore';
-import { db } from './firebaseConfig';
+import { db } from '../../config/FirebaseConfig';
 
 const PaymentForm = () => {
   const [paymentAmount, setPaymentAmount] = useState('');

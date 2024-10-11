@@ -4,7 +4,7 @@ import { View, Text, TouchableOpacity, StyleSheet, ImageBackground } from 'react
 const PaymentTypeScreen = ({ navigation }) => {
   return (
     <ImageBackground
-    source={require('../assets/images/ssscribble.svg')} // Replace with your background image path
+    source={require('../../assets/images/ssscribble.svg')} // Replace with your background image path
       style={styles.background}
       resizeMode="cover" // Adjust the image scaling, 'cover' keeps aspect ratio and fills the screen
     >

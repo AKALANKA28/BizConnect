@@ -18,13 +18,13 @@ const PaymentStatusScreen = ({ navigation }) => {
       <View style={styles.card}>
         <View style={styles.statusContainer}>
           <Image
-            source={require('../assets/images/successor2r.png')} // Replace with your success check icon
+            source={require('../../assets/images/successor2r.png')} // Replace with your success check icon
             style={styles.icon}
           />
           <Text style={styles.statusText}>Your Payment Is Successful</Text>
           <Text style={styles.thankText}>Thank you very much for joining the fund</Text>
           <Image
-            source={require('../assets/images/auth4.png')} // Replace with your illustration image
+            source={require('../../assets/images/auth4.png')} // Replace with your illustration image
             style={styles.illustration}
           />
         </View>

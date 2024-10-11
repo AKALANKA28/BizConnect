@@ -96,7 +96,7 @@ const RegistrationFormScreen = () => {
 
   return (
     <ImageBackground 
-      source={require('../assets/images/uuunion.svg')} // Replace with your image path
+      source={require('../../assets/images/uuunion.svg')} // Replace with your image path
       style={styles.backgroundImage}
     >
       <View style={styles.container}>
