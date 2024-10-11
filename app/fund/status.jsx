@@ -1,43 +1,109 @@
-import React, { useState, useEffect } from 'react';
-import { View, Text, FlatList,StyleSheet } from 'react-native';
+import React, { useEffect, useState } from 'react';
+import { View, Text, FlatList, TouchableOpacity, StyleSheet, Image, ActivityIndicator } from 'react-native';
+import { Ionicons } from '@expo/vector-icons';
 import { collection, getDocs } from 'firebase/firestore';
-import { db } from '../../config/FirebaseConfig';
+import { db } from '../../config/FirebaseConfig'; // Adjust path as necessary
+import { useRouter } from 'expo-router';
+import { useNavigation } from '@react-navigation/native';
 
-const StatusScreen = () => {
-  const [statuses, setStatuses] = useState([]);
+
+const PaymentsList = () => {
+  const router = useRouter();
+  const navigation = useNavigation();
+
+  const [payments, setPayments] = useState([]);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const fetchStatuses = async () => {
-      const statusCollection = collection(db, "payments"); // Assuming payments status is stored here
-      const statusSnapshot = await getDocs(statusCollection);
-      const statusList = statusSnapshot.docs.map(doc => ({
-        id: doc.id,
-        ...doc.data(),
-      }));
-      setStatuses(statusList);
+    const fetchPayments = async () => {
+      try {
+        const querySnapshot = await getDocs(collection(db, 'fundRequests'));
+        const paymentsList = querySnapshot.docs.map(doc => ({
+          id: doc.id, // Capture document ID
+          ...doc.data() // Spread the document data
+        }));
+        setPayments(paymentsList);
+      } catch (error) {
+        console.error('Error fetching payments:', error);
+      } finally {
+        setLoading(false);
+      }
     };
 
-    fetchStatuses();
+    fetchPayments();
   }, []);
 
+  const renderDate = (date) => {
+    if (date && date.seconds) {
+      return new Date(date.seconds * 1000).toLocaleDateString();
+    }
+    return date;
+  };
+
+  const renderPaymentItem = ({ item }) => (
+    <View style={styles.statusContainer}>
+      {/* Icon */}
+      <View style={styles.iconContainer}>
+        <Image
+          source={require('../../assets/images/document.png')} // Replace with your icon
+          style={styles.icon}
+        />
+      </View>
+
+      {/* Message and Date */}
+      <View style={styles.messageContainer}>
+        <Text style={styles.messageText}>You have successfully paid an amount of Rs.{item.amount}/= as your fund installment.</Text>
+        <Text style={styles.dateText}>{renderDate(item.createdAt)}</Text>
+      </View>
+
+      {/* View Button */}
+      {/* <TouchableOpacity style={styles.viewButton}>
+        <Text style={styles.viewButtonText}>View</Text>
+      </TouchableOpacity> */}
+    </View>
+  );
+
+  if (loading) {
+    return <ActivityIndicator size="large" color="#0000ff" />;
+  }
+
   return (
-    <View>
+    <View style={styles.container}>
+      {/* Header */}
+      <View style={styles.topNav}>
+        <TouchableOpacity style={styles.navIcon} onPress={() => navigation.goBack()}>
+          <Ionicons name="arrow-back" size={24} color="black" />
+        </TouchableOpacity>
+        <Text style={styles.navTitle}>Payment History</Text>
+        {/* <TouchableOpacity style={styles.navIcon} onPress={() => alert('Open Settings')}>
+          <Ionicons name="settings" size={24} color="black" />
+        </TouchableOpacity> */}
+      </View>
+
+      {/* Payments List */}
       <FlatList
-        data={statuses}
-        renderItem={({ item }) => (
-          <View>
-            <Text>{item.paymentAmount} - {item.paymentDate}</Text>
-          </View>
-        )}
+        data={payments}
+        renderItem={renderPaymentItem}
         keyExtractor={(item) => item.id}
       />
+
+      {/* OK Button */}
+      <TouchableOpacity
+            style={styles.okButton}
+            onPress={() => router.push('/fund/method')}
+        >
+            <Text style={styles.okButtonText}>Pay Now</Text>
+        </TouchableOpacity>
+
+      
     </View>
   );
 };
+
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#f5f5f5',
+    backgroundColor: 'white',
     padding: 20,
   },
   topNav: {
@@ -47,7 +113,7 @@ const styles = StyleSheet.create({
     padding: 10,
     backgroundColor: '#fff',
     elevation: 4,
-    shadowColor: '#000',
+    shadowColor: 'white',
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.1,
     shadowRadius: 3,
@@ -59,37 +125,9 @@ const styles = StyleSheet.create({
   },
   navTitle: {
     fontSize: 18,
+    marginRight:170,
     fontWeight: 'bold',
     color: '#333',
-  },
-  header: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    marginBottom: 40,
-  },
-  backButton: {
-    backgroundColor: '#FF6E40',
-    borderRadius: 20,
-    padding: 10,
-  },
-  backText: {
-    fontSize: 18,
-    color: '#fff',
-  },
-  headerText: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    color: '#333',
-  },
-  menuButton: {
-    backgroundColor: '#FF6E40',
-    borderRadius: 20,
-    padding: 10,
-  },
-  menuText: {
-    fontSize: 18,
-    color: '#fff',
   },
   statusContainer: {
     flexDirection: 'row',
@@ -98,7 +136,7 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     padding: 15,
     marginBottom: 15,
-    elevation: 2, // Adds shadow
+    elevation: 2,
   },
   iconContainer: {
     marginRight: 15,
@@ -120,7 +158,7 @@ const styles = StyleSheet.create({
     marginTop: 5,
   },
   viewButton: {
-    backgroundColor: '#FF6E40',
+    backgroundColor: '#b26a27',
     borderRadius: 5,
     paddingVertical: 8,
     paddingHorizontal: 20,
@@ -132,20 +170,20 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
   },
   okButton: {
-    backgroundColor: '#FF6E40',
+    backgroundColor: '#b26a27',
     borderRadius: 10,
     paddingVertical: 12,
     paddingHorizontal: 25,
     alignSelf: 'center',
     marginTop: 20,
-    width:200,
+    width: 200,
   },
   okButtonText: {
     color: '#fff',
     fontSize: 18,
     fontWeight: 'bold',
-    margin:'auto'
+    margin: 'auto'
   },
 });
 
-export default StatusScreen;
+export default PaymentsList;

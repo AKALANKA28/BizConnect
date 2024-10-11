@@ -1,18 +1,14 @@
 import React, { useState } from 'react';
 import { View, Text, TextInput, StyleSheet, TouchableOpacity, ScrollView, Alert, ImageBackground } from 'react-native';
 import { Picker } from '@react-native-picker/picker';
-import { Ionicons } from '@expo/vector-icons'; // Make sure to install this library if you haven't
-import { getDatabase, ref, set } from 'firebase/database'; // Firebase Database import
+import { Ionicons } from '@expo/vector-icons';
+import { db } from '../../config/FirebaseConfig'; // Firestore DB
+import { addDoc, collection } from 'firebase/firestore';
+import { useRouter } from 'expo-router'; // Import useRouter from expo-router
 import { useNavigation } from '@react-navigation/native';
 
-// Firebase should be initialized in your project
-// Ensure that you have Firebase configured properly
-// Example of how to initialize (put this in your main app or firebaseConfig file):
-// import { initializeApp } from 'firebase/app';
-// const firebaseConfig = { /* Your firebase config here */ };
-// const app = initializeApp(firebaseConfig);
-
 const RegistrationFormScreen = () => {
+  const router = useRouter(); // Initialize useRouter from expo-router
   const navigation = useNavigation();
 
   const [name, setName] = useState('');
@@ -68,47 +64,39 @@ const RegistrationFormScreen = () => {
     return isValid;
   };
 
-  const handleRegister = () => {
+  const handleRegister = async () => {
     if (validateForm()) {
-      // Insert data into Firebase Database
-      const db = getDatabase();
-      const fundRequestRef = ref(db, 'fundRequests/' + Date.now()); // Create a unique node for each entry
-
-      set(fundRequestRef, {
-        name: name,
-        yearStarted: yearStarted,
-        businessIdentity: businessIdentity,
-        madeOnlinePayments: madeOnlinePayments,
-        monthlyAmount: monthlyAmount,
-      })
-        .then(() => {
-          Alert.alert('Success', 'Registration successful and data added to Firebase!', [
-            { text: 'OK', onPress: () => navigation.navigate('PaymentTypeScreen') }, // Navigate to Payment Form
-          ]);
-        })
-        .catch((error) => {
-          Alert.alert('Error', 'Failed to register: ' + error.message);
+      try {
+        // Add data to Firestore
+        await addDoc(collection(db, 'fundReg'), {
+          name,
+          yearStarted,
+          businessIdentity,
+          madeOnlinePayments,
+          monthlyAmount,
         });
+
+        Alert.alert('Success', 'Registration successful', [
+          { text: 'OK', onPress: () => router.push('/fund/method') }, // Navigate using router.push
+        ]);
+
+      } catch (error) {
+        Alert.alert('Error', 'Failed to register: ' + error.message);
+      }
     } else {
       Alert.alert('Error', 'Please fill all required fields correctly.');
     }
   };
 
   return (
-    <ImageBackground 
-      source={require('../../assets/images/uuunion.svg')} // Replace with your image path
-      style={styles.backgroundImage}
-    >
+    <ImageBackground style={styles.backgroundImage}>
       <View style={styles.container}>
         {/* Top Navigation Bar */}
         <View style={styles.topNav}>
-          <TouchableOpacity style={styles.navIcon} onPress={() => alert('Go Back')}>
+          <TouchableOpacity style={styles.navIcon} onPress={() => navigation.goBack()}>
             <Ionicons name="arrow-back" size={24} color="black" />
           </TouchableOpacity>
-          <Text style={styles.navTitle}>Registration</Text>
-          <TouchableOpacity style={styles.navIcon} onPress={() => alert('Open Settings')}>
-            <Ionicons name="settings" size={24} color="black" />
-          </TouchableOpacity>
+          <Text style={styles.navTitle}>Fund Registration</Text>
         </View>
 
         <ScrollView contentContainerStyle={styles.contentContainer}>
@@ -212,7 +200,6 @@ const RegistrationFormScreen = () => {
     </ImageBackground>
   );
 };
-
 const styles = StyleSheet.create({
   container: {
     flex: 1,
@@ -227,12 +214,13 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'space-between',
     padding: 10,
-    backgroundColor: '#fff',
+    backgroundColor: 'white',
     elevation: 4,
-    shadowColor: '#000',
+    shadowColor: 'white',
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.1,
     shadowRadius: 3,
+    marginTop: 15,
   },
   navIcon: {
     padding: 10,
@@ -241,10 +229,12 @@ const styles = StyleSheet.create({
     fontSize: 18,
     fontWeight: 'bold',
     color: '#333',
+    marginRight:170,
   },
   contentContainer: {
     padding: 20,
     paddingBottom: 100,
+    backgroundColor: 'white',
   },
   title: {
     fontSize: 24,
@@ -259,7 +249,7 @@ const styles = StyleSheet.create({
   label: {
     fontSize: 16,
     fontWeight: 'bold',
-    marginBottom: 5,
+    marginBottom: 10,
     color: '#333',
   },
   input: {
@@ -270,9 +260,10 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     fontSize: 16,
     color: '#333',
+    marginBottom: 20,
   },
   pickerContainer: {
-    backgroundColor: '#fff',
+    backgroundColor: 'white',
     borderRadius: 5,
     borderColor: '#ccc',
     borderWidth: 1,
@@ -282,7 +273,7 @@ const styles = StyleSheet.create({
     color: '#333',
   },
   button: {
-    backgroundColor: '#4CAF50',
+    backgroundColor: '#b26a27',
     padding: 15,
     borderRadius: 5,
     justifyContent: 'center',
@@ -295,6 +286,7 @@ const styles = StyleSheet.create({
   },
   footer: {
     padding: 20,
+    backgroundColor: 'white',
   },
   errorText: {
     color: 'red',

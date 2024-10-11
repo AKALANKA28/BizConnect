@@ -1,8 +1,11 @@
 import React from 'react';
 import { View, Text, Image, TouchableOpacity, StyleSheet } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+import { useNavigation } from '@react-navigation/native';
+import { useRouter } from 'expo-router';
 
-const PaymentStatusScreen = ({ navigation }) => {
+const PaymentStatusScreen = () => {
+    const router = useRouter(); 
   return (
     <View style={styles.container}>
       <View style={styles.topNav}>
@@ -10,9 +13,9 @@ const PaymentStatusScreen = ({ navigation }) => {
             <Ionicons name="arrow-back" size={24} color="black" />
           </TouchableOpacity>
           <Text style={styles.navTitle}>Payment Status</Text>
-          <TouchableOpacity style={styles.navIcon} onPress={() => alert('Open Settings')}>
+          {/* <TouchableOpacity style={styles.navIcon} onPress={() => alert('Open Settings')}>
             <Ionicons name="settings" size={24} color="black" />
-          </TouchableOpacity>
+          </TouchableOpacity> */}
         </View>
 
       <View style={styles.card}>
@@ -28,9 +31,10 @@ const PaymentStatusScreen = ({ navigation }) => {
             style={styles.illustration}
           />
         </View>
-        <TouchableOpacity style={styles.okButton} onPress={() => console.log('OK Pressed')}>
-          <Text style={styles.okText}>OK</Text>
+        <TouchableOpacity style={styles.okButton} onPress={() => router.push('/fund/requestFund')}>
+            <Text style={styles.okText}>OK</Text>
         </TouchableOpacity>
+
       </View>
     </View>
   );
@@ -39,7 +43,7 @@ const PaymentStatusScreen = ({ navigation }) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#F5F5F5',
+    backgroundColor: 'white',
     padding: 16,
   },
   header: {
@@ -55,7 +59,7 @@ const styles = StyleSheet.create({
     padding: 10,
     backgroundColor: '#fff',
     elevation: 4,
-    shadowColor: '#000',
+    shadowColor: 'white',
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.1,
     shadowRadius: 3,
@@ -67,16 +71,11 @@ const styles = StyleSheet.create({
   },
   navTitle: {
     fontSize: 18,
+    marginRight: 160,
     fontWeight: 'bold',
     color: '#333',
   },
   backButton: {
-    width: 32,
-    height: 32,
-    backgroundColor: '#D2673D',
-    borderRadius: 16,
-  },
-  dotsMenu: {
     width: 32,
     height: 32,
     backgroundColor: '#D2673D',
