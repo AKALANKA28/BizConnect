@@ -93,7 +93,7 @@ const styles = StyleSheet.create({
     flex: 1,
     textAlign: "left",
     marginLeft: 30,
-    fontSize: RFValue(14),
+    fontSize: RFValue(16),
     fontFamily: "poppins-semibold",
   },
   deleteButton: {

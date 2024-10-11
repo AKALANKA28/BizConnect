@@ -8,6 +8,7 @@ import Intro from "../../components/BusinessDetails/Intro";
 import ActionButton from "../../components/BusinessDetails/ActionButton";
 import About from "../../components/BusinessDetails/About";
 import LoadingScreen from "../../components/LoadingScreen";
+import { StatusBar } from "expo-status-bar";
 
 export default function BusinessDetail() {
   const { businessid } = useLocalSearchParams();
@@ -42,17 +43,15 @@ export default function BusinessDetail() {
         <LoadingScreen />
       ) : (
         <View>
+          <StatusBar  translucent />
           {business && (
             <View>
               {/* Intro */}
               <Intro business={business} />
-                {/* AboutSection */}
-                <About business={business} />
-               {/* Action Button */}
-               <ActionButton business={business} />
-              
-             
-            
+              {/* AboutSection */}
+              <About business={business} />
+              {/* Action Button */}
+              <ActionButton business={business} />
             </View>
           )}
         </View>
