@@ -1,10 +1,9 @@
-import React, { useEffect, useState,useCallback } from 'react';
+import React, { useEffect, useState } from 'react';
 import { View, FlatList, StyleSheet, Text } from 'react-native';
 import PostCard from './PostCard'; // Assuming PostCard is imported correctly
 import { db, auth } from '../../config/FirebaseConfig'; // Firebase and Auth config import
-import { getDocs, collection, query, where } from 'firebase/firestore';
+import { getDocs, collection, query, where, doc as firestoreDoc, getDoc } from 'firebase/firestore';
 import { onAuthStateChanged } from 'firebase/auth'; // To detect the logged-in user
-import { useFocusEffect } from '@react-navigation/native'; // For automatic refresh
 
 export default function MyCollabSpaces() {
   const [posts, setPosts] = useState([]);
@@ -30,24 +29,32 @@ export default function MyCollabSpaces() {
     try {
       const q = query(collection(db, 'CollabSpaces'), where('userId', '==', userId)); // Fetch only posts by the logged-in user
       const querySnapshot = await getDocs(q);
-      const postsData = querySnapshot.docs.map((doc) => ({
-        id: doc.id,
-        ...doc.data(),
-      }));
+      
+      // Map through posts to add profile image from entrepreneurs collection
+      const postsData = await Promise.all(
+        querySnapshot.docs.map(async (postDoc) => {
+          const postData = { id: postDoc.id, ...postDoc.data() };
 
-      // Adding a sample profile image for now
-      const postsWithProfileImage = postsData.map((post) => ({
-        ...post,
-        profileImage:
-          'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQbxcbt8ejR6RhFF5ysw97gpXm6yf0woiXAig&s', // Replace with actual image URL
-      }));
+          // Fetch the corresponding entrepreneur profile image using the creator's uid
+          const entrepreneurRef = firestoreDoc(db, 'entrepreneurs', postData.userId);
+          const entrepreneurSnap = await getDoc(entrepreneurRef);
 
-      setPosts(postsWithProfileImage);
+          // Check if the entrepreneur document exists and get the profileImage
+          let profileImage = null; // Default image URL
+          if (entrepreneurSnap.exists()) {
+            profileImage = entrepreneurSnap.data().profileImage || profileImage;
+          }
+
+          // Return the post data with the profile image
+          return { ...postData, profileImage };
+        })
+      );
+
+      setPosts(postsData);
     } catch (error) {
       console.error('Error fetching posts: ', error);
     }
   };
-
 
   const renderPost = ({ item }) => <PostCard post={item} />;
 

@@ -7,14 +7,13 @@ import Header from './Header';
 import { useAuth } from "../../context/authContext";
 
 export default function CollabSpace() {
-  const { postId, proPic } = useLocalSearchParams();
+  const { postId } = useLocalSearchParams();
   const [post, setPost] = useState(null);
+  const [profileImage, setProfileImage] = useState(null); // State for profile image
   const [activeTab, setActiveTab] = useState('about'); // State for tab switching
   const { user } = useAuth(); // Assuming you have a hook that provides the logged-in user
   const [isMember, setIsMember] = useState(false);
   const router = useRouter(); 
-
-  console.log('in collabspace' + proPic );
 
   useEffect(() => {
     if (postId) {
@@ -22,19 +21,23 @@ export default function CollabSpace() {
     }
   }, [postId]);
 
-  useEffect(() => {
-    if (post && user) {
-      setIsMember(post.members?.includes(user.uid));
-    }
-  }, [post, user]);
-
   const fetchPostDetails = async (id) => {
     try {
       const postRef = doc(db, 'CollabSpaces', id);
       const postSnap = await getDoc(postRef);
 
       if (postSnap.exists()) {
-        setPost(postSnap.data());
+        const data = postSnap.data();
+        setPost(data);
+
+        // Fetch the profile image of the user who created the collab space
+        const userRef = doc(db, 'entrepreneurs', data.userId); // Assuming userId exists in post data
+        const userSnap = await getDoc(userRef);
+        if (userSnap.exists()) {
+          setProfileImage(userSnap.data().profileImage);
+        } else {
+          console.log('No entrepreneur document found!');
+        }
       } else {
         console.log('No such document!');
       }
@@ -42,6 +45,12 @@ export default function CollabSpace() {
       console.error('Error fetching post details: ', error);
     }
   };
+
+  useEffect(() => {
+    if (post && user) {
+      setIsMember(post.members?.includes(user.uid));
+    }
+  }, [post, user]);
 
   const joinCollabSpace = async () => {
     if (!user || !postId) return;
@@ -118,7 +127,7 @@ export default function CollabSpace() {
 
             {/* Publisher Info */}
             <View style={styles.publisherInfo}>
-              <Image source={{ uri: proPic }} style={styles.profileImage} />
+              {profileImage && <Image source={{ uri: profileImage }} style={styles.profileImage} />}
               <View>
                 <Text style={styles.publisherName}>{post.userName}</Text>
                 <Text style={styles.publisherLocation}>{post.location}</Text>
@@ -189,11 +198,11 @@ export default function CollabSpace() {
 
       {/* Floating Action Button */}
       <TouchableOpacity style={styles.fab} onPress={navigateToChatRoom}>
-  <Image 
-    source={require('../../assets/icons/Chat.png')} // Update the path to your icon
-    style={styles.fabIcon} 
-  />
-</TouchableOpacity>
+        <Image 
+          source={require('../../assets/icons/Chat.png')} // Update the path to your icon
+          style={styles.fabIcon} 
+        />
+      </TouchableOpacity>
     </View>
   );
 }
@@ -337,9 +346,5 @@ const styles = StyleSheet.create({
     width: 34, // Set the width of your icon
     height: 34, // Set the height of your icon
   },
-  fabText: {
-    color: '#fff',
-    fontSize: 24,
-    fontWeight: 'bold',
-  },
 });
+
