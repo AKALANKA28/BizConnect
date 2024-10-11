@@ -6,6 +6,7 @@ import Category from "../../components/Home/Category";
 import PopularBusiness from "../../components/Home/PopularBusiness";
 import { Colors } from "../../constants/Colors";
 import { useAuth } from "../../context/authContext";
+import RecommendPost from "../../components/Home/RecommendPost";
 
 export default function Home() {
   const { signout, user } = useAuth(); // Get signout function from Auth context
@@ -34,6 +35,7 @@ export default function Home() {
       {/* Scrollable Content */}
       <ScrollView
         contentContainerStyle={styles.scrollContent}
+        showsVerticalScrollIndicator={false}
         refreshControl={
           <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
         }
@@ -46,6 +48,7 @@ export default function Home() {
         <PopularBusiness />
         {/* <PopularBusiness />
         <PopularBusiness /> */}
+        <RecommendPost />
 
         {/* Logout Button */}
         {/* <View>
@@ -71,7 +74,7 @@ const styles = StyleSheet.create({
   scrollContent: {
     marginTop: 100,
     paddingTop: 80, // Adjust this based on your header height to prevent overlapping
-    paddingBottom: 160,
+    paddingBottom: 120,
     backgroundColor: Colors.primaryColor,
   },
 });

@@ -4,9 +4,9 @@ import {
   TextInput,
   TouchableOpacity,
   StyleSheet,
-  Alert,
   Text,
   StatusBar,
+  ToastAndroid, // Import ToastAndroid
 } from "react-native";
 import { useNavigation, useRoute } from "@react-navigation/native";
 import { useAuth } from "../../../context/authContext";
@@ -27,23 +27,20 @@ const EditFieldScreen = () => {
       const result = await updateProfile(updatedData);
 
       if (result.success) {
-        Alert.alert("Field updated successfully!");
+        ToastAndroid.show("Field updated successfully!", ToastAndroid.SHORT); // Success message
         navigation.goBack();
       } else {
-        Alert.alert("Error updating field. Please try again.");
+        ToastAndroid.show("Error updating field. Please try again.", ToastAndroid.SHORT); // Error message
       }
     } catch (error) {
       console.error("Error updating field:", error);
-      Alert.alert("Error updating field. Please try again.");
+      ToastAndroid.show("Error updating field. Please try again.", ToastAndroid.SHORT); // Error message
     }
   };
 
   return (
     <>
-      <StatusBar
-        barStyle="dark-content"
-        backgroundColor={Colors.primaryColor}
-      />
+      <StatusBar barStyle="dark-content" backgroundColor={Colors.primaryColor} />
       <View style={styles.header}>
         <TouchableOpacity onPress={() => navigation.goBack()}>
           <Ionicons name="close" size={24} color="black" />

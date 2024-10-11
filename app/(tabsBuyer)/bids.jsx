@@ -13,13 +13,21 @@ import {
 import Ionicons from "react-native-vector-icons/Ionicons";
 import { useRouter } from "expo-router";
 import { db, auth } from "../../config/FirebaseConfig"; // Update with your actual Firebase config path
-import { collection, getDocs, query, where, deleteDoc, doc } from "firebase/firestore";
+import {
+  collection,
+  getDocs,
+  query,
+  where,
+  deleteDoc,
+  doc,
+} from "firebase/firestore";
 import { Colors } from "../../constants/Colors";
 import { RFValue } from "react-native-responsive-fontsize";
 import { getStorage, ref, deleteObject } from "firebase/storage"; // Import the necessary storage functions
-import { useFocusEffect } from '@react-navigation/native'; // Import useFocusEffect
+import { useFocusEffect } from "@react-navigation/native"; // Import useFocusEffect
 import * as ImagePicker from "expo-image-picker";
 import DateTimePicker from "@react-native-community/datetimepicker";
+import Header from "../../components/Header";
 
 export default function Bids() {
   const [bids, setBids] = useState([]);
@@ -128,11 +136,21 @@ export default function Bids() {
               onPress={() => setVisibleMenu(null)} // Close menu on tapping outside
             />
             <View style={styles.menuOptions}>
-              <TouchableOpacity onPress={() => handleEdit(item.id)} style={styles.menuOption}>
-                <Ionicons name="pencil" size={20} color={Colors.secondaryColor} />
+              <TouchableOpacity
+                onPress={() => handleEdit(item.id)}
+                style={styles.menuOption}
+              >
+                <Ionicons
+                  name="pencil"
+                  size={20}
+                  color={Colors.secondaryColor}
+                />
                 <Text style={styles.menuOptionText}>Edit</Text>
               </TouchableOpacity>
-              <TouchableOpacity onPress={() => handleDelete(item.id, item.image)} style={styles.menuOption}>
+              <TouchableOpacity
+                onPress={() => handleDelete(item.id, item.image)}
+                style={styles.menuOption}
+              >
                 <Ionicons name="trash" size={20} color="red" />
                 <Text style={styles.menuOptionText}>Delete</Text>
               </TouchableOpacity>
@@ -182,7 +200,9 @@ export default function Bids() {
   };
 
   return (
-    <View style={{ flex: 1, backgroundColor: Colors.primaryColor}}>
+    <View style={{ flex: 1, backgroundColor: Colors.primaryColor }}>
+      <Header title="Bids" showBackButton={false} />
+
       <FlatList
         data={bids}
         renderItem={renderBidItem}
