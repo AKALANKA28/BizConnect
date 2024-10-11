@@ -1,12 +1,13 @@
 import React, { useEffect, useState } from 'react';
-import { View, FlatList, StyleSheet, Text } from 'react-native';
+import { View, FlatList, StyleSheet, Text, ActivityIndicator } from 'react-native';
 import PostCard from './PostCard'; // Assuming PostCard is imported correctly
 import { db } from '../../config/FirebaseConfig'; // Firebase config import
-import { getDocs, collection, query, getDoc, where,doc } from 'firebase/firestore'; // Import necessary functions
+import { getDocs, collection, query, getDoc, where, doc } from 'firebase/firestore'; // Import necessary functions
 import { useAuth } from '../../context/authContext'; // Assuming you have a context for authentication
 
 export default function JoinedFeed() {
   const [posts, setPosts] = useState([]);
+  const [isLoading, setIsLoading] = useState(true); // Loading state
   const { user } = useAuth(); // Assuming useAuth provides the current user information
 
   useEffect(() => {
@@ -15,6 +16,9 @@ export default function JoinedFeed() {
 
   const fetchJoinedCollabSpaces = async () => {
     try {
+      // Start loading
+      setIsLoading(true);
+
       // Fetch all CollabSpace posts
       const q = query(collection(db, 'CollabSpaces'));
       const querySnapshot = await getDocs(q);
@@ -48,6 +52,9 @@ export default function JoinedFeed() {
       setPosts(filteredPostsData);
     } catch (error) {
       console.error('Error fetching posts: ', error);
+    } finally {
+      // Stop loading
+      setIsLoading(false);
     }
   };
 
@@ -55,7 +62,10 @@ export default function JoinedFeed() {
 
   return (
     <View style={styles.feedContainer}>
-      {posts.length > 0 ? (
+      {isLoading ? (
+        // Show loading spinner while fetching posts
+        <ActivityIndicator size="large" color="#FF8C00" style={styles.loader} />
+      ) : posts.length > 0 ? (
         <FlatList
           data={posts}
           keyExtractor={(item) => item.id}
@@ -79,5 +89,10 @@ const styles = StyleSheet.create({
     marginTop: 20,
     fontSize: 16,
     color: '#888',
+  },
+  loader: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
   },
 });

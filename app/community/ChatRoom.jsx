@@ -87,11 +87,11 @@ export default function ChatScreen() {
             )}
             <Text style={styles.messageText}>{item.message}</Text>
             <Text style={styles.timestamp}>
-  {new Date(item.createdAt.seconds * 1000).toLocaleTimeString([], {
-    hour: '2-digit',
-    minute: '2-digit',
-  })}
-</Text>
+              {new Date(item.createdAt.seconds * 1000).toLocaleTimeString([], {
+                hour: '2-digit',
+                minute: '2-digit',
+              })}
+            </Text>
           </View>
         )}
         ref={flatListRef}
@@ -107,7 +107,7 @@ export default function ChatScreen() {
           style={styles.input}
         />
         <TouchableOpacity onPress={sendMessage} style={styles.sendButton}>
-          <Text style={styles.sendButtonText}>Send</Text>
+          <Ionicons name="send" size={24} color="#fff" />
         </TouchableOpacity>
       </View>
     </KeyboardAvoidingView>
@@ -117,66 +117,79 @@ export default function ChatScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#f5f5f5",
+    backgroundColor: "#f2f2f2",
   },
   messageList: {
-    padding: 10,
-    flexGrow: 1, // Ensure the FlatList takes full height
+    padding: 15,
+    flexGrow: 1,
+    backgroundColor: "#fff",
+    borderTopLeftRadius: 25,
+    borderTopRightRadius: 25,
   },
   messageContainer: {
-    maxWidth: "80%",
-    borderRadius: 10,
-    padding: 10,
-    marginVertical: 5,
+    maxWidth: "75%",
+    borderRadius: 20,
+    padding: 12,
+    marginVertical: 8,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 3,
+    elevation: 2,
   },
   sentMessage: {
-    backgroundColor: "#dcf8c6",
+    backgroundColor: "#FF8C00", // Using accent color
     alignSelf: "flex-end",
+    borderTopRightRadius: 5, // Add a slight corner difference for a modern look
   },
   receivedMessage: {
-    backgroundColor: "#ffffff",
+    backgroundColor: "#ECECEC",
     alignSelf: "flex-start",
+    borderTopLeftRadius: 5, // Add a slight corner difference for a modern look
   },
   usernameText: {
     fontSize: 12,
     fontWeight: "bold",
-    color: "#333",
-    marginBottom: 2,
+    color: "#444",
+    marginBottom: 3,
   },
   messageText: {
     fontSize: 16,
-    color: "#333",
+    color: "#222",
   },
   timestamp: {
-    fontSize: 10,
-    color: "#666",
+    fontSize: 11,
+    color: "#888",
     marginTop: 5,
     alignSelf: "flex-end",
   },
   inputContainer: {
     flexDirection: "row",
     alignItems: "center",
-    padding: 10,
+    paddingHorizontal: 15,
+    paddingVertical: 10,
     borderTopWidth: 1,
     borderColor: "#ddd",
     backgroundColor: "#fff",
+    borderRadius: 30,
+    marginHorizontal: 10,
+    marginBottom: 10,
+    elevation: 4,
   },
   input: {
     flex: 1,
-    padding: 10,
+    padding: 12,
     backgroundColor: "#f1f1f1",
-    borderRadius: 20,
+    borderRadius: 25,
     marginRight: 10,
-    elevation: 2, // Add shadow to input
+    fontSize: 16,
   },
   sendButton: {
-    backgroundColor: "#25D366",
-    padding: 10,
+    backgroundColor: "#FF8C00", // Using accent color
+    padding: 12,
     borderRadius: 50,
-    elevation: 2, // Add shadow to button
-  },
-  sendButtonText: {
-    color: "#fff",
-    fontWeight: "bold",
+    alignItems: "center",
+    justifyContent: "center",
+    elevation: 4,
   },
 });
