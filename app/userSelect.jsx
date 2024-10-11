@@ -10,6 +10,7 @@ import {
 import RegistrationOptions from "../components/UserSelectOnboard/RegistrationOptions";
 import { RFPercentage, RFValue } from "react-native-responsive-fontsize";
 import { useRouter } from "expo-router";
+import { StatusBar } from "expo-status-bar";
 
 const UserSelect = () => {
   const [role, setRole] = useState(null); // Store selected role
@@ -24,34 +25,38 @@ const UserSelect = () => {
   };
 
   return (
-    <View style={styles.container}>
-      <ImageBackground
-        resizeMode="cover"
-        source={require("../assets/images/user_select.jpg")}
-        style={styles.backgroundImage}
-      >
-        <View style={styles.overlay} />
+    <>
+      <StatusBar style="dark" translucent />
 
-        <View style={styles.contentContainer}>
-          <View style={styles.titleContainer}>
-            <Text style={styles.title}>
-              Empowering Your Journey to Business Success
-            </Text>
+      <View style={styles.container}>
+        <ImageBackground
+          resizeMode="cover"
+          source={require("../assets/images/user_select.jpg")}
+          style={styles.backgroundImage}
+        >
+          <View style={styles.overlay} />
+
+          <View style={styles.contentContainer}>
+            <View style={styles.titleContainer}>
+              <Text style={styles.title}>
+                Empowering Your Journey to Business Success
+              </Text>
+            </View>
+            <View style={styles.subtitleContainer}>
+              <Text style={styles.subtitle}>Register as a,</Text>
+            </View>
+            <View style={styles.descriptionContainer}>
+              <Text style={styles.description}>
+                Join our platform to find the best opportunities for growing
+                your business or sourcing high-quality products.
+              </Text>
+            </View>
+            {/* Pass the handleRoleSelect callback to RegistrationOptions */}
+            <RegistrationOptions onSelectRole={handleRoleSelect} />
           </View>
-          <View style={styles.subtitleContainer}>
-            <Text style={styles.subtitle}>Register as a,</Text>
-          </View>
-          <View style={styles.descriptionContainer}>
-            <Text style={styles.description}>
-              Join our platform to find the best opportunities for growing your
-              business or sourcing high-quality products.
-            </Text>
-          </View>
-          {/* Pass the handleRoleSelect callback to RegistrationOptions */}
-          <RegistrationOptions onSelectRole={handleRoleSelect} />
-        </View>
-      </ImageBackground>
-    </View>
+        </ImageBackground>
+      </View>
+    </>
   );
 };
 
