@@ -63,7 +63,7 @@ const ProfileHeader = ({ entrepreneurId }) => {
     if (user?.role === "entrepreneur" && user.uid === user?.uid) {
       return (
         <TouchableOpacity
-          onPress={() => router.push("/profile/BuyerProfile/EditProfileScreen")}
+          onPress={() => router.push("/profile/EntrepreneurProfile/EditProfileScreen")}
         >
           <FontAwesome5 name="edit" size={18} color="#6D4C41" />
         </TouchableOpacity>

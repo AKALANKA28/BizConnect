@@ -15,21 +15,12 @@ import { useRouter } from "expo-router"; // Navigation hook
 import * as ImagePicker from "expo-image-picker"; // Image picker module
 import { storage } from "../../../config/FirebaseConfig"; // Import Firebase storage
 import { ref, uploadBytes, getDownloadURL } from "firebase/storage"; // Import functions for uploading and getting download URL
-import { RFValue } from "react-native-responsive-fontsize";
 
 const EditProfileScreen = () => {
   const { user, updateProfile } = useAuth(); // Access user data and update function
   const router = useRouter();
   const [title] = useState("Edit Profile"); // Title of the screen
   const [profileImage, setProfileImage] = useState(user?.profileImage); // Initial profile image state
-
-  // Initial state for social media links
-  const [socialLinks, setSocialLinks] = useState({
-    website: user?.website || "",
-    instagram: user?.instagram || "",
-    facebook: user?.facebook || "",
-    twitter: user?.twitter || "",
-  });
 
   // Alert if user data is not found
   useEffect(() => {
@@ -114,16 +105,6 @@ const EditProfileScreen = () => {
         {/* Editable Fields with placeholder text for empty fields */}
         <TouchableOpacity
           style={styles.editRow}
-          onPress={() => navigateToEditField("Profession", user.title || "Add Profession")}
-        >
-          <Text style={styles.label}>Title</Text>
-          <Text style={styles.value}>
-            {user.title || "Add Title"}
-          </Text>
-        </TouchableOpacity>
-
-        <TouchableOpacity
-          style={styles.editRow}
           onPress={() => navigateToEditField("firstName", user.firstName)}
         >
           <Text style={styles.label}>First Name</Text>
@@ -169,49 +150,6 @@ const EditProfileScreen = () => {
           <Text style={styles.label}>Bio</Text>
           <Text style={styles.value}>
             {user.bio || "Add Bio"}
-          </Text>
-        </TouchableOpacity>
-
-        {/* Social Media Section */}
-        <Text style={styles.sectionTitle}>Social Media Links</Text>
-
-        <TouchableOpacity
-          style={styles.editRow}
-          onPress={() => navigateToEditField("website", socialLinks.website)}
-        >
-          <Text style={styles.label}>Website</Text>
-          <Text style={styles.value}>
-            {socialLinks.website || "Add Website"}
-          </Text>
-        </TouchableOpacity>
-
-        <TouchableOpacity
-          style={styles.editRow}
-          onPress={() => navigateToEditField("instagram", socialLinks.instagram)}
-        >
-          <Text style={styles.label}>Instagram</Text>
-          <Text style={styles.value}>
-            {socialLinks.instagram || "Add Instagram"}
-          </Text>
-        </TouchableOpacity>
-
-        <TouchableOpacity
-          style={styles.editRow}
-          onPress={() => navigateToEditField("facebook", socialLinks.facebook)}
-        >
-          <Text style={styles.label}>Facebook</Text>
-          <Text style={styles.value}>
-            {socialLinks.facebook || "Add Facebook"}
-          </Text>
-        </TouchableOpacity>
-
-        <TouchableOpacity
-          style={styles.editRow}
-          onPress={() => navigateToEditField("twitter", socialLinks.twitter)}
-        >
-          <Text style={styles.label}>Twitter</Text>
-          <Text style={styles.value}>
-            {socialLinks.twitter || "Add Twitter"}
           </Text>
         </TouchableOpacity>
       </ScrollView>
@@ -266,14 +204,6 @@ const styles = StyleSheet.create({
     flexShrink: 1,
     textAlign: "left",
     flex: 4,
-  },
-  sectionTitle: {
-    marginTop: 40,
-    marginBottom: 5,
-    fontSize: 18,
-    fontFamily: "lato-bold",
-    marginVertical: RFValue(16),
-    color: "rgba(141, 110, 99, 1)",
   },
 });
 

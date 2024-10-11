@@ -25,11 +25,12 @@ import {
   doc,
 } from "firebase/firestore"; // Ensure you import doc from firestore
 import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
-import * as ImagePicker from 'expo-image-picker';
+import * as ImagePicker from "expo-image-picker";
 import DateTimePicker from "@react-native-community/datetimepicker";
 import { Ionicons } from "@expo/vector-icons";
 import Header from "../../components/Header";
 import { getAuth } from "firebase/auth";
+import Loading from "../../components/Loading";
 
 export default function AddBidEdit() {
   const router = useRouter();
@@ -49,6 +50,7 @@ export default function AddBidEdit() {
   const [selectedDate, setSelectedDate] = useState(new Date());
   const [selectedTime, setSelectedTime] = useState(new Date());
   const [title, setTitle] = useState(bidId ? "Edit Bid" : "Add Bid");
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     fetchCategoryList();
@@ -96,32 +98,31 @@ export default function AddBidEdit() {
 
   const requestMediaLibraryPermission = async () => {
     const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
-    if (status !== 'granted') {
-      alert('Sorry, we need media library permissions to make this work!');
+    if (status !== "granted") {
+      alert("Sorry, we need media library permissions to make this work!");
     }
   };
 
   const pickImage = async () => {
     // Ensure that permission has been granted before picking an image
     const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
-    if (status !== 'granted') {
-      alert('You need to grant permission to access the image library!');
+    if (status !== "granted") {
+      alert("You need to grant permission to access the image library!");
       return;
     }
-  
+
     let result = await ImagePicker.launchImageLibraryAsync({
       mediaTypes: ImagePicker.MediaTypeOptions.Images,
       allowsEditing: true,
       aspect: [4, 3],
       quality: 1,
     });
-  
+
     if (!result.canceled) {
       setImage(result.assets[0].uri); // Set the picked image URI
     }
   };
 
-  
   const onDateChange = (event, selectedDate) => {
     setShowDatePicker(false);
     if (event.type === "set") {
@@ -170,6 +171,11 @@ export default function AddBidEdit() {
   };
 
   const onSubmitPost = async () => {
+    if (loading) {
+      return;
+    }
+
+    setLoading(true);
     try {
       if (name && address && description && categories && bidClosingTime) {
         let imageUrl = null;
@@ -215,6 +221,8 @@ export default function AddBidEdit() {
     } catch (error) {
       console.error("Error adding/updating document: ", error);
       ToastAndroid.show("Error processing bid", ToastAndroid.BOTTOM);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -268,7 +276,7 @@ export default function AddBidEdit() {
             onPress={() => setShowDatePicker(true)}
             style={styles.datePickerButton}
           >
-             <Ionicons
+            <Ionicons
               name="calendar-outline"
               size={16}
               color={Colors.secondaryColor}
@@ -277,7 +285,6 @@ export default function AddBidEdit() {
             <Text style={styles.datePickerText}>
               {selectedDate.toLocaleDateString()}
             </Text>
-           
           </TouchableOpacity>
 
           {showDatePicker && (
@@ -293,7 +300,7 @@ export default function AddBidEdit() {
             onPress={() => setShowTimePicker(true)}
             style={styles.datePickerButton}
           >
-             <Ionicons
+            <Ionicons
               name="time-outline"
               size={16}
               color={Colors.secondaryColor}
@@ -302,7 +309,6 @@ export default function AddBidEdit() {
             <Text style={styles.datePickerText}>
               {selectedTime.toLocaleTimeString()}
             </Text>
-           
           </TouchableOpacity>
 
           {showTimePicker && (
@@ -325,11 +331,15 @@ export default function AddBidEdit() {
           style={styles.input}
         />
 
-        <TouchableOpacity style={styles.button} onPress={onSubmitPost}>
-          <Text style={styles.buttonText}>
-            {bidId ? "Update Bid" : "Add Bid"}
-          </Text>
-        </TouchableOpacity>
+        <View style={styles.buttonContainer}>
+          {loading ? (
+            <Loading />
+          ) : (
+            <TouchableOpacity onPress={onSubmitPost} style={styles.button}>
+              <Text style={styles.buttonText}>Post</Text>
+            </TouchableOpacity>
+          )}
+        </View>
       </ScrollView>
     </KeyboardAvoidingView>
   );
@@ -342,8 +352,7 @@ const styles = StyleSheet.create({
   },
   scrollContainer: {
     padding: 20,
-        marginTop: -20 
-
+    marginTop: -20,
   },
   imagePreviewContainer: {
     borderRadius: 10,
@@ -388,8 +397,7 @@ const styles = StyleSheet.create({
     borderColor: Colors.GRAY,
     // backgroundColor: "rgba(211, 113, 69, 0.03)",
     fontFamily: "roboto",
-
-    },
+  },
   label: {
     color: "#000",
     fontSize: 14,
@@ -398,7 +406,7 @@ const styles = StyleSheet.create({
     fontFamily: "poppins-semibold",
   },
 
- datePickerContainer: {
+  datePickerContainer: {
     flexDirection: "row",
     alignItems: "flex-start", // Align items to the left
     justifyContent: "space-between", // Align content to the left
@@ -426,11 +434,15 @@ const styles = StyleSheet.create({
     marginLeft: 10, // Space between text and icon
   },
 
+  buttonContainer: {
+    marginTop: 20,
+    alignItems: "center", // Centering the button or loading spinner
+  },
   button: {
     padding: 20,
+    width: "100%",
     backgroundColor: Colors.secondaryColor,
     borderRadius: 10,
-    marginTop: 20,
     alignItems: "center",
     shadowColor: "#000",
     shadowOffset: { width: 1, height: 3 },
@@ -444,6 +456,5 @@ const styles = StyleSheet.create({
     fontFamily: "roboto-bold",
     textTransform: "uppercase",
     fontSize: 16,
-
   },
 });

@@ -1,22 +1,23 @@
 import React, { useEffect, useState } from "react";
-import { View, StyleSheet, Text } from "react-native";
-import Fontisto from '@expo/vector-icons/Fontisto';
+import {
+  View,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  Linking,
+  ToastAndroid, // Import ToastAndroid for displaying toast messages
+} from "react-native"; // Import Linking for URL handling
+import Fontisto from "@expo/vector-icons/Fontisto";
 import { useAuth } from "../../../context/authContext"; // Import useAuth hook
 import { doc, getDoc } from "firebase/firestore";
 import { db } from "../../../config/FirebaseConfig"; // Firestore instance
 
-const SocialMediaItem = ({ icon, label, value }) => (
-  <View style={styles.socialItem}>
-    <Fontisto
-      name={icon}
-      size={18}
-      color="#262626"
-      style={styles.icon}
-    />
-    <View style={styles.socialDetails}>
-      <Text style={styles.socialLabel}>{label}:</Text>
-      <Text style={styles.socialValue}>{value}</Text>
-    </View>
+const SocialMediaItem = ({ icon, label, value, onPress }) => (
+  <View style={styles.itemContainer}>
+    <TouchableOpacity style={styles.socialItem} onPress={onPress}>
+      <Fontisto name={icon} size={20} color="#ffffff" style={styles.icon} />
+    </TouchableOpacity>
+    <Text style={styles.socialLabel}>{label}</Text>
   </View>
 );
 
@@ -26,6 +27,7 @@ const SocialMediaLinks = ({ buyerId }) => {
     website: "",
     instagram: "",
     facebook: "",
+    twitter: "", // Added Twitter state
   }); // State to hold social media links
   const [loading, setLoading] = useState(true); // Loading state
 
@@ -39,17 +41,13 @@ const SocialMediaLinks = ({ buyerId }) => {
       if (userDocSnap.exists()) {
         const userData = userDocSnap.data();
         setSocialLinks({
-          website: userData.website || "No website available",
-          instagram: userData.instagram || "No Instagram link available",
-          facebook: userData.facebook || "No Facebook link available",
+          website: userData.website || "",
+          instagram: userData.instagram || "",
+          facebook: userData.facebook || "",
+          twitter: userData.twitter || "", // Fetch Twitter link
         });
       } else {
         console.log("No document found for this UID:", idToFetch); // Log if no document is found
-        setSocialLinks({
-          website: "No website available",
-          instagram: "No Instagram link available",
-          facebook: "No Facebook link available",
-        });
       }
     } catch (error) {
       console.error("Error fetching social media links from Firestore:", error); // Log errors
@@ -70,33 +68,60 @@ const SocialMediaLinks = ({ buyerId }) => {
       icon: "world-o",
       label: "Website",
       value: socialLinks.website,
+      url: socialLinks.website, // URL to open for website
     },
     {
       icon: "instagram",
       label: "Instagram",
       value: socialLinks.instagram,
+      url: socialLinks.instagram, // URL to open for Instagram
     },
     {
       icon: "facebook",
       label: "Facebook",
       value: socialLinks.facebook,
+      url: socialLinks.facebook, // URL to open for Facebook
+    },
+    {
+      icon: "twitter", // Twitter icon
+      label: "Twitter", // Change this to the desired label if needed
+      value: socialLinks.twitter,
+      url: socialLinks.twitter, // URL to open for Twitter
     },
   ];
+
+  // Function to handle opening URLs or showing a toast message
+  const handleLinkPress = async (url, label) => {
+    if (url) {
+      const supported = await Linking.canOpenURL(url);
+      if (supported) {
+        await Linking.openURL(url);
+      } else {
+        console.log(`Can't open URL: ${url}`);
+      }
+    } else {
+      // Show a toast message if no link is available
+      ToastAndroid.show(`No ${label} link available.`, ToastAndroid.SHORT); // Show toast message
+    }
+  };
 
   return (
     <View style={styles.container}>
       <Text style={styles.title}>Website and Social Media Links:</Text>
       {loading ? (
-        <Text></Text>
+        <Text>Loading...</Text>
       ) : (
-        socialData.map((item, index) => (
-          <SocialMediaItem
-            key={index}
-            icon={item.icon}
-            label={item.label}
-            value={item.value}
-          />
-        ))
+        <View style={styles.socialContainer}>
+          {socialData.map((item, index) => (
+            <SocialMediaItem
+              key={index}
+              icon={item.icon}
+              label={item.label}
+              value={item.value || "No link available"} // Show a placeholder if the value is empty
+              onPress={() => handleLinkPress(item.url, item.label)} // Pass the URL and label to the onPress function
+            />
+          ))}
+        </View>
       )}
     </View>
   );
@@ -105,6 +130,7 @@ const SocialMediaLinks = ({ buyerId }) => {
 const styles = StyleSheet.create({
   container: {
     marginTop: 0,
+    paddingHorizontal: 0,
   },
   title: {
     color: "rgba(141, 110, 99, 1)",
@@ -112,32 +138,38 @@ const styles = StyleSheet.create({
     fontFamily: "poppins-semibold",
     marginBottom: 8,
   },
+  socialContainer: {
+    flexDirection: "row", // Display items in a row
+    marginTop: 10, // Add some margin above the buttons
+  },
+  itemContainer: {
+    alignItems: "center", // Center align items within each item container
+    flex: 1, // Allow the item containers to flexibly occupy space
+    marginHorizontal: 5, // Reduced horizontal margin for less gap between items
+  },
   socialItem: {
-    flexDirection: "row",
     alignItems: "center",
-    marginTop: 10,
-    alignContent: "center",
-  },
-  icon: {
-    width: 20,
-    aspectRatio: 1,
-    marginRight: 10,
-  },
-  socialDetails: {
-    flexDirection: "row",
-    flex: 1,
+    justifyContent: "center",
+    paddingVertical: 12,
+    paddingHorizontal: 15,
+    backgroundColor: "#AA6A1C", // Updated background color for uniformity
+    borderRadius: 30, // Make buttons rounded
+    elevation: 3,
+    shadowColor: "#000",
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.25,
+    shadowRadius: 3.84,
+    width: 60, // Fixed width for the button
+    height: 60, // Fixed height for the button
   },
   socialLabel: {
-    width: 80,
+    marginTop: 5, // Add some space above the label
     fontFamily: "poppins-semibold",
-    fontSize: 15,
-    color: "#262626",
-  },
-  socialValue: {
-    flex: 1,
-    fontFamily: "poppins",
-    fontSize: 16,
-    color: "#262626",
+    fontSize: 14,
+    color: "#000", // Change label color to white for contrast
   },
 });
 

@@ -7,6 +7,7 @@ import {
   Text,
   TouchableOpacity,
   TouchableWithoutFeedback,
+  Share, // Import Share API
 } from "react-native";
 import Icon from "react-native-vector-icons/MaterialIcons";
 import { useAuth } from "../../../context/authContext"; // Import useAuth hook
@@ -78,6 +79,18 @@ const ProfileHeader = ({ buyerId }) => {
     }
   };
 
+  // Function to share profile
+  const handleShareProfile = async () => {
+    const message = `Check out my profile! \nName: ${profileData.firstName} ${profileData.lastName}\nTitle: ${profileData.title}\nProfile Image: ${profileData.profileImage}`;
+    try {
+      await Share.share({
+        message: message,
+      });
+    } catch (error) {
+      console.error("Error sharing profile: ", error);
+    }
+  };
+
   return (
     <TouchableWithoutFeedback onPress={closeDropdown}>
       <View style={styles.container}>
@@ -104,7 +117,7 @@ const ProfileHeader = ({ buyerId }) => {
             </TouchableOpacity>
             <TouchableOpacity
               style={styles.shareProfileButton}
-              onPress={() => {}}
+              onPress={handleShareProfile} // Call the share function
             >
               <Icon name="share" size={17} color="#333" />
               <Text style={styles.buttonText}>Share Profile</Text>
@@ -120,9 +133,19 @@ const ProfileHeader = ({ buyerId }) => {
         {/* Dropdown menu */}
         {dropdownVisible && (
           <View style={styles.dropdown}>
-            <TouchableOpacity style={styles.dropdownItem} onPress={handleLogout}>
-              <Icon name="logout" size={20} color="red" style={styles.dropdownIcon} />
-              <Text style={[styles.dropdownText, styles.logoutText]}>Logout</Text>
+            <TouchableOpacity
+              style={styles.dropdownItem}
+              onPress={handleLogout}
+            >
+              <Icon
+                name="logout"
+                size={20}
+                color="red"
+                style={styles.dropdownIcon}
+              />
+              <Text style={[styles.dropdownText, styles.logoutText]}>
+                Logout
+              </Text>
             </TouchableOpacity>
           </View>
         )}

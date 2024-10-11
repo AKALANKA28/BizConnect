@@ -8,10 +8,10 @@ import {
   StyleSheet,
   Image,
   StatusBar,
-  Alert,
   ScrollView,
   Platform,
   KeyboardAvoidingView,
+  ToastAndroid, // Import ToastAndroid for Android
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons"; // Import Ionicons from expo
 import Loading from "../../components/Loading";
@@ -32,20 +32,34 @@ export default function SignIn() {
     setPasswordVisibility(!isPasswordVisible); // Toggles the visibility of the password
   };
 
-  const handleSubmit = async () => {
-    setLoading(true);
+  // Helper function to show Toast messages
+  const showToast = (message) => {
+    ToastAndroid.show(message, ToastAndroid.SHORT);
+  };
 
-    if (!email || !password) {
-      Alert.alert("Please Fill All Fields");
-      setLoading(false);
-      return;
+  const validateInputs = () => {
+    if (!email) {
+      showToast("Email is required");
+      return false;
+    }
+    if (!password) {
+      showToast("Password is required");
+      return false;
+    }
+    return true;
+  };
+
+  const handleSubmit = async () => {
+    if (!validateInputs()) {
+      return; // Exit if validation fails
     }
 
+    setLoading(true);
     const response = await signin(email, password);
     setLoading(false);
 
     if (!response.success) {
-      Alert.alert("Error", response.message);
+      showToast(response.message); // Show error message as a Toast
       return;
     }
 
@@ -54,6 +68,8 @@ export default function SignIn() {
       router.push("/(tabsBuyer)/home");
     } else if (response.role === "entrepreneur") {
       router.push("/(tabsEntrepreneur)/home");
+    } else {
+      // showToast("Invalid user role");
     }
   };
 
@@ -158,7 +174,6 @@ const styles = StyleSheet.create({
     flexGrow: 1,
     padding: 24,
     backgroundColor: "#fff",
-    // justifyContent: "center",
   },
   title: {
     fontSize: RFValue(36),

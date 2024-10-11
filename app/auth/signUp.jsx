@@ -9,9 +9,9 @@ import {
   Image,
   StatusBar,
   KeyboardAvoidingView,
-  Alert,
   Platform,
   ScrollView,
+  ToastAndroid, // Import ToastAndroid for Android
 } from "react-native";
 import Loading from "../../components/Loading";
 import { useAuth } from "../../context/authContext";
@@ -34,19 +34,44 @@ export default function SignUp() {
     setPasswordVisibility(!isPasswordVisible); // Toggles the visibility of the password
   };
 
-  const handleSubmit = async () => {
-    if (!email || !password || !username || !phoneNumber || !role) {
-      Alert.alert("Please fill all fields");
-      return;
-    }
-    setLoading(true);
+  // Helper function to show Toast messages
+  const showToast = (message) => {
+    ToastAndroid.show(message, ToastAndroid.SHORT);
+  };
 
+  const validateInputs = () => {
+    if (!email) {
+      showToast("Email is required");
+      return false;
+    }
+    if (!username) {
+      showToast("Username is required");
+      return false;
+    }
+    if (!phoneNumber) {
+      showToast("Phone number is required");
+      return false;
+    }
+    if (!password) {
+      showToast("Password is required");
+      return false;
+    }
+    // Add additional validations as needed
+    return true;
+  };
+
+  const handleSubmit = async () => {
+    if (!validateInputs()) {
+      return; // Exit if validation fails
+    }
+
+    setLoading(true);
     let response = await signup(email, password, username, phoneNumber, role); // Include new fields in signup function
     console.log(response);
     setLoading(false);
 
     if (!response.success) {
-      Alert.alert("Error", response.data);
+      showToast(response.data);
       return;
     }
 
@@ -56,7 +81,7 @@ export default function SignUp() {
     } else if (role === "entrepreneur") {
       router.push("/(tabsEntrepeneur)/home");
     } else {
-      Alert.alert("Invalid role");
+      showToast("Invalid role");
     }
   };
 
@@ -69,6 +94,7 @@ export default function SignUp() {
       <ScrollView
         contentContainerStyle={styles.container}
         keyboardShouldPersistTaps="handled" // Dismiss the keyboard when tapping outside
+        showsVerticalScrollIndicator={false} // Hide vertical scroll indicator
       >
         <StatusBar barStyle="dark-content" />
         <Text style={styles.title}>Sign Up</Text>
@@ -148,7 +174,7 @@ export default function SignUp() {
             <Loading />
           ) : (
             <TouchableOpacity style={styles.loginButton} onPress={handleSubmit}>
-              <Text style={styles.loginButtonText}>Log In</Text>
+              <Text style={styles.loginButtonText}>Create Account</Text>
             </TouchableOpacity>
           )}
         </View>

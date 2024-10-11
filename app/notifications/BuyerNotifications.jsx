@@ -193,6 +193,9 @@ const NotificationScreen = () => {
             renderItem={renderNotificationItem}
             keyExtractor={(item) => item.id}
             contentContainerStyle={styles.list}
+            ListEmptyComponent={
+              <Text style={styles.emptyText}>No notifications available.</Text> // This can be removed
+            }
           />
         </>
       )}
