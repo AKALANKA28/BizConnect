@@ -4,6 +4,9 @@ import { useNavigation } from '@react-navigation/native';  // Import useNavigati
 import Icon from 'react-native-vector-icons/MaterialIcons';  // Importing icons
 import RegistrationFormScreen from '../fund/fundRegisterForm';
 import { useRouter } from 'expo-router';
+import { Colors } from '../../constants/Colors';
+import { RFValue } from 'react-native-responsive-fontsize';
+import { StatusBar } from 'expo-status-bar';
 
 // FundSystemScreen Component
 const FundSystemScreen = () => {
@@ -19,6 +22,8 @@ const FundSystemScreen = () => {
 
   return (
     <View style={styles.container}>
+            <StatusBar style="dark" translucent />
+
       {/* Image Background */}
       <ImageBackground 
         source={require('../../assets/images/dddepth-345.jpg')} 
@@ -60,16 +65,21 @@ const FundSystemScreen = () => {
 };
 
 const styles = StyleSheet.create({
+  container: {
+    backgroundColor: 'white',
+    flex: 1,
+  },
   imageBackground: {
     width: '100%',
     height: 150,
     justifyContent: 'center',
     alignItems: 'center',
+    
   },
   titleText: {
     color: 'black',
     fontSize: 20,
-    fontWeight: 'bold',
+    fontFamily: "poppins-bold",
     backgroundColor: 'white',
     padding: 20,
     borderRadius: 10,
@@ -80,40 +90,54 @@ const styles = StyleSheet.create({
   },
   description: {
     fontSize: 20,
-    fontWeight: 'bold',
+    fontFamily: "poppins-semibold",
     marginBottom: 30,
     marginTop: 20,
   },
   paragraph: {
-    fontSize: 18,
+    fontSize: RFValue(14),
     marginBottom: 10,
+    fontFamily: "lato",
+
   },
   listItem: {
-    fontSize: 18,
     marginLeft: 10,
     marginTop: 20,
+    fontSize: RFValue(14),
+    marginBottom: 10,
+    fontFamily: "lato",
   },
   footer: {
     padding: 20,
     borderTopWidth: 1,
     borderColor: 'white',
     backgroundColor: 'white',
-    alignItems: 'center',
+    alignItems: 'lef',
   },
   footerText: {
     fontSize: 16,
     marginBottom: 10,
+    fontFamily: "poppins-semibold",
+
   },
   button: {
-    backgroundColor: '#b26a27',
-    paddingVertical: 15,
-    paddingHorizontal: 30,
+    padding: 20,
+    width: "100%",
+    backgroundColor: Colors.secondaryColor,
     borderRadius: 10,
+    alignItems: "center",
+    shadowColor: "#000",
+    shadowOffset: { width: 1, height: 3 },
+    shadowOpacity: 0.75,
+    shadowRadius: 3.84,
+    elevation: 5,
   },
   buttonText: {
-    color: 'white',
+    textAlign: "center",
+    color: "#fff",
+    fontFamily: "roboto-bold",
+    textTransform: "uppercase",
     fontSize: 16,
-    fontWeight: 'bold',
   },
 });
 

@@ -7,27 +7,27 @@ import {
   Alert,
 } from "react-native";
 import React, { useEffect, useState, useRef } from "react";
-import { collection, getDocs, query } from "firebase/firestore";
+import { collection, getDocs, query, where } from "firebase/firestore";
 import { db } from "../../config/FirebaseConfig";
 import { Colors } from "../../constants/Colors";
 import { RFValue } from "react-native-responsive-fontsize";
 import { useAuth } from "../../context/authContext"; // Import useAuth to access user data
-import { useNavigation } from "@react-navigation/native"; // Import useNavigation for navigation
-import { useRouter } from "expo-router";
+import { useRouter } from "expo-router"; // Import useRouter for navigation
 
 export default function Slider() {
   const { user } = useAuth(); // Get the current user and their role
-  const navigation = useNavigation(); // Initialize navigation
-  const [sliderList, setSliderList] = useState([]);
   const flatListRef = useRef(null);
+  const [sliderList, setSliderList] = useState([]);
   const [currentIndex, setCurrentIndex] = useState(0);
   const router = useRouter();
-  // Correctly require your local images and their corresponding screen links
+  const [isRegistered, setIsRegistered] = useState(false); // State to track registration status
+
+  // Define your local images and their corresponding screen links
   const assetImages = {
     entrepreneurSlider: [
       {
         image: require("../../assets/images/sliders/slider1.jpg"),
-        screenLink: "/fund/fundExplain", 
+        screenLink: isRegistered ? "/fund/status" : "/fund/fundExplain", // Use isRegistered for dynamic link
       },
       {
         image: require("../../assets/images/sliders/slider2.jpg"),
@@ -37,14 +37,20 @@ export default function Slider() {
   };
 
   useEffect(() => {
-    if (user?.role === "entrepreneur") {
-      // Load sliders from assets if the user is an entrepreneur
-      setSliderList(assetImages.entrepreneurSlider);
-    } else {
-      // Fetch sliders from Firestore for non-entrepreneurs
-      GetSliderList();
-    }
-  }, [user]); // Add user to dependencies to update when it changes
+    const fetchSliderData = async () => {
+      if (user?.role === "entrepreneur") {
+        // Check if the entrepreneur is registered
+        await checkRegistrationStatus();
+        // Load sliders from assets if the user is an entrepreneur
+        setSliderList(assetImages.entrepreneurSlider);
+      } else if (user?.role === "buyer") {
+        // Fetch sliders from Firestore for buyers
+        await GetSliderList();
+      }
+    };
+
+    fetchSliderData();
+  }, [user]); // Depend only on user
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -56,21 +62,31 @@ export default function Slider() {
     return () => clearInterval(interval); // Clear interval on component unmount
   }, [sliderList, currentIndex]);
 
+  // Check registration status
+  const checkRegistrationStatus = async () => {
+    const q = query(collection(db, "fundReg"), where("registrationStatus", "==", true && "userId", "==", user?.uid)); // Ensure correct structure
+    const querySnapshot = await getDocs(q);
+    setIsRegistered(!querySnapshot.empty); // Set registered status based on query results
+  };
+
+  // Fetch sliders from Firestore for buyers
   const GetSliderList = async () => {
-    setSliderList([]); // Reset the slider list
-    const q = query(collection(db, "sliders"));
+    const q = query(collection(db, "sliders")); // Query Firestore collection for sliders
     const querySnapshot = await getDocs(q);
     const sliderItems = [];
 
     querySnapshot.forEach((doc) => {
-      sliderItems.push(doc.data());
+      sliderItems.push({
+        imageUrl: doc.data().imageUrl, // Assuming Firestore has a field 'imageUrl'
+        screenLink: doc.data().screenLink, // Assuming Firestore has a field 'screenLink'
+      });
     });
 
     setSliderList(sliderItems); // Update the state with Firestore data
   };
 
   const scrollToNextItem = () => {
-    if (flatListRef.current) {
+    if (flatListRef.current && sliderList.length > 0) {
       const nextIndex = (currentIndex + 1) % sliderList.length; // Looping logic
       flatListRef.current.scrollToIndex({ index: nextIndex, animated: true });
       setCurrentIndex(nextIndex);
@@ -81,8 +97,15 @@ export default function Slider() {
   const handleImagePress = (screenLink) => {
     if (user?.role === "entrepreneur") {
       router.push(screenLink); // Navigate to the corresponding screen
-    } else {
-    }
+    } 
+    // else {
+    //   // Show an alert if the user is a buyer
+    //   // Alert.alert(
+    //   //   "Access Denied",
+    //   //   "You cannot access this section as a buyer.",
+    //   //   [{ text: "OK" }] // Button to dismiss the alert
+    //   // );
+    // }
   };
 
   return (
@@ -108,9 +131,9 @@ export default function Slider() {
             <Image
               source={
                 user?.role === "entrepreneur"
-                  ? item.image
-                  : { uri: item.imageUrl }
-              } // Local asset for entrepreneurs, Firestore for others
+                  ? item.image // Local asset for entrepreneurs
+                  : { uri: item.imageUrl } // Use Firestore image URL for buyers
+              }
               style={{
                 width: 366,
                 height: 186,

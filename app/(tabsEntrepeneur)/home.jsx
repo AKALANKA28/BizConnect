@@ -33,9 +33,9 @@ export default function Home() {
         {/* <PopularBusiness />
         <PopularBusiness /> */}
         <RecommendPost />
-        <View>
+        {/* <View>
           <Button title="Logout" onPress={handleLogout} />
-        </View>
+        </View> */}
       </ScrollView>
     </View>
   );
@@ -56,7 +56,7 @@ const styles = StyleSheet.create({
   scrollContent: {
     marginTop: 100,
     paddingTop: 80, // Adjust this based on your header height to prevent overlapping
-    paddingBottom: 160,
+    paddingBottom: 110,
     backgroundColor: Colors.primaryColor,
   },
 });

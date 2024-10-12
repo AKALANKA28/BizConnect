@@ -1,4 +1,4 @@
-import { useRouter } from "expo-router"; // Changed to useRouter, not router
+import { useRouter } from "expo-router"; // Corrected use of useRouter
 import React, { useEffect, useState } from "react";
 import {
   View,
@@ -8,6 +8,7 @@ import {
   TouchableOpacity,
   TouchableWithoutFeedback,
   Share, // Import Share API
+  Alert, // Import Alert API for messaging functionality
 } from "react-native";
 import Icon from "react-native-vector-icons/MaterialIcons";
 import { useAuth } from "../../../context/authContext"; // Import useAuth hook
@@ -91,6 +92,15 @@ const ProfileHeader = ({ buyerId }) => {
     }
   };
 
+  // New function to handle messaging
+  const handleMessage = () => {
+    
+    // Implement your messaging logic here
+  };
+
+  const isBuyer = user?.role === "buyer"; // Check if the user is a buyer
+  const isEntrepreneur = user?.role === "entrepreneur"; // Check if the user is an entrepreneur
+
   return (
     <TouchableWithoutFeedback onPress={closeDropdown}>
       <View style={styles.container}>
@@ -108,13 +118,16 @@ const ProfileHeader = ({ buyerId }) => {
           <Text style={styles.title}>{profileData.title}</Text>
 
           <View style={styles.buttonContainer}>
-            <TouchableOpacity
-              style={styles.editProfileButton}
-              onPress={handleEditProfile}
-            >
-              <Icon name="edit" size={17} color="#333" />
-              <Text style={styles.buttonText}>Edit Profile</Text>
-            </TouchableOpacity>
+            {/* Show edit button only if not a buyer or entrepreneur */}
+            { !isEntrepreneur && (
+              <TouchableOpacity
+                style={styles.editProfileButton}
+                onPress={handleEditProfile}
+              >
+                <Icon name="edit" size={17} color="#333" />
+                <Text style={styles.buttonText}>Edit Profile</Text>
+              </TouchableOpacity>
+            )}
             <TouchableOpacity
               style={styles.shareProfileButton}
               onPress={handleShareProfile} // Call the share function
@@ -122,16 +135,27 @@ const ProfileHeader = ({ buyerId }) => {
               <Icon name="share" size={17} color="#333" />
               <Text style={styles.buttonText}>Share Profile</Text>
             </TouchableOpacity>
+            {isEntrepreneur && ( // Show message button if user is a buyer
+              <TouchableOpacity
+                style={styles.messageButton}
+                onPress={handleMessage} // Call the message function
+              >
+                <Icon name="message" size={17} color="#333" />
+                <Text style={styles.buttonText}>Message</Text>
+              </TouchableOpacity>
+            )}
           </View>
         </View>
 
         {/* Three dots menu */}
-        <TouchableOpacity style={styles.menuButton} onPress={toggleDropdown}>
-          <Icon name="more-vert" size={24} color="#333" />
-        </TouchableOpacity>
+        {!isBuyer && !isEntrepreneur && ( // Only show the menu button if not a buyer or entrepreneur
+          <TouchableOpacity style={styles.menuButton} onPress={toggleDropdown}>
+            <Icon name="more-vert" size={24} color="#333" />
+          </TouchableOpacity>
+        )}
 
         {/* Dropdown menu */}
-        {dropdownVisible && (
+        {dropdownVisible && !isBuyer && !isEntrepreneur && ( // Show dropdown only if not a buyer or entrepreneur
           <View style={styles.dropdown}>
             <TouchableOpacity
               style={styles.dropdownItem}
@@ -200,6 +224,15 @@ const styles = StyleSheet.create({
     borderRadius: 5,
   },
   shareProfileButton: {
+    flexDirection: "row",
+    alignItems: "center",
+    backgroundColor: "#EAEAEA",
+    paddingVertical: 5,
+    paddingHorizontal: 15,
+    gap: 5,
+    borderRadius: 5,
+  },
+  messageButton: { // New styles for the message button
     flexDirection: "row",
     alignItems: "center",
     backgroundColor: "#EAEAEA",

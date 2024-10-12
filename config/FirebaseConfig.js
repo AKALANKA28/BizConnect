@@ -1,6 +1,6 @@
 // Import the functions you need from the SDKs
 import { initializeApp } from 'firebase/app';
-import { collection, getFirestore, doc, getDoc } from 'firebase/firestore';
+import { collection, getFirestore, doc, getDoc,getDocs } from 'firebase/firestore';
 import { initializeAuth, getReactNativePersistence } from 'firebase/auth';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { getStorage } from 'firebase/storage';
@@ -54,3 +54,4 @@ export const fetchUserData = async (uid, role) => {
     return null;
   }
 };
+

@@ -149,28 +149,27 @@ export default function EntrepreneurNotifications() {
 
   return (
     <View style={styles.screen}>
-      {isLoading ? (
-        <LoadingScreen /> // Show loading screen while fetching data
-      ) : (
-        <>
-          <Header
-            title="Notifications"
-            onDeletePress={handleDeleteNotifications} // Handle delete button press
-            showDelete={showDeleteButton && selectedNotifications.length > 0} // Show delete button only if notifications are selected
-          />
-          {notifications.length === 0 ? (
-            <Text style={styles.emptyText}>No notifications available.</Text>
-          ) : (
-            <FlatList
-              data={notifications}
-              renderItem={renderNotificationItem}
-              keyExtractor={(item) => item.id}
-              contentContainerStyle={styles.list}
-            />
-          )}
-        </>
-      )}
-    </View>
+    {isLoading ? (
+      <LoadingScreen /> // Show loading screen while fetching data
+    ) : (
+      <>
+        <Header
+          title="Notifications"
+          onDeletePress={handleDeleteNotifications}
+          showDelete={showDeleteButton && selectedNotifications.length > 0}
+        />
+        <FlatList
+          data={notifications}
+          renderItem={renderNotificationItem}
+          keyExtractor={(item) => item.id}
+          contentContainerStyle={styles.list}
+          ListEmptyComponent={
+            <Text style={styles.emptyText}>No notifications available.</Text> // This can be removed
+          }
+        />
+      </>
+    )}
+  </View>
   );
 }
 

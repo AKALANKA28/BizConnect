@@ -6,6 +6,8 @@ import { db } from '../../config/FirebaseConfig'; // Firestore DB
 import { addDoc, collection } from 'firebase/firestore';
 import { useRouter } from 'expo-router'; // Import useRouter from expo-router
 import { useNavigation } from '@react-navigation/native';
+import Header from '../../components/Header';
+import { auth } from '../../config/FirebaseConfig'; // Import Firebase auth
 
 const RegistrationFormScreen = () => {
   const router = useRouter(); // Initialize useRouter from expo-router
@@ -67,19 +69,23 @@ const RegistrationFormScreen = () => {
   const handleRegister = async () => {
     if (validateForm()) {
       try {
-        // Add data to Firestore
+        const userId = auth.currentUser?.uid; // Get the current user's ID
+  
+        // Add data to Firestore, including the user ID and registration status
         await addDoc(collection(db, 'fundReg'), {
           name,
           yearStarted,
           businessIdentity,
           madeOnlinePayments,
           monthlyAmount,
+          userId, // Store the user ID in the document
+          registrationStatus: true, // New field to indicate registration status
         });
-
+  
         Alert.alert('Success', 'Registration successful', [
           { text: 'OK', onPress: () => router.push('/fund/method') }, // Navigate using router.push
         ]);
-
+  
       } catch (error) {
         Alert.alert('Error', 'Failed to register: ' + error.message);
       }
@@ -87,17 +93,13 @@ const RegistrationFormScreen = () => {
       Alert.alert('Error', 'Please fill all required fields correctly.');
     }
   };
+  
 
   return (
     <ImageBackground style={styles.backgroundImage}>
       <View style={styles.container}>
         {/* Top Navigation Bar */}
-        <View style={styles.topNav}>
-          <TouchableOpacity style={styles.navIcon} onPress={() => navigation.goBack()}>
-            <Ionicons name="arrow-back" size={24} color="black" />
-          </TouchableOpacity>
-          <Text style={styles.navTitle}>Fund Registration</Text>
-        </View>
+        <Header title={"Fund Registration"} />
 
         <ScrollView contentContainerStyle={styles.contentContainer}>
           <Text style={styles.title}>Fill The Registration Form</Text>
@@ -200,6 +202,7 @@ const RegistrationFormScreen = () => {
     </ImageBackground>
   );
 };
+
 const styles = StyleSheet.create({
   container: {
     flex: 1,
@@ -208,28 +211,6 @@ const styles = StyleSheet.create({
   backgroundImage: {
     flex: 1,
     resizeMode: 'cover', // Ensure the image covers the entire background
-  },
-  topNav: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    padding: 10,
-    backgroundColor: 'white',
-    elevation: 4,
-    shadowColor: 'white',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 3,
-    marginTop: 15,
-  },
-  navIcon: {
-    padding: 10,
-  },
-  navTitle: {
-    fontSize: 18,
-    fontWeight: 'bold',
-    color: '#333',
-    marginRight:170,
   },
   contentContainer: {
     padding: 20,

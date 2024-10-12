@@ -68,15 +68,7 @@ export default function EntrepreneurTabLayout() {
             ),
           }}
         />
-         <Tabs.Screen
-          name="fund"
-          options={{
-            tabBarLabel: "Profile",
-            tabBarIcon: ({ color }) => (
-              <Ionicons name="person-outline" size={24} color={color} />
-            ),
-          }}
-        />
+
       </Tabs>
     </>
   );
