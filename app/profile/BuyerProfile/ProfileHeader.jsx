@@ -155,7 +155,7 @@ const ProfileHeader = ({ buyerId }) => {
         )}
 
         {/* Dropdown menu */}
-        {dropdownVisible && !isBuyer && !isEntrepreneur && ( // Show dropdown only if not a buyer or entrepreneur
+        {dropdownVisible && ( // Show dropdown only if not a buyer or entrepreneur
           <View style={styles.dropdown}>
             <TouchableOpacity
               style={styles.dropdownItem}

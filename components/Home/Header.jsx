@@ -15,6 +15,8 @@ import { router } from "expo-router";
 import { NotificationContext } from "../../context/notificationContext"; // Import the context
 import AntDesign from "@expo/vector-icons/AntDesign";
 import { RFValue } from "react-native-responsive-fontsize";
+import { StatusBar } from "expo-status-bar";
+
 export default function Header({ notificationCount }) {
   const { user } = useAuth(); // Access the authenticated user from context
   const { unreadCount } = useContext(NotificationContext); // Access the notification count
@@ -37,6 +39,8 @@ export default function Header({ notificationCount }) {
 
   return (
     <View style={styles.headerContainer}>
+            <StatusBar style="dark" translucent backgroundColor="white" />
+
       <View style={styles.userInfoContainer}>
         <View style={styles.userProfile}>
           <TouchableOpacity onPress={handleImagePress}>
