@@ -37,6 +37,7 @@ export default function PopularBusiness() {
         )}
         style={styles.flatList}
       />
+
     </View>
   );
 }

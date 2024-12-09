@@ -51,9 +51,9 @@ export default function Home() {
         <RecommendPost />
 
         {/* Logout Button */}
-        {/* <View>
+        <View>
           <Button title="Logout" onPress={handleLogout} />
-        </View> */}
+        </View>
       </ScrollView>
     </View>
   );

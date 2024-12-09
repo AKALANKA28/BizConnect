@@ -33,9 +33,9 @@ export default function Home() {
         {/* <PopularBusiness />
         <PopularBusiness /> */}
         <RecommendPost />
-        {/* <View>
+        <View>
           <Button title="Logout" onPress={handleLogout} />
-        </View> */}
+        </View>
       </ScrollView>
     </View>
   );

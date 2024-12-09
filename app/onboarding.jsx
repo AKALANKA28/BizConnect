@@ -9,6 +9,7 @@ import {
 } from "react-native";
 import { router } from "expo-router"; // Import router for navigation
 import { useAuth } from "../context/authContext";
+import { StatusBar } from "expo-status-bar";
 
 const Index = () => {
   const { user, isAuthenticated } = useAuth(); // Fetch user and auth status from context
@@ -38,40 +39,44 @@ const Index = () => {
   };
 
   return (
-    <View style={styles.container}>
-      <ImageBackground
-        resizeMode="cover"
-        source={require("../assets/images/onboardscreen.jpg")}
-        style={styles.backgroundImage}
-      >
-        {/* Overlay to add opacity to the background */}
-        <View style={styles.overlay} />
+    <>
+      <StatusBar translucent />
 
-        <View style={styles.contentContainer}>
-          <View style={styles.titleContainer}>
-            <Text style={styles.titleText}>
-              Welcome to{"\n"}
-              <Text style={styles.bizconnectText}>Bizconnect</Text>
-            </Text>
+      <View style={styles.container}>
+        <ImageBackground
+          resizeMode="cover"
+          source={require("../assets/images/onboardscreen.jpg")}
+          style={styles.backgroundImage}
+        >
+          {/* Overlay to add opacity to the background */}
+          <View style={styles.overlay} />
+
+          <View style={styles.contentContainer}>
+            <View style={styles.titleContainer}>
+              <Text style={styles.titleText}>
+                Welcome to{"\n"}
+                <Text style={styles.bizconnectText}>Bizconnect</Text>
+              </Text>
+            </View>
+            <View style={styles.subtitleContainer}>
+              <Text style={styles.subtitleText}>
+                Connecting artisans and buyers for unique, handcrafted products
+              </Text>
+            </View>
+            {/* Show button only if the user is not authenticated */}
+            {!authenticated && (
+              <TouchableOpacity
+                style={styles.getStartedButton}
+                accessibilityRole="button"
+                onPress={handleGetStarted}
+              >
+                <Text style={styles.getStartedText}>Get Started</Text>
+              </TouchableOpacity>
+            )}
           </View>
-          <View style={styles.subtitleContainer}>
-            <Text style={styles.subtitleText}>
-              Connecting artisans and buyers for unique, handcrafted products
-            </Text>
-          </View>
-          {/* Show button only if the user is not authenticated */}
-          {!authenticated && (
-            <TouchableOpacity
-              style={styles.getStartedButton}
-              accessibilityRole="button"
-              onPress={handleGetStarted}
-            >
-              <Text style={styles.getStartedText}>Get Started</Text>
-            </TouchableOpacity>
-           )} 
-        </View>
-      </ImageBackground>
-    </View>
+        </ImageBackground>
+      </View>
+    </>
   );
 };
 

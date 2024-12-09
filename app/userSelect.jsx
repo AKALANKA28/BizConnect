@@ -26,7 +26,7 @@ const UserSelect = () => {
 
   return (
     <>
-      <StatusBar style="dark" translucent />
+      <StatusBar  translucent />
 
       <View style={styles.container}>
         <ImageBackground
