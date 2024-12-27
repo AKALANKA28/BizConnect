@@ -1,7 +1,6 @@
 import {
   View,
   Text,
-  ScrollView,
   TouchableOpacity,
   Linking,
   StyleSheet,
@@ -11,61 +10,25 @@ import { Ionicons } from "@expo/vector-icons"; // Ensure you import Ionicons fro
 import { RFValue } from "react-native-responsive-fontsize";
 
 export default function ActionButton({ business }) {
-  const actionButtonMenu = [
-    {
-      id: 1,
-      name: "Call",
-      icon: <Ionicons name="call-outline" size={27} color="white" />, // Ionicons for Call
-      url: "tel:" + business?.contact,
-    },
-    {
-      id: 2,
-      name: "Location",
-      icon: <Ionicons name="location-outline" size={27} color="white" />, // Ionicons for Location
-      url:
-        "https://www.google.com/maps/search/?api=1&query=" +
-        encodeURIComponent(business?.address),
-    },
-    {
-      id: 3,
-      name: "Profile",
-      icon: <Ionicons name="person-outline" size={27} color="white" />, // Ionicons for Share
-      url: "tel:" + business?.contact, // Example for sharing the contact
-    },
-    {
-      id: 4,
-      name: "Share",
-      icon: <Ionicons name="share-social-outline" size={27} color="white" />, // Ionicons for Share
-      url: "tel:" + business?.contact, // Example for sharing the contact
-    },
-  ];
-
-  const onPressHandler = (item) => {
-    if (item.name === "Share") {
-      // Implement share functionality if needed
-      return;
-    }
-    Linking.openURL(item?.url);
+  const actionButton = {
+    id: 1,
+    name: "View Profile",
+    icon: <Ionicons name="person-outline" size={20} color="white" />, // Ionicons for Call
+    url: "tel:" + business?.contact,
   };
+
+  const onPressHandler = () => {
+    Linking.openURL(actionButton.url);
+  };
+
   return (
     <View style={styles.container}>
-      <ScrollView
-        horizontal={true}
-        showsHorizontalScrollIndicator={false}
-        contentContainerStyle={styles.scrollContainer}
-      >
-        {actionButtonMenu.map((item) => (
-          <View key={item.id} style={styles.buttonContainer}>
-            <TouchableOpacity
-              style={styles.button}
-              onPress={() => onPressHandler(item)}
-            >
-              {item.icon}
-            </TouchableOpacity>
-            <Text style={styles.buttonText}>{item.name}</Text>
-          </View>
-        ))}
-      </ScrollView>
+      <TouchableOpacity style={styles.button} onPress={onPressHandler}>
+        <View style={styles.buttonContent}>
+          {actionButton.icon}
+          <Text style={styles.buttonText}>{actionButton.name}</Text>
+        </View>
+      </TouchableOpacity>
     </View>
   );
 }
@@ -73,25 +36,18 @@ export default function ActionButton({ business }) {
 const styles = StyleSheet.create({
   container: {
     backgroundColor: "#fff",
-    paddingVertical: 10,
-    alignItems: "left",
-     height: "100%"
-  },
-  scrollContainer: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-  },
-  buttonContainer: {
-    alignItems: "center", // Center content in buttonContainer
-    marginHorizontal: 17, // Space between buttons
+    paddingVertical: 20,
+    paddingHorizontal: 23,
+    height: "100%",
+    width: "100%", // Ensure container takes up full width
   },
   button: {
     backgroundColor: "#AA6A1C", // Light gray background
     borderRadius: 60, // Rounded button
     justifyContent: "center", // Center content vertically
     alignItems: "center", // Center content horizontally
-    width: 70,
-    height: 70, // Fixed width for uniformity
+    width: "100%", // Full width button
+    height: 60, // Fixed height for uniformity
     elevation: 3,
     shadowColor: "#000",
     shadowOffset: {
@@ -101,10 +57,16 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.25,
     shadowRadius: 3.84,
   },
+  buttonContent: {
+    flexDirection: "row", // Align text and icon in a row
+    justifyContent: "center", // Center both icon and text
+    alignItems: "center", // Align items vertically
+  },
   buttonText: {
     fontFamily: "lato-bold",
     textAlign: "center",
     fontSize: RFValue(12),
-    marginTop: 5,
+    color: "white",
+    marginLeft: 10, // Space between the icon and text
   },
 });

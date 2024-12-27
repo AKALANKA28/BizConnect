@@ -65,7 +65,8 @@
     "react-navigation": "^5.0.0",
     "stream-chat": "^8.40.9",
     "stream-chat-react-native": "^5.39.1",
-    "stripe": "^17.2.0"
+    "stripe": "^17.2.0",
+    "expo-blur": "~14.0.1"
   },
   "devDependencies": {
     "@babel/core": "^7.20.0",

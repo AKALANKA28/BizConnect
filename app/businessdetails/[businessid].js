@@ -43,7 +43,7 @@ export default function BusinessDetail() {
         <LoadingScreen />
       ) : (
         <View>
-          <StatusBar  translucent />
+          <StatusBar  translucent style="dark" />
           {business && (
             <View>
               {/* Intro */}
