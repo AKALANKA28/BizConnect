@@ -1,4 +1,4 @@
-import { View, Text, ActivityIndicator, ScrollView } from "react-native";
+import { View, Text, ActivityIndicator, ScrollView, StyleSheet } from "react-native";
 import React, { useEffect, useState } from "react";
 import { useLocalSearchParams } from "expo-router";
 import { doc, getDoc } from "firebase/firestore";
@@ -9,8 +9,10 @@ import ActionButton from "../../components/BusinessDetails/ActionButton";
 import About from "../../components/BusinessDetails/About";
 import LoadingScreen from "../../components/LoadingScreen";
 import { StatusBar } from "expo-status-bar";
+import { useAuth } from "../../context/authContext";
 
 export default function BusinessDetail() {
+  const { user } = useAuth(); // Access the authenticated user from context
   const { businessid } = useLocalSearchParams();
   const [business, setBusiness] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -42,20 +44,27 @@ export default function BusinessDetail() {
       {loading ? (
         <LoadingScreen />
       ) : (
-        <View>
-          <StatusBar  translucent style="dark" />
+        <View style={styles.container}>
+          <StatusBar translucent style="dark" />
           {business && (
-            <View>
+            <>
               {/* Intro */}
               <Intro business={business} />
-              {/* AboutSection */}
+              {/* About Section */}
               <About business={business} />
               {/* Action Button */}
-              <ActionButton business={business} />
-            </View>
+              <ActionButton entrepreneurId={business.userId} />
+              </>
           )}
         </View>
       )}
     </>
   );
 }
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    justifyContent: "flex-start", // Ensure the content starts at the top
+  },
+});

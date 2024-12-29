@@ -16,6 +16,7 @@ export default function About({ business }) {
 const styles = StyleSheet.create({
   container: {
     paddingHorizontal: 20,
+    height: "30%",
     backgroundColor: "#fff",
   },
   title: {

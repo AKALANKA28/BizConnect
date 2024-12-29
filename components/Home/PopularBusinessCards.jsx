@@ -1,5 +1,5 @@
 import { View, Text, Image, TouchableOpacity, StyleSheet } from "react-native";
-import React from "react";
+import React, { useMemo } from "react";
 import { Colors } from "../../constants/Colors";
 import { useRouter } from "expo-router";
 import { RFValue } from "react-native-responsive-fontsize";
@@ -8,16 +8,24 @@ import { Ionicons } from "@expo/vector-icons";
 export default function PopularBusinessCards({ business }) {
   const router = useRouter();
 
+  // Get the image source, handling both array and single imageUrl cases
+  const imageSource = useMemo(() => {
+    if (business?.images && Array.isArray(business.images) && business.images.length > 0) {
+      return { uri: business.images[0] };
+    }
+    return { uri: business?.imageUrl };
+  }, [business?.images, business?.imageUrl]);
+
   return (
     <TouchableOpacity
       onPress={() => router.push("/businessdetails/" + business?.id)}
       style={styles.card}
     >
       <View style={styles.imageContainer}>
-      <TouchableOpacity style={styles.heartContainer}>
+        <TouchableOpacity style={styles.heartContainer}>
           <Ionicons name="heart-outline" size={20} color="#fff" />
         </TouchableOpacity>
-        <Image source={{ uri: business?.imageUrl }} style={styles.image} />
+        <Image source={imageSource} style={styles.image} />
         <View style={styles.infoContainer}>
           <View style={styles.blurContainer} />
           <Text style={styles.name}>{business?.name}</Text>
@@ -55,26 +63,26 @@ const styles = StyleSheet.create({
     borderWidth: 0,
     width: 250,
     height: 356,
-    overflow: "hidden", // Ensure content stays within the card
-    shadowOffset: { width: 0, height: 4 }, // Shadow offset (0 for horizontal, 4 for vertical)
-    shadowColor: "#000", // Shadow color
-    shadowOpacity: 0.85, // Shadow transparency
-    shadowRadius: 14, // How blurry the shadow is
-    elevation: 5, // Android-specific shadow property
+    overflow: "hidden",
+    shadowOffset: { width: 0, height: 4 },
+    shadowColor: "#000",
+    shadowOpacity: 0.85,
+    shadowRadius: 14,
+    elevation: 5,
   },
   imageContainer: {
-    position: "relative", // Allows absolute positioning of the infoContainer
+    position: "relative",
     width: "100%",
     height: "100%",
   },
   heartContainer: {
     position: "absolute",
-    top: 10, // Distance from the top of the card
-    right: 10, // Distance from the right of the card
-    backgroundColor: "rgba(0, 0, 0, 0.5)", // Semi-transparent background
-    padding: 8, // Padding around the heart icon
-    borderRadius: 20, // Makes it circular
-    zIndex: 10, // Ensures it appears above the image
+    top: 10,
+    right: 10,
+    backgroundColor: "rgba(0, 0, 0, 0.5)",
+    padding: 8,
+    borderRadius: 20,
+    zIndex: 10,
   },
   image: {
     width: "100%",
@@ -83,18 +91,18 @@ const styles = StyleSheet.create({
   },
   infoContainer: {
     position: "absolute",
-    bottom: 10, // Space between the container and the bottom of the image
-    left: 10, // Space on the left
-    right: 10, // Space on the right
-    backgroundColor: "rgba(0, 0, 0, 0.4)", // Light transparent background for the glass effect
-    padding: 10, // Internal padding for the content
-    borderRadius: 16, // Rounded corners for the glass effect
-    overflow: "hidden", // Ensures blur doesn't exceed rounded corners
+    bottom: 10,
+    left: 10,
+    right: 10,
+    backgroundColor: "rgba(0, 0, 0, 0.4)",
+    padding: 10,
+    borderRadius: 16,
+    overflow: "hidden",
   },
   blurContainer: {
-    ...StyleSheet.absoluteFillObject, // Fills the entire infoContainer
-    backgroundColor: "rgba(177, 176, 176, 0.3)", // Light transparent background for the glass effect
-    blurRadius: 50, // Creates the blur effect
+    ...StyleSheet.absoluteFillObject,
+    backgroundColor: "rgba(177, 176, 176, 0.3)",
+    blurRadius: 50,
   },
   name: {
     fontFamily: "lato-bold",

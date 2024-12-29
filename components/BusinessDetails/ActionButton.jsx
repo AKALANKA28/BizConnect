@@ -1,3 +1,4 @@
+import React from "react";
 import {
   View,
   Text,
@@ -5,57 +6,45 @@ import {
   Linking,
   StyleSheet,
 } from "react-native";
-import React from "react";
 import { Ionicons } from "@expo/vector-icons"; // Ensure you import Ionicons from Expo
 import { RFValue } from "react-native-responsive-fontsize";
+import { Colors } from "../../constants/Colors";
+import { useRouter } from "expo-router";
 
-export default function ActionButton({ business }) {
-  const actionButton = {
-    id: 1,
-    name: "View Profile",
-    icon: <Ionicons name="person-outline" size={20} color="white" />, // Ionicons for Call
-    url: "tel:" + business?.contact,
-  };
+export default function ActionButton({ entrepreneurId }) {
+  const router = useRouter();
 
   const onPressHandler = () => {
-    Linking.openURL(actionButton.url);
+    console.log("Navigating to entrepreneur profile:", entrepreneurId);
+    if (entrepreneurId) {
+      router.push(`/profile/${entrepreneurId}`);
+    } else {
+      console.error("Business owner ID is missing.");
+    }
   };
 
   return (
-    <View style={styles.container}>
-      <TouchableOpacity style={styles.button} onPress={onPressHandler}>
-        <View style={styles.buttonContent}>
-          {actionButton.icon}
-          <Text style={styles.buttonText}>{actionButton.name}</Text>
-        </View>
-      </TouchableOpacity>
-    </View>
+    <TouchableOpacity style={styles.button} onPress={onPressHandler}>
+      <View style={styles.buttonContent}>
+        <Ionicons name="person-outline" size={20} color="white" />
+        <Text style={styles.buttonText}>View Profile</Text>
+      </View>
+    </TouchableOpacity>
   );
 }
 
 const styles = StyleSheet.create({
-  container: {
-    backgroundColor: "#fff",
-    paddingVertical: 20,
-    paddingHorizontal: 23,
-    height: "100%",
-    width: "100%", // Ensure container takes up full width
-  },
   button: {
-    backgroundColor: "#AA6A1C", // Light gray background
-    borderRadius: 60, // Rounded button
-    justifyContent: "center", // Center content vertically
-    alignItems: "center", // Center content horizontally
-    width: "100%", // Full width button
-    height: 60, // Fixed height for uniformity
-    elevation: 3,
-    shadowColor: "#000",
-    shadowOffset: {
-      width: 0,
-      height: 2,
-    },
-    shadowOpacity: 0.25,
-    shadowRadius: 3.84,
+    position: "absolute",
+    bottom: 29,
+    left: 18,
+    right: 18,
+    backgroundColor: Colors.secondaryColor, // Replace with your color
+    borderRadius: 28,
+    padding: 19,
+    elevation: 6,
+    alignItems: "center",
+    justifyContent: "center",
   },
   buttonContent: {
     flexDirection: "row", // Align text and icon in a row

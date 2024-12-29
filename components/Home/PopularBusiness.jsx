@@ -1,6 +1,6 @@
 import { View, Text, FlatList, StyleSheet } from "react-native";
 import React, { useEffect, useState } from "react";
-import { collection, getDocs, query, limit } from "firebase/firestore"; 
+import { collection, getDocs, query, limit } from "firebase/firestore";
 import { db } from "../../config/FirebaseConfig";
 import { Colors } from "../../constants/Colors";
 import PopularBusinessCards from "./PopularBusinessCards";
@@ -28,6 +28,7 @@ export default function PopularBusiness() {
         <Text style={styles.headerTitle}>Popular Business</Text>
         <Text style={styles.viewAll}>View All</Text>
       </View>
+
       <FlatList
         data={businessList}
         showsHorizontalScrollIndicator={false}
@@ -36,8 +37,8 @@ export default function PopularBusiness() {
           <PopularBusinessCards business={item} key={index} />
         )}
         style={styles.flatList}
+        contentContainerStyle={{ paddingRight: 20 }}
       />
-
     </View>
   );
 }
@@ -61,7 +62,6 @@ const styles = StyleSheet.create({
     color: "#6D4C41",
     fontFamily: "lato-bold",
     fontSize: RFValue(11),
-
   },
   flatList: {
     marginLeft: 0,
