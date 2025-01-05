@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { useRouter,useLocalSearchParams } from "expo-router";
+import { useRouter, useLocalSearchParams } from "expo-router";
 import {
   View,
   Text,
@@ -54,21 +54,21 @@ export default function SignIn() {
     if (!validateInputs()) {
       return; // Exit if validation fails
     }
-  
+
     setLoading(true);
     const response = await signin(email, password);
     setLoading(false);
-  
+
     if (!response.success) {
       showToast(response.data); // Show error message as a Toast
       return;
     }
-  
+
     // Log the response for debugging purposes
-    console.log("Response:", response); 
-  
+    console.log("Response:", response);
+
     const { role } = response;
-  
+
     if (role === "buyer") {
       // Navigate to buyer's home only if role is fetched
       router.push("/(tabsBuyer)/home");
@@ -79,9 +79,7 @@ export default function SignIn() {
       showToast("Invalid user role");
     }
   };
-  
-  
-  
+
   return (
     <KeyboardAvoidingView
       style={{ flex: 1 }}
@@ -151,8 +149,8 @@ export default function SignIn() {
         </View>
 
         {/* Forgot Password */}
-        <TouchableOpacity>
-          <Text style={styles.forgotPasswordText}>Forget Password?</Text>
+        <TouchableOpacity onPress={() => router.push("/auth/forgotPassword")}>
+          <Text style={styles.forgotPasswordText}>Forgot Password?</Text>
         </TouchableOpacity>
 
         {/* Log In Button */}

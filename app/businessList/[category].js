@@ -1,6 +1,6 @@
 import { View, FlatList, ActivityIndicator, Text } from "react-native";
 import React, { useEffect, useState } from "react";
-import { useLocalSearchParams, useNavigation } from "expo-router";
+import { useLocalSearchParams } from "expo-router";
 import { collection, getDocs, query, where } from "firebase/firestore";
 import BusinessListCard from "../../components/BusinessList/BusinessListCard";
 import Header from "../../components/Header";
@@ -9,7 +9,6 @@ import { Colors } from "../../constants/Colors";
 import LoadingScreen from "../../components/LoadingScreen";
 
 export default function BusinessListByCategory() {
-  const navigation = useNavigation();
   const { category } = useLocalSearchParams();
 
   const [loading, setLoading] = useState(true);

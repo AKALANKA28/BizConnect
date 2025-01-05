@@ -7,7 +7,7 @@ import {
   Platform,
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
-import { useNavigation, useRouter } from "expo-router";
+import {  useRouter } from "expo-router";
 import { StatusBar } from "expo-status-bar";
 import { NotificationContext } from "../context/notificationContext"; // Import the context
 import { useAuth } from "../context/authContext"; // Assuming AuthContext is in this path
@@ -23,7 +23,6 @@ export default function Header({
   showBackButton = true, 
 }) {
   const router = useRouter();
-  const navigation = useNavigation();
   const { user } = useAuth(); // Access the authenticated user from context
   const { unreadCount } = useContext(NotificationContext); // Access the notification count
 
@@ -42,7 +41,7 @@ export default function Header({
       <StatusBar style="dark" translucent backgroundColor="white" />
       {/* Conditionally render the back button */}
       {showBackButton && (
-        <TouchableOpacity onPress={() => navigation.goBack()}>
+        <TouchableOpacity>
           <Ionicons name="arrow-back" size={24} color="black" />
         </TouchableOpacity>
       )}

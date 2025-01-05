@@ -20,10 +20,12 @@ import { StatusBar } from "expo-status-bar";
 export default function Header({ notificationCount }) {
   const { user } = useAuth(); // Access the authenticated user from context
   const { unreadCount } = useContext(NotificationContext); // Access the notification count
-
   const handleImagePress = () => {
     // Navigate to the user's profile using the userId
-    router.push(`/profile?userId=${user.id}`); // Use the user's ID as a query parameter
+
+    console.log(user);
+    console.log("user id", user.uid);
+    router.push(`/profile?userId=${user.uid}`); // Use the user's ID as a query parameter
   };
 
   const handleNotificationPress = () => {
@@ -39,7 +41,7 @@ export default function Header({ notificationCount }) {
 
   return (
     <View style={styles.headerContainer}>
-            <StatusBar style="dark" translucent backgroundColor="white" />
+      <StatusBar style="dark" translucent backgroundColor="white" />
 
       <View style={styles.userInfoContainer}>
         <View style={styles.userProfile}>

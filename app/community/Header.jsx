@@ -7,12 +7,11 @@ import {
   Platform,
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
-import { useNavigation, useRouter } from "expo-router";
+import {  useRouter } from "expo-router";
 import { StatusBar } from "expo-status-bar";
 
 export default function Header({ title }) {
   const router = useRouter();
-  const navigation = useNavigation();
 
   return (
     <View style={styles.header}>

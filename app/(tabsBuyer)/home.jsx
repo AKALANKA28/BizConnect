@@ -1,4 +1,11 @@
-import { View, Text, ScrollView, Button, StyleSheet, RefreshControl } from "react-native";
+import {
+  View,
+  Text,
+  ScrollView,
+  Button,
+  StyleSheet,
+  RefreshControl,
+} from "react-native";
 import React, { useState } from "react";
 import Header from "../../components/Home/Header";
 import Slider from "../../components/Home/Slider";
@@ -7,6 +14,7 @@ import PopularBusiness from "../../components/Home/PopularBusiness";
 import { Colors } from "../../constants/Colors";
 import { useAuth } from "../../context/authContext";
 import RecommendPost from "../../components/Home/RecommendPost";
+import { router } from "expo-router";
 
 export default function Home() {
   const { signout, user } = useAuth(); // Get signout function from Auth context
@@ -20,7 +28,7 @@ export default function Home() {
   const onRefresh = async () => {
     setRefreshing(true);
     // Simulate a network request or data fetching
-    await new Promise(resolve => setTimeout(resolve, 2000)); // Simulating a 2 seconds delay
+    await new Promise((resolve) => setTimeout(resolve, 2000)); // Simulating a 2 seconds delay
     setRefreshing(false);
     // Fetch or refresh your data here if necessary
   };
@@ -51,6 +59,7 @@ export default function Home() {
         <RecommendPost />
 
         {/* Logout Button */}
+
         <View>
           <Button title="Logout" onPress={handleLogout} />
         </View>

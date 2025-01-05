@@ -1,25 +1,26 @@
 import React from "react";
-import {
-  View,
-  Text,
-  TouchableOpacity,
-  Linking,
-  StyleSheet,
-} from "react-native";
-import { Ionicons } from "@expo/vector-icons"; // Ensure you import Ionicons from Expo
+import { View, Text, TouchableOpacity, StyleSheet } from "react-native";
+import { Ionicons } from "@expo/vector-icons";
 import { RFValue } from "react-native-responsive-fontsize";
 import { Colors } from "../../constants/Colors";
 import { useRouter } from "expo-router";
+import { useAuth } from "../../context/authContext";
 
 export default function ActionButton({ entrepreneurId }) {
+  const { user } = useAuth();
   const router = useRouter();
 
+  if (user?.uid === entrepreneurId) {
+    return null; // Hide button for the user's own profile
+  }
+  console.log(user);
+  console.log("user id", user.uid);
+
   const onPressHandler = () => {
-    console.log("Navigating to entrepreneur profile:", entrepreneurId);
     if (entrepreneurId) {
       router.push(`/profile/${entrepreneurId}`);
     } else {
-      console.error("Business owner ID is missing.");
+      console.error("Entrepreneur ID is missing.");
     }
   };
 
@@ -39,7 +40,7 @@ const styles = StyleSheet.create({
     bottom: 29,
     left: 18,
     right: 18,
-    backgroundColor: Colors.secondaryColor, // Replace with your color
+    backgroundColor: Colors.secondaryColor,
     borderRadius: 28,
     padding: 19,
     elevation: 6,
@@ -47,15 +48,14 @@ const styles = StyleSheet.create({
     justifyContent: "center",
   },
   buttonContent: {
-    flexDirection: "row", // Align text and icon in a row
-    justifyContent: "center", // Center both icon and text
-    alignItems: "center", // Align items vertically
+    flexDirection: "row",
+    justifyContent: "center",
+    alignItems: "center",
   },
   buttonText: {
     fontFamily: "lato-bold",
-    textAlign: "center",
     fontSize: RFValue(12),
     color: "white",
-    marginLeft: 10, // Space between the icon and text
+    marginLeft: 10,
   },
 });

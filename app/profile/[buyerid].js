@@ -5,16 +5,16 @@ import {
   StyleSheet,
   ScrollView,
 } from "react-native";
-import { db } from "../../../config/FirebaseConfig";
+import { db } from "../../config/FirebaseConfig";
 import { doc, getDoc } from "firebase/firestore";
 import { useLocalSearchParams } from "expo-router";
-import ProfileHeader from "./ProfileHeader";
-import AboutMe from "../../../components/Profile/BuyerProfile/AboutMe";
-import ContactInformation from "../../../components/Profile/BuyerProfile/ContactInformation";
-import SocialMediaLinks from "../../../components/Profile/BuyerProfile/SocialMediaLinks";
-import Header from "../../../components/Header"; // Assuming you want the Header component
-import LoadingScreen from "../../../components/LoadingScreen";
-import { Colors } from "../../../constants/Colors";
+import ProfileHeader from "./buyerprofile/ProfileHeader";
+import AboutMe from "../../components/Profile/BuyerProfile/AboutMe";
+import ContactInformation from "../../components/Profile/BuyerProfile/ContactInformation";
+import SocialMediaLinks from "../../components/Profile/BuyerProfile/SocialMediaLinks";
+import Header from "../../components/Header"; // Assuming you want the Header component
+import LoadingScreen from "../../components/LoadingScreen";
+import { Colors } from "../../constants/Colors";
 
 export default function BuyerProfile() {
   const { buyerid } = useLocalSearchParams(); // Get the buyer ID from the route

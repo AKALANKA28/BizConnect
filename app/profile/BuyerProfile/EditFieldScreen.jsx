@@ -8,14 +8,13 @@ import {
   StatusBar,
   ToastAndroid, // Import ToastAndroid
 } from "react-native";
-import { useNavigation, useRoute } from "@react-navigation/native";
+import { useRoute } from "@react-navigation/native";
 import { useAuth } from "../../../context/authContext";
 import { Ionicons } from "@expo/vector-icons";
 import { Colors } from "../../../constants/Colors"; // Ensure this path is correct based on your project structure
 
 const EditFieldScreen = () => {
   const { updateProfile } = useAuth();
-  const navigation = useNavigation();
   const route = useRoute();
   const { field, initialValue } = route.params;
 
@@ -28,31 +27,43 @@ const EditFieldScreen = () => {
 
       if (result.success) {
         ToastAndroid.show("Field updated successfully!", ToastAndroid.SHORT); // Success message
-        navigation.goBack();
       } else {
-        ToastAndroid.show("Error updating field. Please try again.", ToastAndroid.SHORT); // Error message
+        ToastAndroid.show(
+          "Error updating field. Please try again.",
+          ToastAndroid.SHORT
+        ); // Error message
       }
     } catch (error) {
       console.error("Error updating field:", error);
-      ToastAndroid.show("Error updating field. Please try again.", ToastAndroid.SHORT); // Error message
+      ToastAndroid.show(
+        "Error updating field. Please try again.",
+        ToastAndroid.SHORT
+      ); // Error message
     }
   };
 
   return (
     <>
-      <StatusBar barStyle="dark-content" backgroundColor={Colors.primaryColor} />
+      <StatusBar
+        barStyle="dark-content"
+        backgroundColor={Colors.primaryColor}
+      />
       <View style={styles.header}>
-        <TouchableOpacity onPress={() => navigation.goBack()}>
+        <TouchableOpacity>
           <Ionicons name="close" size={24} color="black" />
         </TouchableOpacity>
         {/* Add the label in the header */}
-        <Text style={styles.headerTitle}>{`Edit ${field.charAt(0).toUpperCase() + field.slice(1)}`}</Text>
+        <Text style={styles.headerTitle}>{`Edit ${
+          field.charAt(0).toUpperCase() + field.slice(1)
+        }`}</Text>
         <TouchableOpacity onPress={handleSave}>
           <Ionicons name="checkmark" size={24} color={Colors.secondaryColor} />
         </TouchableOpacity>
       </View>
       <View style={styles.container}>
-        <Text style={styles.label}>{`${field.charAt(0).toUpperCase() + field.slice(1)}`}</Text>
+        <Text style={styles.label}>{`${
+          field.charAt(0).toUpperCase() + field.slice(1)
+        }`}</Text>
         <TextInput
           style={styles.input}
           value={value}

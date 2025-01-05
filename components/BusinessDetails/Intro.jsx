@@ -1,3 +1,4 @@
+import React, { useState, useMemo, useRef } from "react";
 import {
   View,
   Text,
@@ -6,7 +7,6 @@ import {
   FlatList,
   Dimensions,
 } from "react-native";
-import React, { useState, useMemo } from "react";
 import { Colors } from "../../constants/Colors";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import { useRouter } from "expo-router";
@@ -14,68 +14,50 @@ import { RFValue } from "react-native-responsive-fontsize";
 
 const { width } = Dimensions.get("window");
 const HORIZONTAL_MARGIN = 20;
-const ITEM_WIDTH = width - (HORIZONTAL_MARGIN * 2);
+const ITEM_WIDTH = width - HORIZONTAL_MARGIN * 2;
 
 export default function Intro({ business }) {
   const router = useRouter();
   const [activeIndex, setActiveIndex] = useState(0);
+  const flatListRef = useRef(null);
 
-  // Convert single imageUrl or multiple images into a consistent array format
+  // Prepare image array from business data
   const images = useMemo(() => {
     if (!business) return [];
-    if (business.images && Array.isArray(business.images)) {
-      return business.images;
-    }
-    if (business.imageUrl) {
-      return [business.imageUrl];
-    }
+    if (Array.isArray(business.images)) return business.images;
+    if (business.imageUrl) return [business.imageUrl];
     return [];
   }, [business]);
-
-  const flatListRef = React.useRef(null);
 
   const handleMomentumScrollEnd = (event) => {
     const scrollPosition = event.nativeEvent.contentOffset.x;
     const index = Math.floor(scrollPosition / (ITEM_WIDTH + HORIZONTAL_MARGIN * 2));
-    const maxIndex = images.length - 1;
-    const boundedIndex = Math.min(Math.max(0, index), maxIndex);
-    setActiveIndex(boundedIndex);
-
-    // Ensure we don't over-scroll
-    if (index > maxIndex) {
-      flatListRef.current?.scrollToIndex({
-        index: maxIndex,
-        animated: true,
-      });
-    }
+    setActiveIndex(Math.max(0, Math.min(index, images.length - 1)));
   };
 
   const handleScrollBegin = (event) => {
     const scrollPosition = event.nativeEvent.contentOffset.x;
     const currentIndex = Math.floor(scrollPosition / (ITEM_WIDTH + HORIZONTAL_MARGIN * 2));
     const velocity = event.nativeEvent.velocity?.x || 0;
-    
+
     if (Math.abs(velocity) > 0.05) {
-      const maxIndex = images.length - 1;
-      const nextIndex = velocity < 0 
-        ? Math.min(currentIndex + 1, maxIndex)
+      const nextIndex = velocity < 0
+        ? Math.min(currentIndex + 1, images.length - 1)
         : Math.max(currentIndex - 1, 0);
-        
-      flatListRef.current?.scrollToIndex({
-        index: nextIndex,
-        animated: true,
-        viewPosition: 0,
-      });
+
+      flatListRef.current?.scrollToIndex({ index: nextIndex, animated: true });
     }
   };
-  
+
   const renderImage = ({ item, index }) => (
-    <View style={{ 
-      width: ITEM_WIDTH,
-      marginLeft: HORIZONTAL_MARGIN,
-      marginRight: index === images.length - 1 ? HORIZONTAL_MARGIN : 0,
-      marginBottom: 20 
-    }}>
+    <View
+      style={{
+        width: ITEM_WIDTH,
+        marginLeft: HORIZONTAL_MARGIN,
+        marginRight: index === images.length - 1 ? HORIZONTAL_MARGIN : 0,
+        marginBottom: 20,
+      }}
+    >
       <Image
         source={{ uri: item }}
         style={{
@@ -83,10 +65,7 @@ export default function Intro({ business }) {
           height: 600,
           borderRadius: 26,
           shadowColor: "#000",
-          shadowOffset: {
-            width: 0,
-            height: 3,
-          },
+          shadowOffset: { width: 0, height: 3 },
           shadowOpacity: 0.29,
           shadowRadius: 20,
           elevation: 7,
@@ -96,10 +75,8 @@ export default function Intro({ business }) {
     </View>
   );
 
-  const renderDots = () => {
-    if (images.length <= 1) return null;
-
-    return (
+  const renderDots = () => (
+    images.length > 1 && (
       <View
         style={{
           flexDirection: "row",
@@ -116,28 +93,27 @@ export default function Intro({ business }) {
               width: 8,
               height: 8,
               borderRadius: 4,
-              backgroundColor:
-                activeIndex === index ? Colors.primaryColor : "#fff",
+              backgroundColor: activeIndex === index ? Colors.primaryColor : "#fff",
               marginHorizontal: 4,
               opacity: activeIndex === index ? 1 : 0.5,
             }}
           />
         ))}
       </View>
-    );
-  };
+    )
+  );
 
-  if (images.length === 0) {
+  if (!images.length) {
     return (
-      <View style={{ backgroundColor: Colors.primaryColor }}>
-        <Text style={{ color: "#fff", padding: 20 }}>No images available</Text>
+      <View style={{ backgroundColor: Colors.primaryColor, padding: 20 }}>
+        <Text style={{ color: "#fff" }}>No images available</Text>
       </View>
     );
   }
 
   return (
     <View style={{ backgroundColor: Colors.primaryColor }}>
-      {/* Back Button */}
+      {/* Header */}
       <View
         style={{
           position: "absolute",
@@ -149,10 +125,7 @@ export default function Intro({ business }) {
           flexDirection: "row",
           justifyContent: "space-between",
           shadowColor: "#000",
-          shadowOffset: {
-            width: 0,
-            height: 3,
-          },
+          shadowOffset: { width: 0, height: 3 },
           shadowOpacity: 0.29,
           shadowRadius: 10,
           elevation: 5,
@@ -187,7 +160,7 @@ export default function Intro({ business }) {
           data={images}
           renderItem={renderImage}
           horizontal
-          pagingEnabled={true}
+          pagingEnabled
           bounces={false}
           showsHorizontalScrollIndicator={false}
           onMomentumScrollEnd={handleMomentumScrollEnd}
@@ -202,11 +175,10 @@ export default function Intro({ business }) {
             index,
           })}
         />
-
         {renderDots()}
       </View>
 
-      {/* Business Details Section */}
+      {/* Business Details */}
       <View
         style={{
           paddingHorizontal: 24,

@@ -1,16 +1,16 @@
 import React, { useEffect, useState } from "react";
 import { View, Text, StyleSheet, ScrollView } from "react-native";
-import { db } from "../../config/FirebaseConfig";
+import { db } from "../../../config/FirebaseConfig";
 import { doc, getDoc } from "firebase/firestore";
 import { getAuth } from "firebase/auth"; // Import getAuth from firebase/auth
 import { useLocalSearchParams } from "expo-router";
-import ProfileHeader from "./EntrepreneurProfile/ProfileHeader";
-import ProfileInfo from "../../components/Profile/EntrepreneurProfile/ProfileInfo";
-import ContactDetails from "../../components/Profile/EntrepreneurProfile/ContactDetails";
-import PreviousWorks from "../../components/Profile/EntrepreneurProfile/PreviousWorks";
-import LoadingScreen from "../../components/LoadingScreen";
-import Header from "../../components/Header";
-import AcceptBidButton from "../../components/Profile/EntrepreneurProfile/AcceptBidButton"; // Import the new component
+import ProfileHeader from "./ProfileHeader";
+import ProfileInfo from "../../../components/Profile/EntrepreneurProfile/ProfileInfo";
+import ContactDetails from "../../../components/Profile/EntrepreneurProfile/ContactDetails";
+import PreviousWorks from "../../../components/Profile/EntrepreneurProfile/PreviousWorks";
+import LoadingScreen from "../../../components/LoadingScreen";
+import Header from "../../../components/Header";
+import AcceptBidButton from "../../../components/Profile/EntrepreneurProfile/AcceptBidButton"; // Import the new component
 
 export default function EntrepreneurProfile() {
   const { entrepeneurid } = useLocalSearchParams(); // Get the entrepreneur ID

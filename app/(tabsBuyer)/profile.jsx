@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { View, StyleSheet, ScrollView } from "react-native";
 import { useIsFocused, useRoute } from "@react-navigation/native"; // Import useRoute to access route params
-import ProfileHeader from "../profile/BuyerProfile/ProfileHeader";
+import ProfileHeader from "../profile/buyerprofile/ProfileHeader";
 import AboutMe from "../../components/Profile/BuyerProfile/AboutMe";
 import ContactInformation from "../../components/Profile/BuyerProfile/ContactInformation";
 import SocialMediaLinks from "../../components/Profile/BuyerProfile/SocialMediaLinks";
@@ -9,8 +9,6 @@ import { Colors } from "../../constants/Colors";
 
 export default function Profile() {
   const isFocused = useIsFocused(); // Check if the screen is focused
-  const route = useRoute(); // Access route parameters
-  const { buyerId } = route.params || {}; // Destructure buyerId from route params
 
   // You can implement your fetch function here
   const fetchData = () => {
@@ -29,7 +27,7 @@ export default function Profile() {
     <ScrollView style={styles.container}>
       <View style={styles.content}>
         {/* Pass buyerId to ProfileHeader */}
-        <ProfileHeader buyerId={buyerId} />
+        <ProfileHeader  />
         <View style={styles.divider} />
         <AboutMe />
         <ContactInformation />
