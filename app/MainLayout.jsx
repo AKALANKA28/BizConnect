@@ -55,15 +55,11 @@ const MainLayout = () => {
 
   return (
     <NavigationContainer>
-      <Stack>
-        <Stack.Screen name="(tabsBuyer)" options={{ headerShown: false }} />
-        <Stack.Screen
-          name="(tabsEntrepeneur)"
-          options={{ headerShown: false }}
-        />
-        <Stack.Screen name="onboarding" options={{ headerShown: false }} />
-        <Stack.Screen name="userSelect" options={{ headerShown: false }} />
-      </Stack>
+      <Stack
+        screenOptions={{
+          headerShown: false, // Hide headers globally
+        }}
+      />
     </NavigationContainer>
   );
 };
