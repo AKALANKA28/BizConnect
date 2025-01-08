@@ -62,6 +62,6 @@ const styles = StyleSheet.create({
     flexDirection: "row",  // Align items in rows
     flexWrap: "wrap",      // Allow wrapping to create two columns
     justifyContent: "space-between", // Space between columns
-    paddingHorizontal: 8, // Add horizontal padding for layout
+    paddingHorizontal: 2, // Add horizontal padding for layout
   },
 });

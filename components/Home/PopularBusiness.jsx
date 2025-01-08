@@ -5,9 +5,11 @@ import { db } from "../../config/FirebaseConfig";
 import { Colors } from "../../constants/Colors";
 import PopularBusinessCards from "./PopularBusinessCards";
 import { RFValue } from "react-native-responsive-fontsize";
+import { useTranslation } from "react-i18next";
 
 export default function PopularBusiness() {
   const [businessList, setBusinessList] = useState([]);
+  const { t } = useTranslation();
 
   useEffect(() => {
     GetBusinessList();
@@ -25,8 +27,8 @@ export default function PopularBusiness() {
   return (
     <View style={styles.container}>
       <View style={styles.header}>
-        <Text style={styles.headerTitle}>Popular Business</Text>
-        <Text style={styles.viewAll}>View All</Text>
+        <Text style={styles.headerTitle}>{t('business.popular')}</Text>
+        <Text style={styles.viewAll}>{t('business.viewAll')}</Text>
       </View>
 
       <FlatList

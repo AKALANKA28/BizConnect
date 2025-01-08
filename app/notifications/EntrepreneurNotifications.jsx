@@ -130,7 +130,7 @@ export default function EntrepreneurNotifications() {
 
   // Navigate to the buyer's profile when a notification is clicked
   const handleNotificationPress = (buyerId) => {
-    router.push(`/profile/BuyerProfile/${buyerId}`);
+    router.push(`/profile/buyerProfile/${buyerId}`);
   };
 
   // Render each notification item

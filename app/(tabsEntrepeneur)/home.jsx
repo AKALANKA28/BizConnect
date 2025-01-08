@@ -7,6 +7,7 @@ import PopularBusiness from "../../components/Home/PopularBusiness";
 import RecommendPost from "../../components/Home/RecommendPost";
 import { Colors } from "../../constants/Colors";
 import { useAuth } from "../../context/authContext";
+import { LanguageSwitcher } from "../../components/LanguageSwitcher";
 
 export default function Home() {
   const { signout, user } = useAuth(); // Get signout function from Auth context
@@ -23,7 +24,10 @@ export default function Home() {
       </View>
 
       {/* Scrollable Content */}
-      <ScrollView contentContainerStyle={styles.scrollContent}>
+      <ScrollView
+        contentContainerStyle={styles.scrollContent}
+        showsVerticalScrollIndicator={false}
+      >
         {/* Slider */}
         <Slider />
         {/* Category */}

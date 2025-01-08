@@ -16,15 +16,13 @@ import { NotificationContext } from "../../context/notificationContext"; // Impo
 import AntDesign from "@expo/vector-icons/AntDesign";
 import { RFValue } from "react-native-responsive-fontsize";
 import { StatusBar } from "expo-status-bar";
+import { LanguageSwitcher } from "../LanguageSwitcher";
 
 export default function Header({ notificationCount }) {
   const { user } = useAuth(); // Access the authenticated user from context
   const { unreadCount } = useContext(NotificationContext); // Access the notification count
   const handleImagePress = () => {
     // Navigate to the user's profile using the userId
-
-    console.log(user);
-    console.log("user id", user.uid);
     router.push(`/profile?userId=${user.uid}`); // Use the user's ID as a query parameter
   };
 
@@ -63,25 +61,29 @@ export default function Header({ notificationCount }) {
           </View>
         </View>
 
-        {/* Notifications */}
-        <TouchableOpacity
-          activeOpacity={0.5}
-          onPress={handleNotificationPress}
-          style={styles.notificationIconWrapper}
-        >
-          <Ionicons
-            name="notifications-outline"
-            size={24}
-            color={"#6D4C41"}
-            style={styles.notificationIcon}
-          />
-          {/* Notification Badge */}
-          {unreadCount > 0 && (
-            <View style={styles.notificationBadge}>
-              <Text style={styles.notificationBadgeText}>{unreadCount}</Text>
-            </View>
-          )}
-        </TouchableOpacity>
+        {/* Right-side section with Language Switcher and Notifications */}
+        <View style={styles.rightSection}>
+          <LanguageSwitcher />
+          
+          <TouchableOpacity
+            activeOpacity={0.5}
+            onPress={handleNotificationPress}
+            style={styles.notificationIconWrapper}
+          >
+            <Ionicons
+              name="notifications-outline"
+              size={24}
+              color={"#6D4C41"}
+              style={styles.notificationIcon}
+            />
+            {/* Notification Badge */}
+            {unreadCount > 0 && (
+              <View style={styles.notificationBadge}>
+                <Text style={styles.notificationBadgeText}>{unreadCount}</Text>
+              </View>
+            )}
+          </TouchableOpacity>
+        </View>
       </View>
 
       <View style={styles.searchContainer}>
@@ -164,6 +166,13 @@ export const styles = StyleSheet.create({
   notificationBadgeText: {
     color: "#fff",
     fontSize: 12,
+  },
+  rightSection: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-around",
+    alignContent: "right",
+    gap: 0,
   },
   searchContainer: {
     display: "flex",

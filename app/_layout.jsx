@@ -8,6 +8,7 @@ import { NotificationProvider } from "../context/notificationContext";
 import LoadingScreen from "../components/LoadingScreen";
 import { Stack } from "expo-router";
 import MainLayout from "./MainLayout";
+import "../config/i18n"; // Import your i18n configuration
 
 
 export default function RootLayout() {

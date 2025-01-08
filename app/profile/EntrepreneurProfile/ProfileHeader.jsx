@@ -57,13 +57,12 @@ const ProfileHeader = ({ entrepreneurId }) => {
   useEffect(() => {
     fetchProfileData();
   }, [entrepreneurId, user]);
-
   const renderButton = () => {
     // If the logged-in user is the owner of the profile and they are an entrepreneur, show the "Edit" button
     if (user?.role === "entrepreneur" && user.uid === user?.uid) {
       return (
         <TouchableOpacity
-          onPress={() => router.push("/profile/EntrepreneurProfile/EditProfileScreen")}
+          onPress={() => router.push("./EditProfileScreen")}
         >
           <FontAwesome5 name="edit" size={18} color="#6D4C41" />
         </TouchableOpacity>

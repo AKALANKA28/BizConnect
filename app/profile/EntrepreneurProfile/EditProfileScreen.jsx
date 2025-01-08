@@ -81,7 +81,7 @@ const EditProfileScreen = () => {
   // Function to navigate to edit field screen
   const navigateToEditField = (field, initialValue) => {
     router.push({
-      pathname: "/profile/BuyerProfile/EditFieldScreen",
+      pathname: "/profile/buyerProfile/EditFieldScreen",
       params: { field, initialValue },
     });
   };

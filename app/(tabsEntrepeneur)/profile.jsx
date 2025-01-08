@@ -5,7 +5,7 @@ import ProfileInfo from "../../components/Profile/EntrepreneurProfile/ProfileInf
 import ContactDetails from "../../components/Profile/EntrepreneurProfile/ContactDetails";
 import PreviousWorks from "../../components/Profile/EntrepreneurProfile/PreviousWorks";
 import { StatusBar } from "expo-status-bar";
-import ProfileHeader from "../profile/EntrepreneurProfile/ProfileHeader";
+import ProfileHeader from "../profile/entrepreneurProfile/ProfileHeader";
 
 export default function profile() {
   return (

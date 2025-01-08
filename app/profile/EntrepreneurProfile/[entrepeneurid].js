@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { View, Text, StyleSheet, ScrollView } from "react-native";
 import { db } from "../../../config/FirebaseConfig";
 import { doc, getDoc } from "firebase/firestore";
-import { getAuth } from "firebase/auth"; // Import getAuth from firebase/auth
+import { getAuth } from "firebase/auth";
 import { useLocalSearchParams } from "expo-router";
 import ProfileHeader from "./ProfileHeader";
 import ProfileInfo from "../../../components/Profile/EntrepreneurProfile/ProfileInfo";
@@ -10,31 +10,53 @@ import ContactDetails from "../../../components/Profile/EntrepreneurProfile/Cont
 import PreviousWorks from "../../../components/Profile/EntrepreneurProfile/PreviousWorks";
 import LoadingScreen from "../../../components/LoadingScreen";
 import Header from "../../../components/Header";
-import AcceptBidButton from "../../../components/Profile/EntrepreneurProfile/AcceptBidButton"; // Import the new component
+import AcceptBidButton from "../../../components/Profile/EntrepreneurProfile/AcceptBidButton";
 
 export default function EntrepreneurProfile() {
-  const { entrepeneurid } = useLocalSearchParams(); // Get the entrepreneur ID
+  // Get both possible parameter names (id and entrepreneurid)
+  const params = useLocalSearchParams();
+  const entrepreneurId = params.id || params.entrepreneurid;
+console.log("Entrepreneur ID: ", entrepreneurId);
   const [entrepreneur, setEntrepreneur] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [showAcceptButton, setShowAcceptButton] = useState(false); // State for button visibility
+  const [showAcceptButton, setShowAcceptButton] = useState(false);
+  const [isPublicView, setIsPublicView] = useState(true);
 
-  const auth = getAuth(); // Get auth instance
-  const currentUser = auth.currentUser; // Get the currently logged-in user
+  const auth = getAuth();
+  const currentUser = auth.currentUser;
 
+  console.log("Entrepreneur ID: ", entrepreneurId);
   useEffect(() => {
     const fetchEntrepreneurProfile = async () => {
       try {
         setLoading(true);
-        const docRef = doc(db, "entrepreneurs", entrepeneurid);
+
+        if (!entrepreneurId) {
+          console.log("No entrepreneur ID provided");
+          return;
+        }
+
+        const docRef = doc(db, "entrepreneurs", entrepreneurId);
         const docSnap = await getDoc(docRef);
 
         if (docSnap.exists()) {
-          const entrepreneurData = docSnap.data();
-          console.log("Entrepreneur Data:", entrepreneurData); // Debug log to check fetched data
+          const entrepreneurData = {
+            ...docSnap.data(),
+            uid: entrepreneurId, // Ensure uid is set correctly
+          };
+
           setEntrepreneur(entrepreneurData);
-          setShowAcceptButton(true); // Show the AcceptBidButton after data is fetched
+
+          // Check if current user is the entrepreneur
+          if (currentUser) {
+            const isOwner = currentUser.uid === entrepreneurId;
+            setIsPublicView(!isOwner);
+            setShowAcceptButton(!isOwner);
+          }
         } else {
           console.log("No entrepreneur found!");
+          setEntrepreneur(null);  // Explicitly set to null when no data is found
+          
         }
       } catch (error) {
         console.error("Error fetching entrepreneur data: ", error);
@@ -43,54 +65,59 @@ export default function EntrepreneurProfile() {
       }
     };
 
-    if (entrepeneurid) {
-      fetchEntrepreneurProfile();
-    }
-  }, [entrepeneurid]);
+    fetchEntrepreneurProfile();
+  }, [entrepreneurId, currentUser]);
 
   if (loading) {
     return <LoadingScreen />;
   }
 
-  // Debugging: Check if user and entrepreneur data are correct
-  console.log("Current User ID:", currentUser?.uid);
-  console.log("Entrepreneur Data:", entrepreneur);
-
-  // Check if the logged-in user is the same as the entrepreneur
-  const isLoggedInUserEntrepreneur = entrepreneur?.uid.trim() === currentUser?.uid.trim();
-
-  // Debugging: Check the result of the comparison
-  console.log("Is logged-in user the entrepreneur?", isLoggedInUserEntrepreneur);
+  if (!entrepreneur) {
+    return (
+      <View style={styles.container}>
+        <Header title="Profile Not Found" showNotification={false} />
+        <View style={styles.centerContent}>
+          <Text>This entrepreneur profile is not available.</Text>
+        </View>
+      </View>
+    );
+  }
 
   return (
     <>
-      <Header
-        title={`${entrepreneur?.username}'s Profile`}
-        showNotification={true}
-      />
-      <View style={styles.container}>
-        {entrepreneur ? (
-          <ScrollView style={styles.container}>
-            <View style={styles.content}>
-              <ProfileHeader entrepreneurId={entrepeneurid} />
-              <ProfileInfo entrepreneurId={entrepeneurid} />
-              <ContactDetails entrepreneurId={entrepeneurid} />
-            </View>
-            <View>
-              {entrepeneurid ? (
-                <PreviousWorks entrepreneurId={entrepeneurid} />
-              ) : (
-                <Text>No Entrepreneur ID available</Text>
-              )}
-            </View>
-          </ScrollView>
-        ) : (
-          <Text>No entrepreneur found.</Text>
-        )}
+      {isPublicView && (
+        <Header
+          title={`${entrepreneur?.username || "Entrepreneur"}'s Profile`}
+          showNotification={isPublicView}
+        />
+      )}
 
-        {/* Conditionally render the AcceptBidButton */}
-        {!isLoggedInUserEntrepreneur && showAcceptButton && (
-          <AcceptBidButton entrepeneurid={entrepeneurid} />
+      <View style={styles.container}>
+        <ScrollView style={styles.scrollContainer}>
+          <View style={styles.content}>
+            <ProfileHeader
+              entrepreneurId={entrepreneurId}
+              isPublicView={isPublicView}
+            />
+            <ProfileInfo
+              entrepreneurId={entrepreneurId}
+              isPublicView={isPublicView}
+            />
+            {!isPublicView && (
+              <ContactDetails entrepreneurId={entrepreneurId} />
+            )}
+          </View>
+          <View>
+            <PreviousWorks
+              entrepreneurId={entrepreneurId}
+              isPublicView={isPublicView}
+            />
+          </View>
+        </ScrollView>
+
+        {/* Show AcceptBidButton only for public view and when appropriate */}
+        {isPublicView && showAcceptButton && (
+          <AcceptBidButton entrepreneurId={entrepreneurId} />
         )}
       </View>
     </>
@@ -101,9 +128,18 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: "rgba(255, 255, 255, 1)",
+  },
+  scrollContainer: {
+    flex: 1,
     marginTop: -20,
   },
   content: {
     padding: 16,
+  },
+  centerContent: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    padding: 20,
   },
 });

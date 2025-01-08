@@ -160,7 +160,7 @@ const NotificationScreen = () => {
   };
 
   const handleNotificationPress = (entrepreneurId) => {
-    router.push(`/profile/${entrepreneurId}`);
+    router.push(`/profile/entrepreneurProfile/${entrepreneurId}`);
   };
 
   // Render each notification item

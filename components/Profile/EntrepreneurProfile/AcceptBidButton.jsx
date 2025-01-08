@@ -16,7 +16,7 @@ import { Colors } from "../../../constants/Colors"; // Assuming you have a Color
 import Loading from "../../Loading";
 import { RFValue } from "react-native-responsive-fontsize";
 
-export default function AcceptBidButton({ entrepeneurid }) {
+export default function AcceptBidButton({ entrepreneurId }) {
   const [loading, setLoading] = useState(false);
   const [bidAccepted, setBidAccepted] = useState(false); // New state for bid status
 
@@ -24,7 +24,7 @@ export default function AcceptBidButton({ entrepeneurid }) {
     // Check if the bid is already accepted when the component mounts
     const checkBidStatus = async () => {
       try {
-        if (!entrepeneurid) {
+        if (!entrepreneurId) {
           console.error("Entrepreneur ID is undefined");
           return;
         }
@@ -32,7 +32,7 @@ export default function AcceptBidButton({ entrepeneurid }) {
         // Query to get the bidId from PlacedBids collection where entrepreneurId matches
         const q = query(
           collection(db, "PlacedBids"),
-          where("entrepreneurId", "==", entrepeneurid)
+          where("entrepreneurId", "==", entrepreneurId)
         );
 
         const querySnapshot = await getDocs(q);
@@ -55,13 +55,13 @@ export default function AcceptBidButton({ entrepeneurid }) {
     };
 
     checkBidStatus();
-  }, [entrepeneurid]);
+  }, [entrepreneurId]);
 
   const acceptBid = async () => {
     try {
       setLoading(true);
 
-      if (!entrepeneurid) {
+      if (!entrepreneurId) {
         console.error("Entrepreneur ID is undefined");
         Alert.alert("Error", "Entrepreneur ID is missing.");
         setLoading(false);
@@ -71,7 +71,7 @@ export default function AcceptBidButton({ entrepeneurid }) {
       // Query to get the bidId from PlacedBids collection where entrepreneurId matches
       const q = query(
         collection(db, "PlacedBids"),
-        where("entrepreneurId", "==", entrepeneurid)
+        where("entrepreneurId", "==", entrepreneurId)
       );
 
       const querySnapshot = await getDocs(q);
@@ -127,7 +127,7 @@ console.log(" ownerId: ",bidData.ownerId);
 
       // Add a new notification to the `EntrepreneurNotifications` collection
       const entrepreneurNotification = {
-        entrepreneurId: entrepeneurid,
+        entrepreneurId: entrepreneurId,
         buyerId: bidData.ownerId,
         
         bidId: bidId,

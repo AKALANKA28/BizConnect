@@ -54,13 +54,13 @@ const MainLayout = () => {
   }
 
   return (
-    <NavigationContainer>
-      <Stack
-        screenOptions={{
-          headerShown: false, // Hide headers globally
-        }}
-      />
-    </NavigationContainer>
+      <NavigationContainer>
+        <Stack
+          screenOptions={{
+            headerShown: false, // Hide headers globally
+          }}
+        />
+      </NavigationContainer>
   );
 };
 
