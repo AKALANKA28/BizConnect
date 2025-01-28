@@ -9,7 +9,12 @@ import { RFValue } from "react-native-responsive-fontsize";
 // Component for rendering individual contact details
 const ContactItem = ({ label, value, iconName }) => (
   <View style={styles.contactItem}>
-    <Ionicons name={iconName} size={17} color="#6D4C41" style={styles.contactIcon} />
+    <Ionicons
+      name={iconName}
+      size={20} // Slightly larger icon for better visibility
+      color="#6D4C41"
+      style={styles.contactIcon}
+    />
     <View style={styles.contactInfo}>
       <Text style={styles.contactLabel}>{label}:</Text>
       <Text style={styles.contactValue}>{value}</Text>
@@ -34,26 +39,53 @@ const ContactDetails = ({ entrepreneurId }) => {
 
         if (entrepreneurDocSnap.exists()) {
           const entrepreneurData = entrepreneurDocSnap.data();
+
+          // Combine city, streetName, and streetNumber to create a full address
+          const formatAddress = (data) => {
+            // Check if the address is stored as an object
+            if (data.address && typeof data.address === "object") {
+              const { streetNumber, streetName, city } = data.address;
+              return [streetNumber, streetName, city]
+                .filter(Boolean) // Remove any null or undefined values
+                .join(", ");
+            }
+
+            // If stored as separate fields
+            return [data.streetNumber, data.streetName, data.city]
+              .filter(Boolean) // Remove any null or undefined values
+              .join(", ");
+          };
+
           const contactData = [
             {
-              iconName: "call-outline", // Phone icon
+              iconName: "call-outline",
               label: "Phone",
               value: entrepreneurData.phoneNumber || "Not provided",
             },
             {
-              iconName: "location-outline", // Location icon
+              iconName: "location-outline",
               label: "Address",
-              value: entrepreneurData.address || "Not provided",
+              value: formatAddress(entrepreneurData) || "Not provided",
+              // Pass the full address object for editing
+              rawValue: entrepreneurData.address || {
+                streetNumber: entrepreneurData.streetNumber,
+                streetName: entrepreneurData.streetName,
+                city: entrepreneurData.city,
+              },
             },
           ];
           setContactInfo(contactData); // Update state with fetched contact details
         } else {
           console.log("No such entrepreneur document!");
-          setContactInfo([{ label: "Error", value: "No contact details found." }]);
+          setContactInfo([
+            { label: "Error", value: "No contact details found." },
+          ]);
         }
       } catch (error) {
         console.error("Error fetching contact details: ", error);
-        setContactInfo([{ label: "Error", value: "Failed to fetch contact details." }]);
+        setContactInfo([
+          { label: "Error", value: "Failed to fetch contact details." },
+        ]);
       } finally {
         setLoading(false); // Set loading to false after data fetch
       }
@@ -104,9 +136,9 @@ const styles = StyleSheet.create({
     marginBottom: 10,
   },
   contactIcon: {
-    width: 20,
-    height: 20,
-    marginRight: 10,
+    width: 24, // Increase the icon size for better visibility
+    height: 24, // Ensure the icon is properly proportioned
+    marginRight: 12, // Increase space between icon and text
   },
   contactInfo: {
     flex: 1,
@@ -114,7 +146,7 @@ const styles = StyleSheet.create({
     alignItems: "center", // Centers text within the row
   },
   contactLabel: {
-    width: 64,
+    minWidth: 70, // Set a consistent width to align the label
     color: "#262626",
     fontFamily: "lato-bold",
     fontSize: RFValue(13),

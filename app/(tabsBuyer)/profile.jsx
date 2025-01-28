@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { View, StyleSheet, ScrollView } from "react-native";
 import { useIsFocused, useRoute } from "@react-navigation/native"; // Import useRoute to access route params
-import ProfileHeader from "../profile/buyerprofile/ProfileHeader";
+import ProfileHeader from "../userProfile/buyerprofile/ProfileHeader";
 import AboutMe from "../../components/Profile/BuyerProfile/AboutMe";
 import ContactInformation from "../../components/Profile/BuyerProfile/ContactInformation";
 import SocialMediaLinks from "../../components/Profile/BuyerProfile/SocialMediaLinks";

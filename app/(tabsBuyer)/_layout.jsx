@@ -12,7 +12,7 @@ export default function BuyerTabLayout() {
 
   return (
     <>
-      <StatusBar translucent />
+      <StatusBar style="dark" translucent />
       <Tabs
         screenOptions={{
           headerShown: false,

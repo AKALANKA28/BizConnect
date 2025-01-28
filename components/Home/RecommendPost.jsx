@@ -42,6 +42,7 @@ export default function RecommendPost() {
 const styles = StyleSheet.create({
   container: {
     // marginBottom: 20,
+    width: "100%",
   },
   header: {
     padding: 20,
@@ -50,7 +51,7 @@ const styles = StyleSheet.create({
     marginTop: 0,
   },
   headerTitle: {
-    fontSize: RFValue(14),
+    fontSize: RFValue(17),
     fontFamily: "roboto-bold",
     color: Colors.text,
   },

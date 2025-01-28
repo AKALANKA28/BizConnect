@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { View, Text, StyleSheet, ScrollView } from "react-native";
+import { View, Text, StyleSheet, ScrollView, SectionList, FlatList } from "react-native";
 import { db } from "../../../config/FirebaseConfig";
 import { doc, getDoc } from "firebase/firestore";
 import { getAuth } from "firebase/auth";
@@ -11,12 +11,13 @@ import PreviousWorks from "../../../components/Profile/EntrepreneurProfile/Previ
 import LoadingScreen from "../../../components/LoadingScreen";
 import Header from "../../../components/Header";
 import AcceptBidButton from "../../../components/Profile/EntrepreneurProfile/AcceptBidButton";
+import Buttons from "../../../components/Profile/EntrepreneurProfile/Buttons";
 
 export default function EntrepreneurProfile() {
   // Get both possible parameter names (id and entrepreneurid)
   const params = useLocalSearchParams();
   const entrepreneurId = params.id || params.entrepreneurid;
-console.log("Entrepreneur ID: ", entrepreneurId);
+  // console.log("Entrepreneur ID: ", entrepreneurId);
   const [entrepreneur, setEntrepreneur] = useState(null);
   const [loading, setLoading] = useState(true);
   const [showAcceptButton, setShowAcceptButton] = useState(false);
@@ -25,7 +26,6 @@ console.log("Entrepreneur ID: ", entrepreneurId);
   const auth = getAuth();
   const currentUser = auth.currentUser;
 
-  console.log("Entrepreneur ID: ", entrepreneurId);
   useEffect(() => {
     const fetchEntrepreneurProfile = async () => {
       try {
@@ -55,8 +55,7 @@ console.log("Entrepreneur ID: ", entrepreneurId);
           }
         } else {
           console.log("No entrepreneur found!");
-          setEntrepreneur(null);  // Explicitly set to null when no data is found
-          
+          setEntrepreneur(null); // Explicitly set to null when no data is found
         }
       } catch (error) {
         console.error("Error fetching entrepreneur data: ", error);
@@ -85,17 +84,25 @@ console.log("Entrepreneur ID: ", entrepreneurId);
 
   return (
     <>
-      {isPublicView && (
+      {/* {isPublicView && (
         <Header
           title={`${entrepreneur?.username || "Entrepreneur"}'s Profile`}
           showNotification={isPublicView}
         />
-      )}
+      )} */}
+      <Header
+        title={`${entrepreneur?.username || "Entrepreneur"}'s Profile`}
+        showNotification
+      />
 
       <View style={styles.container}>
         <ScrollView style={styles.scrollContainer}>
+          <ProfileHeader
+            entrepreneurId={entrepreneurId}
+            isPublicView={isPublicView}
+          />
           <View style={styles.content}>
-            <ProfileHeader
+            <Buttons
               entrepreneurId={entrepreneurId}
               isPublicView={isPublicView}
             />
@@ -103,9 +110,10 @@ console.log("Entrepreneur ID: ", entrepreneurId);
               entrepreneurId={entrepreneurId}
               isPublicView={isPublicView}
             />
-            {!isPublicView && (
-              <ContactDetails entrepreneurId={entrepreneurId} />
-            )}
+            <ContactDetails
+              entrepreneurId={entrepreneurId}
+              isPublicView={isPublicView}
+            />
           </View>
           <View>
             <PreviousWorks
@@ -129,10 +137,9 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: "rgba(255, 255, 255, 1)",
   },
-  scrollContainer: {
-    flex: 1,
-    marginTop: -20,
-  },
+  // scrollContainer: {
+  //   marginTop: -20,
+  // },
   content: {
     padding: 16,
   },

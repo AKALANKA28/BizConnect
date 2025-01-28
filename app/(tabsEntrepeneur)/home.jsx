@@ -8,6 +8,7 @@ import RecommendPost from "../../components/Home/RecommendPost";
 import { Colors } from "../../constants/Colors";
 import { useAuth } from "../../context/authContext";
 import { LanguageSwitcher } from "../../components/LanguageSwitcher";
+import { StatusBar } from "expo-status-bar";
 
 export default function Home() {
   const { signout, user } = useAuth(); // Get signout function from Auth context
@@ -34,12 +35,8 @@ export default function Home() {
         <Category />
         {/* Popular Business List */}
         <PopularBusiness />
-        {/* <PopularBusiness />
-        <PopularBusiness /> */}
+
         <RecommendPost />
-        <View>
-          <Button title="Logout" onPress={handleLogout} />
-        </View>
       </ScrollView>
     </View>
   );
@@ -55,11 +52,12 @@ const styles = StyleSheet.create({
     top: 0,
     left: 0,
     right: 0,
-    zIndex: 1, // Ensures header is above other content
+    zIndex: 1,
   },
   scrollContent: {
+    width: "100%",
     marginTop: 100,
-    paddingTop: 80, // Adjust this based on your header height to prevent overlapping
+    paddingTop: 80,
     paddingBottom: 110,
     backgroundColor: Colors.primaryColor,
   },

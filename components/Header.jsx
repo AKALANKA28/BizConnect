@@ -7,10 +7,10 @@ import {
   Platform,
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
-import {  useRouter } from "expo-router";
+import { useRouter } from "expo-router";
 import { StatusBar } from "expo-status-bar";
-import { NotificationContext } from "../context/notificationContext"; // Import the context
-import { useAuth } from "../context/authContext"; // Assuming AuthContext is in this path
+import { NotificationContext } from "../context/notificationContext";
+import { useAuth } from "../context/authContext";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 import { RFValue } from "react-native-responsive-fontsize";
 import { Colors } from "../constants/Colors";
@@ -20,11 +20,12 @@ export default function Header({
   onDeletePress,
   showDelete,
   showNotification,
-  showBackButton = true, 
+  showBackButton = true,
+  isOwner = false, // New prop to check if user is owner
 }) {
   const router = useRouter();
-  const { user } = useAuth(); // Access the authenticated user from context
-  const { unreadCount } = useContext(NotificationContext); // Access the notification count
+  const { user } = useAuth();
+  const { unreadCount } = useContext(NotificationContext);
 
   const handleNotificationPress = () => {
     if (user?.role === "entrepreneur") {
@@ -36,18 +37,39 @@ export default function Header({
     }
   };
 
+  const handleMenuPress = () => {
+    // Handle menu press action here
+    // For example, open a dropdown menu or navigate to settings
+    router.push("/settings"); // Or whatever navigation you want
+  };
+
   return (
     <View style={styles.header}>
-      <StatusBar style="dark" translucent backgroundColor="white" />
-      {/* Conditionally render the back button */}
+      {/* <StatusBar style="dark" translucent backgroundColor="white" /> */}
       {showBackButton && (
-        <TouchableOpacity>
+        <TouchableOpacity onPress={() => router.back()}>
           <Ionicons name="arrow-back" size={24} color="black" />
         </TouchableOpacity>
       )}
       <Text style={styles.headerTitle}>{title}</Text>
       <View style={{ width: 24 }} />
-      {showNotification && (
+      
+      {isOwner ? (
+        // Show menu icon for profile owner
+        <TouchableOpacity
+          activeOpacity={0.5}
+          onPress={handleMenuPress}
+          style={styles.menuIconWrapper}
+        >
+          <Ionicons
+            name="menu-outline"
+            size={24}
+            color={"#6D4C41"}
+            style={styles.menuIcon}
+          />
+        </TouchableOpacity>
+      ) : showNotification && (
+        // Show notification icon for others
         <TouchableOpacity
           activeOpacity={0.5}
           onPress={handleNotificationPress}
@@ -66,6 +88,7 @@ export default function Header({
           )}
         </TouchableOpacity>
       )}
+      
       {showDelete && (
         <TouchableOpacity onPress={onDeletePress} style={styles.deleteButton}>
           <MaterialIcons name="delete-outline" size={24} color="#6D4C41" />
@@ -77,11 +100,11 @@ export default function Header({
 
 const styles = StyleSheet.create({
   header: {
-    height: 70,
+    height: 50,
     flexDirection: "row",
     alignItems: "center",
-    marginVertical: 24,
-    marginBottom: 0,
+    marginTop: 30,
+    marginBottom: -29,
     paddingHorizontal: 16,
     borderBottomWidth: 1,
     borderBottomColor: "#ccc",
@@ -102,6 +125,12 @@ const styles = StyleSheet.create({
     position: "relative",
   },
   notificationIcon: {
+    margin: 5,
+  },
+  menuIconWrapper: {
+    padding: 5,
+  },
+  menuIcon: {
     margin: 5,
   },
   notificationBadge: {

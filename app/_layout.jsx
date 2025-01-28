@@ -1,12 +1,9 @@
-import React, { useEffect, useState } from "react";
+import React from "react";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
-import { useRouter, useSegments } from "expo-router";
-import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useFonts } from "expo-font";
 import { AuthContextProvider, useAuth } from "../context/authContext";
 import { NotificationProvider } from "../context/notificationContext"; 
 import LoadingScreen from "../components/LoadingScreen";
-import { Stack } from "expo-router";
 import MainLayout from "./MainLayout";
 import "../config/i18n"; // Import your i18n configuration
 
