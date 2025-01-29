@@ -8,13 +8,14 @@ import {
   Dimensions,
   ImageBackground,
 } from "react-native";
-import { FontAwesome5 } from "react-native-vector-icons";
 import { useAuth } from "../../../context/authContext";
-import { doc, getDoc } from "firebase/firestore";
+import { doc, getDoc, updateDoc } from "firebase/firestore";
 import { db } from "../../../config/FirebaseConfig";
-import { router } from "expo-router";
 import { Colors } from "../../../constants/Colors";
 import { RFValue } from "react-native-responsive-fontsize";
+import * as ImagePicker from "expo-image-picker";
+import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
+import { storage } from "../../../config/FirebaseConfig";
 
 const { width: screenWidth } = Dimensions.get("window");
 
@@ -45,7 +46,7 @@ const ProfileHeader = ({ entrepreneurId }) => {
             profileImage:
               userData.profileImage || "https://via.placeholder.com/150",
             coverImage:
-              userData.coverImage || "https://via.placeholder.com/800x200", // Add cover image from userData
+              userData.coverImage || "https://via.placeholder.com/800x200",
           });
         } else {
           console.log("No such user document!");
@@ -56,45 +57,69 @@ const ProfileHeader = ({ entrepreneurId }) => {
     }
   };
 
+  const selectAndUploadCoverImage = async () => {
+    if (!user || user.uid !== entrepreneurId) {
+      Alert.alert("Unauthorized", "You are not allowed to edit this cover image.");
+      return;
+    }
+
+    try {
+      const result = await ImagePicker.launchImageLibraryAsync({
+        mediaTypes: ImagePicker.MediaTypeOptions.Images,
+        allowsEditing: true,
+        aspect: [16, 9],
+        quality: 1,
+      });
+
+      if (!result.canceled) {
+        const imageUri = result.assets[0].uri;
+
+        // Upload to Firebase Storage
+        const imageName = `coverImages/${user.uid}_${Date.now()}.jpg`;
+        const storageRef = ref(storage, imageName);
+        const response = await fetch(imageUri);
+        const blob = await response.blob();
+        await uploadBytes(storageRef, blob);
+
+        // Get the download URL
+        const downloadURL = await getDownloadURL(storageRef);
+
+        // Update Firestore
+        const userDocRef = doc(db, "entrepreneurs", user.uid);
+        await updateDoc(userDocRef, { coverImage: downloadURL });
+
+        // Update state
+        setProfileData((prev) => ({ ...prev, coverImage: downloadURL }));
+      }
+    } catch (error) {
+      console.error("Error uploading cover image: ", error);
+      Alert.alert("Error", "Could not upload the cover image. Please try again.");
+    }
+  };
+
   useEffect(() => {
     fetchProfileData();
   }, [entrepreneurId, user]);
 
-  const renderButton = () => {
-    if (user?.role === "entrepreneur" && user.uid === user?.uid) {
-      return (
-        <TouchableOpacity onPress={() => router.push("./EditProfileScreen")}>
-          <FontAwesome5 name="edit" size={16} color="#6D4C41" />
-        </TouchableOpacity>
-      );
-    }
-
-    // return (
-    //   <TouchableOpacity
-    //     style={styles.messageButton}
-    //     onPress={() => {
-    //       router.push(`/messages/${entrepreneurId}`);
-    //     }}
-    //   >
-    //     <Text style={styles.messageButtonText}>Call</Text>
-    //   </TouchableOpacity>
-    // );
-  };
-
   return (
     <View style={styles.container}>
-      <ImageBackground
-        source={{ uri: profileData.coverImage }}
-        style={styles.coverImage}
+      <TouchableOpacity
+        onPress={selectAndUploadCoverImage}
+        disabled={user?.uid !== entrepreneurId} // Disable if not the owner
       >
-        <View style={styles.coverOverlay} />
-      </ImageBackground>
+        <ImageBackground
+          source={{ uri: profileData.coverImage}}
+          style={styles.coverImage}
+        >
+          {/* <View style={styles.coverOverlay} /> */}
+        </ImageBackground>
+      </TouchableOpacity>
 
       <View style={styles.profileContentContainer}>
         <View style={styles.profileSection}>
           <View style={styles.profileImageContainer}>
             <Image
-              source={{ uri: profileData.profileImage }}
+              source={{ uri: profileData.profileImage}}
               style={styles.profileImage}
             />
           </View>
@@ -102,8 +127,8 @@ const ProfileHeader = ({ entrepreneurId }) => {
           <View style={styles.infoContainer}>
             <View style={styles.nameContainer}>
               <Text style={styles.name}>
-                {profileData.firstName}
-                {profileData.lastName}
+                {profileData.firstName} {" "}
+              {profileData.lastName}
               </Text>
               <Text style={styles.profession}>{profileData.title}</Text>
             </View>
@@ -124,10 +149,10 @@ const styles = StyleSheet.create({
     height: 160,
     marginBottom: -45,
   },
-  coverOverlay: {
-    ...StyleSheet.absoluteFillObject,
-    backgroundColor: "rgba(0,0,0,0.1)",
-  },
+  // coverOverlay: {
+  //   ...StyleSheet.absoluteFillObject,
+  //   backgroundColor: "rgba(0,0,0,0.1)",
+  // },
   profileContentContainer: {
     paddingHorizontal: 16,
   },
@@ -142,7 +167,7 @@ const styles = StyleSheet.create({
   profileImage: {
     width: 105,
     height: 105,
-    borderRadius: 38,
+    borderRadius: 60,
     borderWidth: 3,
     borderColor: "white",
 

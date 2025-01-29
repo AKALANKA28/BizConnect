@@ -39,7 +39,7 @@ const PreviousWorks = ({ entrepreneurId, isPublicView = true }) => {
   return (
     <View style={styles.container}>
       {userPosts.length ? (
-        <ScrollView contentContainerStyle={styles.scrollViewContainer}>
+        <ScrollView contentContainerStyle={styles.scrollViewContainer} >
           {userPosts.map((item) => (
             <RecommendPostCards
               key={item.id}

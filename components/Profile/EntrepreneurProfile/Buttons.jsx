@@ -5,6 +5,7 @@ import { RFValue } from "react-native-responsive-fontsize";
 import { Colors } from "../../../constants/Colors";
 import { useAuth } from "../../../context/authContext"; // Importing useAuth
 import { router } from "expo-router";
+import { StatusBar } from "expo-status-bar";
 
 const Buttons = ({ entrepreneurId, isPublicView }) => {
   const { signout, user } = useAuth(); // Get the currently logged-in user
@@ -72,7 +73,7 @@ const Buttons = ({ entrepreneurId, isPublicView }) => {
         transparent={true}
         visible={isModalVisible}
         onRequestClose={toggleModal}
-      >
+      >        
         <TouchableOpacity
           style={styles.modalOverlay}
           activeOpacity={1}

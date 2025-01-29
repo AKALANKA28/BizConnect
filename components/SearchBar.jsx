@@ -63,11 +63,12 @@ const SearchBar = () => {
 
 const styles = StyleSheet.create({
   headerContainer: {
-    padding: 20,
-    paddingTop: 45,
+    height: 105,
+    paddingHorizontal: 16,
+    paddingTop: 50,
     backgroundColor: "#fff",
     borderBottomWidth: 0.5,
-    borderBottomColor: "#cccccc",
+    borderBottomColor: Colors.GRAY,
   },
   searchContainer: {
     flexDirection: "row",
@@ -81,8 +82,8 @@ const styles = StyleSheet.create({
     alignItems: "center",
     gap: 10,
     backgroundColor: "#EFEFF0",
-    paddingHorizontal: 10,
-    paddingVertical: 8,
+    paddingHorizontal: 15,
+    paddingVertical: 5,
     borderRadius: 90,
   },
   searchInput: {

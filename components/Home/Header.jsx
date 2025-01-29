@@ -37,71 +37,51 @@ export default function Header({ notificationCount }) {
     }
   };
 
+  const handleSearchPress = () => {
+    router.push("/productSearchScreen"); // Navigate to ProductSearchScreen
+  };
+
   return (
     <View style={styles.headerContainer}>
       <StatusBar style="dark" translucent backgroundColor="white" />
 
       <View style={styles.userInfoContainer}>
-        <View style={styles.userProfile}>
-          <TouchableOpacity onPress={handleImagePress}>
-            <Image
-              source={
-                user?.profileImage
-                  ? { uri: user.profileImage }
-                  : avatarPlaceholder
-              }
-              style={styles.avatar}
-            />
-          </TouchableOpacity>
-          <View>
-            <Text style={styles.greetingText}>Good Day,</Text>
-            <Text style={styles.usernameText}>
-              {user?.firstName ? user.firstName : user?.username || "Guest"}
-            </Text>
-          </View>
-        </View>
-
-        {/* Right-side section with Language Switcher and Notifications */}
-        <View style={styles.rightSection}>
-          <LanguageSwitcher />
-          
-          <TouchableOpacity
-            activeOpacity={0.5}
-            onPress={handleNotificationPress}
-            style={styles.notificationIconWrapper}
-          >
-            <Ionicons
-              name="notifications-outline"
-              size={24}
-              color={"#6D4C41"}
-              style={styles.notificationIcon}
-            />
-            {/* Notification Badge */}
-            {unreadCount > 0 && (
-              <View style={styles.notificationBadge}>
-                <Text style={styles.notificationBadgeText}>{unreadCount}</Text>
-              </View>
-            )}
-          </TouchableOpacity>
-        </View>
-      </View>
-
-      <View style={styles.searchContainer}>
-        <View style={styles.searchBar}>
+        <TouchableOpacity onPress={handleImagePress}>
+          <Image
+            source={
+              user?.profileImage
+                ? { uri: user.profileImage }
+                : avatarPlaceholder
+            }
+            style={styles.avatar}
+          />
+        </TouchableOpacity>
+        {/* <LanguageSwitcher /> */}
+        <TouchableOpacity onPress={handleSearchPress} style={styles.searchBar}>
           <Ionicons name="search" size={20} color="#6D4C41" />
           <TextInput
-            placeholder="What products you need?"
+            placeholder="Search.."
             style={styles.searchInput}
+            editable={false}
           />
-        </View>
-        {/* Filter Button with Icon */}
+        </TouchableOpacity>
         <TouchableOpacity
-          onPress={() => {
-            /* Handle filter button click */
-          }}
-          style={styles.filterButton}
+          activeOpacity={0.5}
+          onPress={handleNotificationPress}
+          style={styles.notificationIconWrapper}
         >
-          <AntDesign name="filter" size={20} color="#6D4C41" />
+          <Ionicons
+            name="notifications-outline"
+            size={24}
+            color={"#6D4C41"}
+            style={styles.notificationIcon}
+          />
+          {/* Notification Badge */}
+          {unreadCount > 0 && (
+            <View style={styles.notificationBadge}>
+              <Text style={styles.notificationBadgeText}>{unreadCount}</Text>
+            </View>
+          )}
         </TouchableOpacity>
       </View>
     </View>
@@ -110,52 +90,49 @@ export default function Header({ notificationCount }) {
 
 export const styles = StyleSheet.create({
   headerContainer: {
-    padding: 20,
-    paddingTop: 45,
-    height: 200,
-    marginBottom: 9,
+    paddingHorizontal: 20,
+    paddingTop: 52,
     backgroundColor: "#fff",
     borderBottomWidth: 0.5,
-    borderBottomColor: "#cccccc",
+    borderBottomColor: Colors.GRAY,
   },
   userInfoContainer: {
-    display: "flex",
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
+    flexDirection: "row", // Ensure items are in a row
+    alignItems: "center", // Center items vertically
+    justifyContent: "space-between", // Space items evenly
     gap: 10,
     marginBottom: 12,
   },
-  userProfile: {
-    display: "flex",
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 10,
-  },
   avatar: {
-    width: 45,
-    height: 45,
+    width: 42,
+    height: 42,
     borderRadius: 99,
   },
-  greetingText: {
-    color: "#000",
-    fontSize: RFValue(14),
+  searchBar: {
+    flex: 1, // Let the search bar take up available space
+    flexDirection: "row",
+    alignItems: "center",
+    backgroundColor: "#EFEFF0",
+    paddingVertical: 3,
+    paddingHorizontal: 15,
+    borderRadius: 30,
   },
-  usernameText: {
-    fontSize: RFValue(18),
-    fontFamily: "lato-bold",
-    color: "#000",
+  searchInput: {
+    flex: 1, // Ensure the input takes up available space
+    fontSize: RFValue(13),
+    color: "#BCBCBC",
   },
   notificationIconWrapper: {
-    position: "relative",
+    position: "relative", // Ensure proper alignment with the row
+    justifyContent: "center",
+    alignItems: "center",
+    marginLeft: 10, // Add space from the search bar
   },
-  notificationIcon: {
-    margin: 5,
-  },
+
   notificationBadge: {
     position: "absolute",
-    right: -5,
-    top: -5,
+    right: -6,
+    top: -6,
     backgroundColor: Colors.secondaryColor,
     borderRadius: 10,
     width: 20,
@@ -165,41 +142,7 @@ export const styles = StyleSheet.create({
   },
   notificationBadgeText: {
     color: "#fff",
-    fontSize: 12,
-  },
-  rightSection: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-around",
-    alignContent: "right",
-    gap: 0,
-  },
-  searchContainer: {
-    display: "flex",
-    flexDirection: "row",
-    alignItems: "center",
-    alignContent: "center",
-    justifyContent: "space-between",
-    gap: 10,
-  },
-  searchBar: {
-    flex: 1,
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 10,
-    backgroundColor: "#EFEFF0",
-    padding: 10,
-    borderRadius: 90,
-    marginVertical: 10,
-    marginTop: 15,
-  },
-  searchInput: {
-    fontSize: RFValue(13),
-    color: "#BCBCBC",
-  },
-  filterButton: {
-    backgroundColor: "#EFEFF0", // Blue color for the filter button
-    padding: 14,
-    borderRadius: 90,
+    fontSize: RFValue(12),
+    fontWeight: "bold",
   },
 });

@@ -4,13 +4,12 @@ import { View, StyleSheet, ScrollView } from "react-native";
 import ProfileInfo from "../../components/Profile/EntrepreneurProfile/ProfileInfo";
 import ContactDetails from "../../components/Profile/EntrepreneurProfile/ContactDetails";
 import PreviousWorks from "../../components/Profile/EntrepreneurProfile/PreviousWorks";
-import { StatusBar } from "expo-status-bar";
 import ProfileHeader from "../userProfile/entrepreneurProfile/ProfileHeader";
 import Buttons from "../../components/Profile/EntrepreneurProfile/Buttons";
-import { useLocalSearchParams } from "expo-router";
 import { getAuth } from "firebase/auth";
 import { doc, getDoc } from "firebase/firestore";
 import { db } from "../../config/FirebaseConfig";
+import { StatusBar } from "expo-status-bar";
 
 export default function profile() {
   const auth = getAuth();
@@ -39,7 +38,7 @@ export default function profile() {
         if (docSnap.exists()) {
           const entrepreneurData = {
             ...docSnap.data(),
-            uid: entrepreneurId, 
+            uid: entrepreneurId,
           };
 
           setEntrepreneur(entrepreneurData);
@@ -65,21 +64,25 @@ export default function profile() {
   }, [entrepreneurId, currentUser]);
 
   return (
-    <View style={styles.container}>
-      <ScrollView style={styles.container}>
-        <ProfileHeader />
-        <View style={styles.content}>
-          <Buttons entrepreneurId={entrepreneurId}></Buttons>
+    <>
+      <StatusBar style="dark" translucent />
 
-          <ProfileInfo />
-          <ContactDetails />
-        </View>
-        <PreviousWorks
-          entrepreneurId={entrepreneurId}
-          isPublicView={isPublicView}
-        />
-      </ScrollView>
-    </View>
+      <View style={styles.container}>
+        <ScrollView style={styles.container}>
+          <ProfileHeader entrepreneurId={entrepreneurId}/>
+          <View style={styles.content}>
+            <Buttons entrepreneurId={entrepreneurId}></Buttons>
+
+            <ProfileInfo />
+            <ContactDetails />
+          </View>
+          <PreviousWorks
+            entrepreneurId={entrepreneurId}
+            isPublicView={isPublicView}
+          />
+        </ScrollView>
+      </View>
+    </>
   );
 }
 

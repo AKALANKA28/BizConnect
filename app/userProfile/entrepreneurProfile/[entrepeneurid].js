@@ -12,6 +12,7 @@ import LoadingScreen from "../../../components/LoadingScreen";
 import Header from "../../../components/Header";
 import AcceptBidButton from "../../../components/Profile/EntrepreneurProfile/AcceptBidButton";
 import Buttons from "../../../components/Profile/EntrepreneurProfile/Buttons";
+import { useAuth } from "../../../context/authContext";
 
 export default function EntrepreneurProfile() {
   // Get both possible parameter names (id and entrepreneurid)
@@ -23,9 +24,11 @@ export default function EntrepreneurProfile() {
   const [showAcceptButton, setShowAcceptButton] = useState(false);
   const [isPublicView, setIsPublicView] = useState(true);
 
-  const auth = getAuth();
-  const currentUser = auth.currentUser;
+  const {user} = useAuth();
+  const currentUser = user;
 
+
+  console.log("Entrepreneur ID: ", currentUser);
   useEffect(() => {
     const fetchEntrepreneurProfile = async () => {
       try {
@@ -51,7 +54,8 @@ export default function EntrepreneurProfile() {
           if (currentUser) {
             const isOwner = currentUser.uid === entrepreneurId;
             setIsPublicView(!isOwner);
-            setShowAcceptButton(!isOwner);
+            setShowAcceptButton(!isOwner && currentUser?.role === "buyer"
+            );
           }
         } else {
           console.log("No entrepreneur found!");

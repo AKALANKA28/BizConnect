@@ -58,6 +58,8 @@ const MainLayout = () => {
         <Stack
           screenOptions={{
             headerShown: false, // Hide headers globally
+            animation: "none",
+
           }}
         />
       </NavigationContainer>

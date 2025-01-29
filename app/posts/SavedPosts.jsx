@@ -76,7 +76,6 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     paddingHorizontal: 2, // Add horizontal padding for layout
-    marginTop: 30,
     justifyContent: "center",
     alignItems: "center",
     backgroundColor: "white",

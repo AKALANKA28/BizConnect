@@ -115,7 +115,7 @@ export default function Slider() {
           fontSize: RFValue(17),
           fontFamily: "roboto-bold",
           paddingLeft: 20,
-          paddingTop: 40,
+          paddingTop: 20,
           color: Colors.text,
         }}
       >

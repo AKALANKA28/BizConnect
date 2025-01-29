@@ -36,14 +36,19 @@ const ProductSearchScreen = () => {
         {/* Search Bar */}
         <View style={styles.searchContainer}>
           <View style={styles.searchBar}>
+            {/* <Ionicons name="search" size={20} color="#6D4C41" /> */}
+
             <TextInput
-              placeholder="What products are you looking for?"
+              placeholder="Search"
               style={styles.searchInput}
             />
-            {/* Search Button */}
-            <TouchableOpacity onPress={handleSearchPress} style={styles.searchButton}>
-              <Ionicons name="search" size={20} color="#fff" /> 
-            </TouchableOpacity>
+            {/* Search Button
+            // <TouchableOpacity
+              onPress={handleSearchPress}
+              style={styles.searchButton}
+            >
+              <Ionicons name="search" size={20} color="#fff" />
+            </TouchableOpacity> */}
           </View>
         </View>
       </View>
@@ -65,8 +70,10 @@ const ProductSearchScreen = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    padding: 20,
+    paddingHorizontal: 16,
+    paddingTop: 33,
     backgroundColor: "#fff",
+
   },
   headerContainer: {
     flexDirection: "row",
@@ -85,7 +92,8 @@ const styles = StyleSheet.create({
     alignItems: "center",
     backgroundColor: "#EFEFF0",
     borderRadius: 90,
-    padding: 10,
+    paddingHorizontal: 15,
+    paddingVertical: 5,
   },
   searchInput: {
     fontSize: RFValue(13),

@@ -1,5 +1,5 @@
-import { View, Text, ScrollView, Button, StyleSheet } from "react-native";
-import React from "react";
+import { View, Text, ScrollView, Button, StyleSheet, RefreshControl } from "react-native";
+import React, { useState } from "react";
 import Header from "../../components/Home/Header";
 import Slider from "../../components/Home/Slider";
 import Category from "../../components/Home/Category";
@@ -12,9 +12,15 @@ import { StatusBar } from "expo-status-bar";
 
 export default function Home() {
   const { signout, user } = useAuth(); // Get signout function from Auth context
+  const [refreshing, setRefreshing] = useState(false);
 
   const handleLogout = async () => {
     await signout(); // Call the signout function
+  };
+  const onRefresh = async () => {
+    setRefreshing(true);
+    await new Promise((resolve) => setTimeout(resolve, 2000)); // Simulate network request
+    setRefreshing(false);
   };
 
   return (
@@ -28,6 +34,13 @@ export default function Home() {
       <ScrollView
         contentContainerStyle={styles.scrollContent}
         showsVerticalScrollIndicator={false}
+        refreshControl={
+          <RefreshControl
+            refreshing={refreshing}
+            onRefresh={onRefresh}
+            progressViewOffset={170} // Offset to ensure it appears below the header
+          />
+        }
       >
         {/* Slider */}
         <Slider />
@@ -57,7 +70,7 @@ const styles = StyleSheet.create({
   scrollContent: {
     width: "100%",
     marginTop: 100,
-    paddingTop: 80,
+    paddingTop: 6,
     paddingBottom: 110,
     backgroundColor: Colors.primaryColor,
   },

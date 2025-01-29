@@ -45,7 +45,7 @@ export default function Header({
 
   return (
     <View style={styles.header}>
-      {/* <StatusBar style="dark" translucent backgroundColor="white" /> */}
+      <StatusBar style="dark" translucent backgroundColor="white" />
       {showBackButton && (
         <TouchableOpacity onPress={() => router.back()}>
           <Ionicons name="arrow-back" size={24} color="black" />
@@ -100,14 +100,13 @@ export default function Header({
 
 const styles = StyleSheet.create({
   header: {
-    height: 50,
     flexDirection: "row",
     alignItems: "center",
     marginTop: 30,
-    marginBottom: -29,
+    paddingTop:15,
     paddingHorizontal: 16,
     borderBottomWidth: 1,
-    borderBottomColor: "#ccc",
+    borderBottomColor: Colors.GRAY,
     backgroundColor: "#fff",
     zIndex: 100,
   },

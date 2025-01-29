@@ -22,19 +22,82 @@ import { getAuth } from "firebase/auth";
 import { useAuth } from "../../context/authContext";
 import { db } from "../../config/FirebaseConfig";
 
-const RecommendPostCards = ({ business, isPublicView = true, entrepreneurId }) => {
+const MAX_IMAGE_HEIGHT = 500;
+const DEFAULT_HEIGHT = 300;
+
+const RecommendPostCards = ({
+  business,
+  isPublicView = true,
+  entrepreneurId,
+}) => {
   const { user } = useAuth();
   const auth = getAuth();
   const router = useRouter();
   const { width } = Dimensions.get("window");
-  
+  const { width: screenWidth } = Dimensions.get("window");
+  const [containerHeight, setContainerHeight] = useState(DEFAULT_HEIGHT);
+  const flatListRef = useRef(null);
+
   const scrollX = useRef(new Animated.Value(0)).current;
   const [userDetails, setUserDetails] = useState(null);
   const [modalVisible, setModalVisible] = useState(false);
   const [selectedItemId, setSelectedItemId] = useState(null);
   const animation = useRef(new Animated.Value(0)).current;
+  const [localPosts, setLocalPosts] = useState(); 
 
-  const images = business?.images || (business?.imageUrl ? [business.imageUrl] : []);
+  const images =
+    business?.images || (business?.imageUrl ? [business.imageUrl] : []);
+
+  // Calculate and store image heights when images change
+  useEffect(() => {
+    const calculateMaxHeight = async () => {
+      try {
+        const heights = await Promise.all(
+          images.map(
+            (imageUrl) =>
+              new Promise((resolve) => {
+                Image.getSize(
+                  imageUrl,
+                  (width, height) => {
+                    const aspectRatio = height / width;
+                    const calculatedHeight = screenWidth * aspectRatio;
+                    // Limit the height to MAX_IMAGE_HEIGHT
+                    resolve(Math.min(calculatedHeight, MAX_IMAGE_HEIGHT));
+                  },
+                  () => resolve(DEFAULT_HEIGHT) // Default height on error
+                );
+              })
+          )
+        );
+
+        // Set container height to the maximum height found
+        const maxHeight = Math.max(...heights);
+        setContainerHeight(Math.min(maxHeight, MAX_IMAGE_HEIGHT));
+      } catch (error) {
+        console.error("Error calculating image heights:", error);
+        setContainerHeight(DEFAULT_HEIGHT);
+      }
+    };
+
+    if (images?.length > 0) {
+      calculateMaxHeight();
+    }
+  }, [images]);
+
+  const renderImage = ({ item }) => {
+    return (
+      <View style={{ width: screenWidth, height: containerHeight }}>
+        <Image
+          source={{ uri: item }}
+          style={{
+            width: screenWidth,
+            height: containerHeight,
+            resizeMode: "cover",
+          }}
+        />
+      </View>
+    );
+  };
 
   useEffect(() => {
     if (business?.userId) {
@@ -55,7 +118,10 @@ const RecommendPostCards = ({ business, isPublicView = true, entrepreneurId }) =
 
   const handleDeletePost = async () => {
     if (user?.role !== "entrepreneur") {
-      Alert.alert("Permission Denied", "You don't have permission to delete this post.");
+      Alert.alert(
+        "Permission Denied",
+        "You don't have permission to delete this post."
+      );
       return;
     }
 
@@ -69,18 +135,44 @@ const RecommendPostCards = ({ business, isPublicView = true, entrepreneurId }) =
           onPress: async () => {
             try {
               const idToFetch = entrepreneurId || auth.currentUser?.uid;
+
+              // Instantly remove from the local state
+              setLocalPosts((prevPosts) =>
+                prevPosts.filter((post) => post.postId !== business.id)
+              );
+
+              // Remove from Firestore
               await deleteDoc(doc(db, "BusinessList", business.id));
-              
-              const entrepreneurDoc = await getDoc(doc(db, "entrepreneurs", idToFetch));
+
+              const entrepreneurDoc = await getDoc(
+                doc(db, "entrepreneurs", idToFetch)
+              );
+
               if (entrepreneurDoc.exists()) {
-                const updatedPosts = entrepreneurDoc.data().posts
-                  .filter(post => post.postId !== business.id);
-                await updateDoc(doc(db, "entrepreneurs", idToFetch), { posts: updatedPosts });
-                ToastAndroid.show("Post deleted successfully!", ToastAndroid.SHORT);
+                const entrepreneurData = entrepreneurDoc.data();
+                const posts = Array.isArray(entrepreneurData.posts)
+                  ? entrepreneurData.posts
+                  : [];
+
+                const updatedPosts = posts.filter(
+                  (post) => post.postId !== business.id
+                );
+
+                await updateDoc(doc(db, "entrepreneurs", idToFetch), {
+                  posts: updatedPosts,
+                });
+
+                ToastAndroid.show(
+                  "Post deleted successfully!",
+                  ToastAndroid.SHORT
+                );
               }
             } catch (error) {
               console.error("Error deleting post:", error);
               ToastAndroid.show("Error deleting post.", ToastAndroid.SHORT);
+
+              // Optionally, restore the post in case of an error
+              setLocalPosts((prevPosts) => [...prevPosts, business]);
             }
           },
         },
@@ -106,9 +198,9 @@ const RecommendPostCards = ({ business, isPublicView = true, entrepreneurId }) =
       y: diff / (60 * 60 * 24 * 365),
       d: diff / (60 * 60 * 24),
       h: diff / (60 * 60),
-      m: diff / 60
+      m: diff / 60,
     };
-    
+
     for (const [unit, value] of Object.entries(times)) {
       if (value >= 1) return `${Math.floor(value)}${unit}`;
     }
@@ -126,22 +218,30 @@ const RecommendPostCards = ({ business, isPublicView = true, entrepreneurId }) =
     <View style={styles.card}>
       <View style={styles.profileHeader}>
         <View style={styles.headerInfoContainer}>
-          <TouchableOpacity onPress={() => router.push({
-            pathname: "/userProfile/entrepreneurProfile/[entrepreneurid]",
-            params: { id: business.userId },
-          })}>
+          <TouchableOpacity
+            onPress={() =>
+              router.push({
+                pathname: "/userProfile/entrepreneurProfile/[entrepreneurid]",
+                params: { id: business.userId },
+              })
+            }
+          >
             <Image
-              source={{ uri: userDetails?.profileImage }}
+              source={{
+                uri: userDetails?.profileImage
+                  ? userDetails.profileImage
+                  : "https://via.placeholder.com/150", // URL of the placeholder image
+              }}
               style={styles.profileImage}
             />
           </TouchableOpacity>
 
           <View style={styles.profileInfo}>
             <Text style={styles.userName}>
-              {userDetails?.firstName} {userDetails?.lastName}
-            </Text>
+            {(userDetails?.firstName || userDetails?.username) + (userDetails?.lastName ? ` ${userDetails?.lastName}` : '')}
+            </Text> 
             <Text style={styles.jobRole}>
-              {userDetails?.title} | {business?.address}
+              {userDetails?.title || "Job Title Unknown"} | {business?.address || "Location Unknown"}
             </Text>
             <Text style={styles.time}>
               {formatTimeDiff(business?.createdAt)}
@@ -159,53 +259,64 @@ const RecommendPostCards = ({ business, isPublicView = true, entrepreneurId }) =
         </View>
 
         <View style={styles.infoContainer}>
-          <Text style={styles.name}>{business?.name}</Text>
+          <Text style={styles.name}>{business?.content}</Text>
         </View>
       </View>
 
-      <Animated.FlatList
-        data={images}
-        horizontal
-        pagingEnabled
-        showsHorizontalScrollIndicator={false}
-        onScroll={Animated.event(
-          [{ nativeEvent: { contentOffset: { x: scrollX } } }],
-          { useNativeDriver: false }
+      <View style={{ height: containerHeight }}>
+        <Animated.FlatList
+          ref={flatListRef}
+          data={images}
+          horizontal
+          pagingEnabled
+          bounces={false}
+          showsHorizontalScrollIndicator={false}
+          snapToInterval={screenWidth}
+          decelerationRate="fast"
+          snapToAlignment="center"
+          onScroll={Animated.event(
+            [{ nativeEvent: { contentOffset: { x: scrollX } } }],
+            { useNativeDriver: true }
+          )}
+          renderItem={renderImage}
+          keyExtractor={(_, index) => index.toString()}
+          getItemLayout={(_, index) => ({
+            length: screenWidth,
+            offset: screenWidth * index,
+            index,
+          })}
+        />
+        {images.length > 1 && (
+          <View style={styles.dotsContainer}>
+            {images.map((_, index) => (
+              <Animated.View
+                key={index}
+                style={[
+                  styles.dot,
+                  {
+                    opacity: scrollX.interpolate({
+                      inputRange: [
+                        width * (index - 1),
+                        width * index,
+                        width * (index + 1),
+                      ],
+                      outputRange: [0.3, 1, 0.3],
+                      extrapolate: "clamp",
+                    }),
+                  },
+                ]}
+              />
+            ))}
+          </View>
         )}
-        renderItem={({ item }) => (
-          <Image source={{ uri: item }} style={[styles.image, { width }]} />
-        )}
-        keyExtractor={(_, index) => index.toString()}
-      />
-
-      {images.length > 1 && (
-        <View style={styles.dotsContainer}>
-          {images.map((_, index) => (
-            <Animated.View
-              key={index}
-              style={[
-                styles.dot,
-                {
-                  opacity: scrollX.interpolate({
-                    inputRange: [
-                      width * (index - 1),
-                      width * index,
-                      width * (index + 1),
-                    ],
-                    outputRange: [0.3, 1, 0.3],
-                    extrapolate: "clamp",
-                  }),
-                },
-              ]}
-            />
-          ))}
-        </View>
-      )}
+      </View>
 
       <PostActions
         postId={business.id}
         onCommentPress={() => console.log("Navigate to Comments")}
-        onSharePress={() => Share.share({ message: `Check out this business: ${business?.name}` })}
+        onSharePress={() =>
+          Share.share({ message: `Check out this business: ${business?.name}` })
+        }
       />
 
       {!isPublicView && (
@@ -224,12 +335,14 @@ const RecommendPostCards = ({ business, isPublicView = true, entrepreneurId }) =
               style={[
                 styles.modalContent,
                 {
-                  transform: [{
-                    translateY: animation.interpolate({
-                      inputRange: [0, 1],
-                      outputRange: [300, 0],
-                    }),
-                  }],
+                  transform: [
+                    {
+                      translateY: animation.interpolate({
+                        inputRange: [0, 1],
+                        outputRange: [300, 0],
+                      }),
+                    },
+                  ],
                 },
               ]}
             >

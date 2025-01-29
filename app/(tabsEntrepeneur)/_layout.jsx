@@ -28,7 +28,7 @@ export default function EntrepreneurTabLayout() {
           }}
         />
 
-        <Tabs.Screen
+        {/* <Tabs.Screen
           name="explore"
           options={{
             title: "Explore",
@@ -37,7 +37,7 @@ export default function EntrepreneurTabLayout() {
               <Ionicons name="search" size={24} color={color} />
             ),
           }}
-        />
+        /> */}
         <Tabs.Screen
           name="community"
           options={{

@@ -25,6 +25,8 @@ import {
 import { useAuth } from "../../context/authContext";
 import { Colors } from "../../constants/Colors";
 import { RFValue } from "react-native-responsive-fontsize";
+import { StatusBar } from "expo-status-bar";
+import Header from "../Header";
 // import Clipboard from "@react-native-clipboard/clipboard";
 
 const CommentsModal = ({ visible, onClose, postId }) => {
@@ -226,6 +228,7 @@ const CommentsModal = ({ visible, onClose, postId }) => {
   };
 
   return (
+   <>   
     <Modal visible={visible} animationType="slide" onRequestClose={onClose}>
       <KeyboardAvoidingView style={styles.modalContainer} behavior="padding">
         <View style={styles.header}>
@@ -348,6 +351,7 @@ const CommentsModal = ({ visible, onClose, postId }) => {
         </Modal>
       </KeyboardAvoidingView>
     </Modal>
+   </>
   );
 };
 
@@ -428,7 +432,7 @@ const styles = StyleSheet.create({
   },
   modalOverlay: {
     flex: 1,
-    backgroundColor: "rgba(0, 0, 0, 0.5)",
+    backgroundColor: "rgba(0, 0, 0, 0)",
     justifyContent: "flex-end",
   },
 
