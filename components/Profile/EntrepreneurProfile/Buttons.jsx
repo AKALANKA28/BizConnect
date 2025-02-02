@@ -10,6 +10,7 @@ import { StatusBar } from "expo-status-bar";
 const Buttons = ({ entrepreneurId, isPublicView }) => {
   const { signout, user } = useAuth(); // Get the currently logged-in user
   const [isModalVisible, setIsModalVisible] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
 
   const toggleModal = () => {
     setIsModalVisible(!isModalVisible);

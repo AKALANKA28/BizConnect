@@ -11,6 +11,7 @@ import { db } from "../../../config/FirebaseConfig"; // Firestore instance
 import { useAuth } from "../../../context/authContext"; // Importing useAuth for current user
 import { Colors } from "../../../constants/Colors"; // Import Colors for consistency
 import { RFValue } from "react-native-responsive-fontsize";
+import { SkeletonLayouts } from "../../Skeleton/Skeleton";
 
 const ProfileInfo = ({ entrepreneurId }) => {
   const { user } = useAuth(); // Get the currently logged-in user
@@ -49,33 +50,29 @@ const ProfileInfo = ({ entrepreneurId }) => {
     }
   }, [entrepreneurId, user]);
 
+  if (loading) {
+    return <SkeletonLayouts.TextBlock />;
+  }
   return (
     <View style={styles.container}>
       <View style={styles.aboutSection}>
         <Text style={styles.aboutTitle}>About Me</Text>
-        {loading ? (
-          <ActivityIndicator size="small" color={Colors.secondaryColor} />
-        ) : (
-          <Text style={styles.aboutText}>
-            {/* Display the bio with read more/read less inline */}
-            {expanded
-              ? bio
-              : bio.length > 100
-              ? `${bio.substring(0, 100)}`
-              : bio}
-            {bio.length > 100 && !expanded && "..."}{" "}
-            {/* Add ellipsis if truncated */}
-            {/* Show the read more/read less button inline */}
-            {bio.length > 100 && (
-              <Text
-                style={styles.readMore}
-                onPress={() => setExpanded(!expanded)} // Toggle expanded state
-              >
-                {expanded ? " read less" : " read more"}
-              </Text>
-            )}
-          </Text>
-        )}
+
+        <Text style={styles.aboutText}>
+          {/* Display the bio with read more/read less inline */}
+          {expanded ? bio : bio.length > 100 ? `${bio.substring(0, 100)}` : bio}
+          {bio.length > 100 && !expanded && "..."}{" "}
+          {/* Add ellipsis if truncated */}
+          {/* Show the read more/read less button inline */}
+          {bio.length > 100 && (
+            <Text
+              style={styles.readMore}
+              onPress={() => setExpanded(!expanded)} // Toggle expanded state
+            >
+              {expanded ? " read less" : " read more"}
+            </Text>
+          )}
+        </Text>
       </View>
     </View>
   );

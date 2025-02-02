@@ -17,7 +17,7 @@ import * as ImagePicker from "expo-image-picker";
 import { addDoc, updateDoc, doc, collection } from "firebase/firestore";
 import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
 import { db, storage } from "../../config/FirebaseConfig";
-import Header from "./Header";
+import Header from '../../components/Header';
 import { Colors } from "../../constants/Colors";
 import { useAuth } from "../../context/authContext";
 import { v4 as uuidv4 } from "uuid"; // For generating unique image names
@@ -27,7 +27,6 @@ export default function CollabSpaceForm() {
   const { user } = useAuth();
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
-  const [location, setLocation] = useState("");
   const [goals, setGoals] = useState([""]);
   const [featuredImage, setFeaturedImage] = useState(null);
   const [moreImages, setMoreImages] = useState([]);
@@ -115,7 +114,6 @@ export default function CollabSpaceForm() {
         const collabSpaceDoc = await addDoc(collection(db, "CollabSpaces"), {
           title,
           description,
-          location,
           goals,
           featuredImage, // Firebase Storage URL
           moreImages,    // Array of Firebase Storage URLs
@@ -142,7 +140,6 @@ export default function CollabSpaceForm() {
         // Clear input fields
         setTitle("");
         setDescription("");
-        setLocation("");
         setGoals([""]);
         setFeaturedImage(null);
         setMoreImages([]);
@@ -201,13 +198,6 @@ export default function CollabSpaceForm() {
           onChangeText={setDescription}
           style={[styles.input, { height: 100 }]}
           multiline
-        />
-        <Text style={styles.label}>Location</Text>
-        <TextInput
-          placeholder="Location"
-          value={location}
-          onChangeText={setLocation}
-          style={styles.input}
         />
         <Text style={styles.label}>Goals</Text>
         {goals.map((goal, index) => (

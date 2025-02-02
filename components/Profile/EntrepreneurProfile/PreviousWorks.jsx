@@ -4,19 +4,19 @@ import { collection, getDocs, getFirestore } from "firebase/firestore";
 import { getAuth } from "firebase/auth";
 import { RFValue } from "react-native-responsive-fontsize";
 import RecommendPostCards from "../../Home/RecommendPostCards";
+import { SkeletonLayouts } from "../../Skeleton/Skeleton";
 
 const PreviousWorks = ({ entrepreneurId, isPublicView = true }) => {
-  console.log("entrepreneurId", entrepreneurId);
-
-  const auth = getAuth();
-  const currentUser = auth.currentUser;
-
+  // console.log("entrepreneurId", entrepreneurId);
+  const [loading, setLoading] = useState(true);
   const [userPosts, setUserPosts] = useState([]);
   const db = getFirestore();
 
   useEffect(() => {
     const fetchUserPosts = async () => {
       try {
+        setLoading(true);
+
         const querySnapshot = await getDocs(collection(db, "BusinessList"));
         const posts = querySnapshot.docs.map((doc) => ({
           id: doc.id,
@@ -30,6 +30,8 @@ const PreviousWorks = ({ entrepreneurId, isPublicView = true }) => {
         setUserPosts(filteredPosts);
       } catch (error) {
         console.error("Error fetching user posts:", error);
+      } finally {
+        setLoading(false);
       }
     };
 
@@ -38,8 +40,15 @@ const PreviousWorks = ({ entrepreneurId, isPublicView = true }) => {
 
   return (
     <View style={styles.container}>
-      {userPosts.length ? (
-        <ScrollView contentContainerStyle={styles.scrollViewContainer} >
+      {loading ? (
+        // Show skeleton loading state
+        <ScrollView contentContainerStyle={styles.scrollViewContainer}>
+          {[1,2,3].map((item) => (
+            <SkeletonLayouts.BusinessCard key={item} />
+          ))}
+        </ScrollView>
+      ) : userPosts.length ? (
+        <ScrollView contentContainerStyle={styles.scrollViewContainer}>
           {userPosts.map((item) => (
             <RecommendPostCards
               key={item.id}

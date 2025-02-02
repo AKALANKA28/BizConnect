@@ -5,6 +5,9 @@ import MyCollabSpaces from './MyCollabSpaces'; // MyCollabSpaces component
 import FloatingActionButton from './FloatingActionButton';
 import { useRouter } from 'expo-router'; // Import useRouter for navigation
 import { View, TextInput, Text, TouchableOpacity, StyleSheet } from 'react-native';
+import Header from '../../components/Home/Header';
+import { Colors } from '../../constants/Colors';
+import { RFValue } from 'react-native-responsive-fontsize';
 
 
 // SearchBar Component
@@ -42,12 +45,12 @@ const TabBar = ({ tabs, activeTab, onTabPress }) => {
 
 // Main Component (unchanged logic)
 const CommunityScreen = () => {
-  const [activeTab, setActiveTab] = useState('My feed');
+  const [activeTab, setActiveTab] = useState('Community Feed');
   const router = useRouter();
 
   // Render content based on the active tab
   const renderContent = () => {
-    if (activeTab === 'My feed') {
+    if (activeTab === 'Community Feed') {
       return <CommunityFeed />;  // Feed for "My feed" tab
     } else if (activeTab === 'My CollabSpaces') {
       return <MyCollabSpaces />;  // Feed for "My CollabSpaces" tab
@@ -57,16 +60,19 @@ const CommunityScreen = () => {
   };
 
   return (
+  <>
+  <Header/>
     <View style={styles.container}>
       {/* <SearchBar /> */}
       <TabBar
-        tabs={['My feed', 'My CollabSpaces', 'Joined']}
+        tabs={['Community Feed', 'My CollabSpaces', 'Joined']}
         activeTab={activeTab}
         onTabPress={setActiveTab}
       />
       {renderContent()}
       <FloatingActionButton onPress={() => router.push('/community/CollabSpaceForm')} />
     </View>
+  </>
   );
 };
 
@@ -74,7 +80,7 @@ const CommunityScreen = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#fff',
+    backgroundColor: Colors.primaryColor,
   },
   searchBarContainer: {
     paddingHorizontal: 16,
@@ -90,28 +96,28 @@ const styles = StyleSheet.create({
   tabBarContainer: {
     flexDirection: 'row',
     justifyContent: 'space-around',
-    marginTop: 16,
+    marginTop: 10,
     borderBottomWidth: 1,
     borderBottomColor: '#e0e0e0',
   },
   tab: {
     paddingVertical: 12,
-    paddingHorizontal: 16,
     alignItems: 'center',
   },
   tabText: {
-    fontSize: 16,
+    fontSize: RFValue(13),
+    fontFamily: "roboto",
     color: '#888',
   },
   activeTabText: {
     color: '#000',
-    fontWeight: 'bold',
+    fontFamily: "roboto-bold",
   },
   activeTabIndicator: {
     marginTop: 4,
     height: 3,
     width: '100%',
-    backgroundColor: '#FF8C00', // Orange underline
+    backgroundColor: Colors.secondaryColor,
   },
 });
 

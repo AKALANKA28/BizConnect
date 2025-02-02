@@ -21,6 +21,7 @@ import { Entypo, Feather } from "@expo/vector-icons";
 import { getAuth } from "firebase/auth";
 import { useAuth } from "../../context/authContext";
 import { db } from "../../config/FirebaseConfig";
+import { SkeletonLayouts } from "../Skeleton/Skeleton";
 
 const MAX_IMAGE_HEIGHT = 500;
 const DEFAULT_HEIGHT = 300;
@@ -43,7 +44,8 @@ const RecommendPostCards = ({
   const [modalVisible, setModalVisible] = useState(false);
   const [selectedItemId, setSelectedItemId] = useState(null);
   const animation = useRef(new Animated.Value(0)).current;
-  const [localPosts, setLocalPosts] = useState(); 
+  const [localPosts, setLocalPosts] = useState();
+  const [loading, setLoading] = useState(true); // Loading state
 
   const images =
     business?.images || (business?.imageUrl ? [business.imageUrl] : []);
@@ -113,6 +115,8 @@ const RecommendPostCards = ({
       }
     } catch (error) {
       console.error("Error fetching entrepreneur details:", error);
+    } finally {
+      setLoading(false); // Set loading to false after data fetch
     }
   };
 
@@ -213,8 +217,10 @@ const RecommendPostCards = ({
       <Text style={[styles.modalOptionText, { color }]}>{text}</Text>
     </TouchableOpacity>
   );
-
-  return (
+ 
+  return loading ? (
+    <SkeletonLayouts.BusinessCard />
+  ) : (
     <View style={styles.card}>
       <View style={styles.profileHeader}>
         <View style={styles.headerInfoContainer}>
@@ -238,10 +244,12 @@ const RecommendPostCards = ({
 
           <View style={styles.profileInfo}>
             <Text style={styles.userName}>
-            {(userDetails?.firstName || userDetails?.username) + (userDetails?.lastName ? ` ${userDetails?.lastName}` : '')}
-            </Text> 
+              {(userDetails?.firstName || userDetails?.username) +
+                (userDetails?.lastName ? ` ${userDetails?.lastName}` : "")}
+            </Text>
             <Text style={styles.jobRole}>
-              {userDetails?.title || "Job Title Unknown"} | {business?.address || "Location Unknown"}
+              {userDetails?.title || "Job Title Unknown"} |{" "}
+              {business?.address || "Location Unknown"}
             </Text>
             <Text style={styles.time}>
               {formatTimeDiff(business?.createdAt)}
@@ -383,6 +391,7 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     width: "100%",
     marginBottom: 15,
+    backgroundColor: Colors.primaryColor,
   },
   profileHeader: {
     flexDirection: "column",

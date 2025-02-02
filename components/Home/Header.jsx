@@ -13,7 +13,6 @@ import { Colors } from "../../constants/Colors";
 import avatarPlaceholder from "../../assets/images/avatar.png"; // Default avatar
 import { router } from "expo-router";
 import { NotificationContext } from "../../context/notificationContext"; // Import the context
-import AntDesign from "@expo/vector-icons/AntDesign";
 import { RFValue } from "react-native-responsive-fontsize";
 import { StatusBar } from "expo-status-bar";
 import { LanguageSwitcher } from "../LanguageSwitcher";
@@ -38,7 +37,7 @@ export default function Header({ notificationCount }) {
   };
 
   const handleSearchPress = () => {
-    router.push("/productSearchScreen"); // Navigate to ProductSearchScreen
+    router.push("/posts/productSearchScreen"); // Navigate to ProductSearchScreen
   };
 
   return (
@@ -60,7 +59,7 @@ export default function Header({ notificationCount }) {
         <TouchableOpacity onPress={handleSearchPress} style={styles.searchBar}>
           <Ionicons name="search" size={20} color="#6D4C41" />
           <TextInput
-            placeholder="Search.."
+            placeholder="Search..."
             style={styles.searchInput}
             editable={false}
           />
@@ -101,45 +100,33 @@ export const styles = StyleSheet.create({
     alignItems: "center", // Center items vertically
     justifyContent: "space-between", // Space items evenly
     gap: 10,
-    marginBottom: 12,
+    marginBottom: 7,
   },
   avatar: {
     width: 42,
     height: 42,
-    borderRadius: 99,
+    borderRadius: 14,
   },
   searchBar: {
     flex: 1, // Let the search bar take up available space
     flexDirection: "row",
     alignItems: "center",
     backgroundColor: "#EFEFF0",
-    paddingVertical: 3,
+    paddingVertical: 2.5,
     paddingHorizontal: 15,
-    borderRadius: 30,
+    borderRadius: 13,
   },
   searchInput: {
     flex: 1, // Ensure the input takes up available space
-    fontSize: RFValue(13),
+    fontSize: RFValue(12),
     color: "#BCBCBC",
   },
   notificationIconWrapper: {
     position: "relative", // Ensure proper alignment with the row
     justifyContent: "center",
     alignItems: "center",
-    marginLeft: 10, // Add space from the search bar
   },
 
-  notificationBadge: {
-    position: "absolute",
-    right: -6,
-    top: -6,
-    backgroundColor: Colors.secondaryColor,
-    borderRadius: 10,
-    width: 20,
-    height: 20,
-    justifyContent: "center",
-    alignItems: "center",
-  },
   notificationBadgeText: {
     color: "#fff",
     fontSize: RFValue(12),

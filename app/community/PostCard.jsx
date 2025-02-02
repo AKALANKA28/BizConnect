@@ -1,40 +1,58 @@
 import React from "react";
 import { View, Text, Image, StyleSheet, TouchableOpacity } from "react-native";
-import { useRouter } from 'expo-router';
+import { useRouter } from "expo-router";
+import { Colors } from "../../constants/Colors";
+import { RFValue } from "react-native-responsive-fontsize";
 
 export default function PostCard({ post }) {
   const router = useRouter();
 
   const handleViewDetails = () => {
     router.push({
-      pathname: '/community/CollabSpace',
-      params: { postId: post.id, proPic: post.profileImage}, // Pass only the post ID
+      pathname: "/community/CollabSpace",
+      params: { postId: post.id, profileImage: post.profileImage, userName: post.userName, location: post.location }, // Pass only the post ID
     });
   };
-
+  // console.log(post);
   return (
     <View style={styles.cardContainer}>
-      {/* Publisher Info */}
-      <View style={styles.publisherInfo}>
-        <Image source={{ uri: post.profileImage }} style={styles.profileImage} />
-        <View style={styles.publisherDetails}>
-          <Text style={styles.publisherName}>{post.userName}</Text>
-          <Text style={styles.publisherLocation}>{post.location}</Text>
-          <Text style={styles.postDate}>{post.createdAt}</Text>
-        </View>
-      </View>
-
       {/* Image with Overlay */}
       <View style={styles.imageContainer}>
-        <Image
-          source={{ uri: post.featuredImage }}
-          style={styles.cardImage}
-        />
+        <Image source={{ uri: post.featuredImage }} style={styles.cardImage} />
         <View style={styles.overlay}>
-          <Text style={styles.cardTitle}>{post.title}</Text>
-          <TouchableOpacity style={styles.detailsButton} onPress={handleViewDetails}>
-            <Text style={styles.detailsButtonText}>View Details</Text>
-          </TouchableOpacity>
+          {/* Publisher Info at the Top */}
+          <View style={styles.publisherInfo}>
+            <TouchableOpacity
+              onPress={() =>
+                router.push({
+                  pathname: "/userProfile/entrepreneurProfile/[entrepreneurid]",
+                  params: { id: post.userId },
+                })
+              }
+            >
+              <Image
+                source={{ uri: post.profileImage }}
+                style={styles.profileImage}
+              />
+            </TouchableOpacity>
+            <View style={styles.publisherDetails}>
+              <Text style={styles.publisherName}>{post.userName}</Text>
+              {post.location && post.jobTitle && (
+                <Text style={styles.publisherLocation}>{post.jobTitle}| {post.location}</Text>
+              )}
+              <Text style={styles.postDate}>{post.createdAt}</Text>
+            </View>
+          </View>
+          {/* Title and Button at the Bottom */}
+          <View style={styles.bottomContent}>
+            <Text style={styles.cardTitle}>{post.title}</Text>
+            <TouchableOpacity
+              style={styles.detailsButton}
+              onPress={handleViewDetails}
+            >
+              <Text style={styles.detailsButtonText}>View Details</Text>
+            </TouchableOpacity>
+          </View>
         </View>
       </View>
     </View>
@@ -43,51 +61,28 @@ export default function PostCard({ post }) {
 
 const styles = StyleSheet.create({
   cardContainer: {
-    backgroundColor: "white",
-    borderRadius: 15,
-    padding: 15,
-    marginVertical: 10,
+    backgroundColor: Colors.primaryColor,
+    borderRadius: 9,
+    borderBottomLeftRadius: 24,
+    borderBottomRightRadius: 24,
+    borderColor: "#EFEFF0",
+    borderWidth: 1,
+    width: "100%",
+    marginVertical: 8,
+  },
+  imageContainer: {
+    position: "relative",
+    borderRadius: 24,
+    overflow: "hidden",
     shadowColor: "#000",
     shadowOpacity: 0.1,
     shadowRadius: 6,
     elevation: 3,
   },
-  publisherInfo: {
-    flexDirection: "row",
-    alignItems: "center",
-    marginBottom: 10,
-  },
-  profileImage: {
-    width: 50, // Adjusted to match the image size in the design
-    height: 50,
-    borderRadius: 25,
-    marginRight: 10,
-  },
-  publisherDetails: {
-    justifyContent: "center",
-  },
-  publisherName: {
-    fontSize: 16,
-    fontWeight: "bold",
-    color: "#333", // Darker color for the name as per the design
-  },
-  publisherLocation: {
-    fontSize: 14,
-    color: "#666", // Subtle color for the location
-  },
-  postDate: {
-    fontSize: 12,
-    color: "#888", // Lighter color for the date
-  },
-  imageContainer: {
-    position: "relative",
-    borderRadius: 15,
-    overflow: "hidden", // Ensure the image and overlay follow rounded corners
-  },
   cardImage: {
     width: "100%",
-    height: 200, // Matches the height from the design
-    borderRadius: 15,
+    height: 200,
+    borderRadius: 24,
   },
   overlay: {
     position: "absolute",
@@ -95,26 +90,59 @@ const styles = StyleSheet.create({
     left: 0,
     right: 0,
     bottom: 0,
-    backgroundColor: "rgba(0, 0, 0, 0.4)", // Dark overlay for text visibility
-    justifyContent: "flex-end", // Align content at the bottom
-    padding: 15, // Padding to match the design
+    backgroundColor: "rgba(0, 0, 0, 0.4)",
+    padding: 15,
+    justifyContent: "space-between",
+  },
+  publisherInfo: {
+    flexDirection: "row",
+    alignItems: "center",
+    marginBottom: 10,
+  },
+  profileImage: {
+    width: 44,
+    height: 44,
+    borderRadius: 25,
+    marginRight: 10,
+  },
+  publisherDetails: {
+    justifyContent: "center",
+    gap: 2, 
+  },
+  publisherName: {
+    fontSize: RFValue(11),
+    fontFamily: "lato-bold",
+    color: "#fff",
+  },
+  publisherLocation: {
+    fontSize: RFValue(9),
+    color: "#fff",
+    fontFamily: "lato",
+  },
+  postDate: {
+    fontSize: RFValue(9),
+    color: "#fff",
+    fontFamily: "lato",
+  },
+  bottomContent: {
+    alignItems: "flex-start",
   },
   cardTitle: {
-    color: "#fff", // White text for readability on dark overlay
-    fontSize: 20,
-    fontWeight: "bold",
-    marginBottom: 10, // Spacing between title and button
+    color: "#fff",
+    fontSize: RFValue(14),
+    fontFamily: "lato-bold",
+    marginBottom: 10,
   },
   detailsButton: {
-    backgroundColor: "#FF8C00", // Button color matches the image
+    backgroundColor: Colors.secondaryColor,
     paddingVertical: 10,
     paddingHorizontal: 25,
-    borderRadius: 25, // Fully rounded button as per design
-    alignSelf: "flex-start", // Align the button to the left as in the design
+    borderRadius: 25,
+    alignSelf: "flex-start",
   },
   detailsButtonText: {
     color: "#fff",
-    fontSize: 16,
-    fontWeight: "bold",
+    fontSize: RFValue(12),
+    fontFamily: "lato-bold",
   },
 });

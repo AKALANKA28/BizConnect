@@ -2,11 +2,11 @@ import { View, FlatList, ActivityIndicator, Text } from "react-native";
 import React, { useEffect, useState } from "react";
 import { useLocalSearchParams } from "expo-router";
 import { collection, getDocs, query, where } from "firebase/firestore";
-import BusinessListCard from "../../components/BusinessList/BusinessListCard";
 import Header from "../../components/Header";
 import { db } from "../../config/FirebaseConfig";
 import { Colors } from "../../constants/Colors";
 import LoadingScreen from "../../components/LoadingScreen";
+import RecommendPostCards from "../../components/Home/RecommendPostCards";
 
 export default function BusinessListByCategory() {
   const { category } = useLocalSearchParams();
@@ -45,7 +45,7 @@ export default function BusinessListByCategory() {
               onRefresh={getBusinessList}
               refreshing={loading}
               renderItem={({ item, index }) => (
-                <BusinessListCard business={item} key={index} />
+                <RecommendPostCards business={item} key={index} />
               )}
             />
           ) : (

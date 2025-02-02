@@ -42,7 +42,7 @@ export default function EntrepreneurTabLayout() {
           name="community"
           options={{
             tabBarLabel: "Community",
-            headerShown: true,
+            headerShown: false,
             tabBarIcon: ({ color }) => (
               <Ionicons name="people-outline" size={24} color={color} />
             ),
@@ -52,7 +52,7 @@ export default function EntrepreneurTabLayout() {
           name="bids"
           options={{
             title: "bids",
-            headerShown: true, // hide the header
+            headerShown: false, 
             title: "Bids",
             tabBarIcon: ({ color }) => (
               <Ionicons name="briefcase-outline" size={24} color={color} />

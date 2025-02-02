@@ -13,7 +13,7 @@ import { collection, query, where, onSnapshot, addDoc, orderBy } from "firebase/
 import { db } from "../../config/FirebaseConfig";
 import { useAuth } from "../../context/authContext";
 import { useLocalSearchParams } from 'expo-router'; // Access route params
-import Header from "./Header"; // Importing the existing Header component
+import Header from '../../components/Header';
 import { Ionicons } from "@expo/vector-icons"; // For the back button
 
 export default function ChatScreen() {

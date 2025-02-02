@@ -9,6 +9,8 @@ import { useRouter } from "expo-router";
 import { db } from "../../config/FirebaseConfig"; // Update with your actual Firebase config path
 import { collection, getDocs, query } from "firebase/firestore";
 import BidItem from "../../components/EntBidList/BidItem";
+import { Colors } from "../../constants/Colors";
+import Header from "../../components/Home/Header";
 
 export default function Bids() {
   const [bids, setBids] = useState([]);
@@ -36,26 +38,29 @@ export default function Bids() {
 
   const renderBidItem = ({ item }) => <BidItem item={item} />;
 
-    // Handle refresh function
-    const handleRefresh = async () => {
-      setRefreshing(true); // Start the refreshing indicator
-      await fetchBids(); // Fetch bids again
-      setRefreshing(false); // Stop the refreshing indicator
-    };
+  // Handle refresh function
+  const handleRefresh = async () => {
+    setRefreshing(true); // Start the refreshing indicator
+    await fetchBids(); // Fetch bids again
+    setRefreshing(false); // Stop the refreshing indicator
+  };
 
   return (
-    <View style={{ flex: 1, backgroundColor: "#fff" }}>
-      <FlatList
-        data={bids}
-        renderItem={renderBidItem}
-        showsVerticalScrollIndicator={false}
-        keyExtractor={(item) => item.id}
-        contentContainerStyle={styles.list}
-        refreshControl={
-          <RefreshControl refreshing={refreshing} onRefresh={handleRefresh} />
-        }
-      />
-    </View>
+    <>
+      <Header />
+      <View style={{ flex: 1, backgroundColor: Colors.primaryColor }}>
+        <FlatList
+          data={bids}
+          renderItem={renderBidItem}
+          showsVerticalScrollIndicator={false}
+          keyExtractor={(item) => item.id}
+          contentContainerStyle={styles.list}
+          refreshControl={
+            <RefreshControl refreshing={refreshing} onRefresh={handleRefresh} />
+          }
+        />
+      </View>
+    </>
   );
 }
 

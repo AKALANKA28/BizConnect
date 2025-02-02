@@ -5,6 +5,7 @@ import { doc, getDoc } from "firebase/firestore";
 import { db } from "../../../config/FirebaseConfig"; // Firestore instance
 import { useAuth } from "../../../context/authContext"; // Importing useAuth
 import { RFValue } from "react-native-responsive-fontsize";
+import { SkeletonLayouts } from "../../Skeleton/Skeleton";
 
 // Component for rendering individual contact details
 const ContactItem = ({ label, value, iconName }) => (
@@ -96,7 +97,9 @@ const ContactDetails = ({ entrepreneurId }) => {
   useEffect(() => {
     fetchContactDetails();
   }, [entrepreneurId, user]); // Added user to dependency array
-
+  if (loading) {
+    return <SkeletonLayouts.ContactDetails />;
+  }
   return (
     <View style={styles.container}>
       <Text style={styles.title}>Business Contact Details:</Text>

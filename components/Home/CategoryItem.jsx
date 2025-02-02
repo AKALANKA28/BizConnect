@@ -25,18 +25,18 @@ const styles = StyleSheet.create({
     width: 75, // Set width
     height: 75, // Set height (adjust to your needs)
     backgroundColor: "#F8F9FA",
-    borderRadius: 99, // To make it circular
-    borderColor: "#000000", // Black border
+    borderRadius:22, // To make it circular
+    borderColor: Colors.GRAY, // Black border
     borderWidth: 0.5,
     marginRight: 15,
-    justifyContent: "center", // Center the image inside
-    alignItems: "center", // Center the image inside
+    justifyContent: "center",
+    alignItems: "center", 
   },
   iconImage: {
-    width: "100%", // Cover the entire width of the container
-    height: "100%", // Cover the entire height of the container
-    resizeMode: "cover", // Maintain aspect ratio and cover the container
-    borderRadius: 99, // Make sure image is circular as well
+    width: "100%",
+    height: "100%", 
+    resizeMode: "cover",
+    borderRadius:22, 
   },
   categoryName: {
     fontSize: 13,

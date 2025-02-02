@@ -7,6 +7,7 @@ import {
   TouchableOpacity,
   Dimensions,
   ImageBackground,
+  Animated,
 } from "react-native";
 import { useAuth } from "../../../context/authContext";
 import { doc, getDoc, updateDoc } from "firebase/firestore";
@@ -16,17 +17,17 @@ import { RFValue } from "react-native-responsive-fontsize";
 import * as ImagePicker from "expo-image-picker";
 import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
 import { storage } from "../../../config/FirebaseConfig";
-
-const { width: screenWidth } = Dimensions.get("window");
+import { SkeletonLayouts } from "../../../components/Skeleton/Skeleton";
 
 const ProfileHeader = ({ entrepreneurId }) => {
   const { user } = useAuth();
+  const [isLoading, setIsLoading] = useState(true);
   const [profileData, setProfileData] = useState({
-    firstName: "Loading...",
-    lastName: "Loading...",
-    title: "Loading...",
+    firstName: "",
+    lastName: "",
+    title: "",
     profileImage: "https://via.placeholder.com/150",
-    coverImage: "https://via.placeholder.com/800x200", // Default cover image
+    coverImage: "https://via.placeholder.com/800x200",
   });
 
   const fetchProfileData = async () => {
@@ -48,18 +49,21 @@ const ProfileHeader = ({ entrepreneurId }) => {
             coverImage:
               userData.coverImage || "https://via.placeholder.com/800x200",
           });
-        } else {
-          console.log("No such user document!");
         }
       }
     } catch (error) {
       console.error("Error fetching profile data: ", error);
+    } finally {
+      setIsLoading(false);
     }
   };
 
   const selectAndUploadCoverImage = async () => {
     if (!user || user.uid !== entrepreneurId) {
-      Alert.alert("Unauthorized", "You are not allowed to edit this cover image.");
+      Alert.alert(
+        "Unauthorized",
+        "You are not allowed to edit this cover image."
+      );
       return;
     }
 
@@ -93,33 +97,38 @@ const ProfileHeader = ({ entrepreneurId }) => {
       }
     } catch (error) {
       console.error("Error uploading cover image: ", error);
-      Alert.alert("Error", "Could not upload the cover image. Please try again.");
+      Alert.alert(
+        "Error",
+        "Could not upload the cover image. Please try again."
+      );
     }
   };
-
   useEffect(() => {
+    setIsLoading(true);
     fetchProfileData();
   }, [entrepreneurId, user]);
+
+  if (isLoading) {
+    return <SkeletonLayouts.ProfileHeader />;
+  }
 
   return (
     <View style={styles.container}>
       <TouchableOpacity
         onPress={selectAndUploadCoverImage}
-        disabled={user?.uid !== entrepreneurId} // Disable if not the owner
+        disabled={user?.uid !== entrepreneurId}
       >
         <ImageBackground
-          source={{ uri: profileData.coverImage}}
+          source={{ uri: profileData.coverImage }}
           style={styles.coverImage}
-        >
-          {/* <View style={styles.coverOverlay} /> */}
-        </ImageBackground>
+        />
       </TouchableOpacity>
 
       <View style={styles.profileContentContainer}>
         <View style={styles.profileSection}>
           <View style={styles.profileImageContainer}>
             <Image
-              source={{ uri: profileData.profileImage}}
+              source={{ uri: profileData.profileImage }}
               style={styles.profileImage}
             />
           </View>
@@ -127,8 +136,7 @@ const ProfileHeader = ({ entrepreneurId }) => {
           <View style={styles.infoContainer}>
             <View style={styles.nameContainer}>
               <Text style={styles.name}>
-                {profileData.firstName} {" "}
-              {profileData.lastName}
+                {profileData.firstName} {profileData.lastName}
               </Text>
               <Text style={styles.profession}>{profileData.title}</Text>
             </View>
@@ -157,8 +165,8 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
   },
   profileSection: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
     gap: 16,
   },
   profileImageContainer: {
@@ -170,21 +178,17 @@ const styles = StyleSheet.create({
     borderRadius: 60,
     borderWidth: 3,
     borderColor: "white",
-
   },
   infoContainer: {
     flex: 1,
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
-    marginTop: 22, // Adjust this to align with profile image
-
+    marginTop: 22, 
   },
   nameContainer: {
     flex: 1,
-    marginTop: 20, // Adjust this to align with profile image
-
-
+    marginTop: 20, 
   },
   name: {
     fontSize: RFValue(21),
@@ -207,6 +211,18 @@ const styles = StyleSheet.create({
     fontSize: RFValue(12),
     fontFamily: "lato-bold",
   },
+  // nameSkeleton: {
+  //   height: RFValue(21),
+  //   width: 200,
+  //   borderRadius: 4,
+  //   marginBottom: 8,
+  // },
+  // professionSkeleton: {
+  //   height: RFValue(11),
+  //   width: 150,
+  //   borderRadius: 4,
+  // },
+
 });
 
 export default ProfileHeader;
