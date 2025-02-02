@@ -69,9 +69,9 @@ export default function profile() {
 
       <View style={styles.container}>
         <ScrollView style={styles.container}>
-          <ProfileHeader entrepreneurId={entrepreneurId}/>
+          <ProfileHeader entrepreneurId={entrepreneurId} />
           <View style={styles.content}>
-            <Buttons entrepreneurId={entrepreneurId}></Buttons>
+            <Buttons entrepreneurId={entrepreneurId} loading = {loading}></Buttons>
 
             <ProfileInfo />
             <ContactDetails />

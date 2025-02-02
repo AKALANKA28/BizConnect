@@ -195,6 +195,27 @@ export const SkeletonLayouts = {
       </View>
     </View>
   ),
+
+  ButtonRowSkeleton: () => (
+    <View style={styles.skeletonContainer}>
+      {/* Add Post Button Skeleton */}
+      <View style={styles.skeletonButton}>
+        <Skeleton width={16} height={16} style={styles.skeletonIcon} />
+        <Skeleton width={80} height={16} style={styles.skeletonText} />
+      </View>
+
+      {/* Edit Profile Button Skeleton */}
+      <View style={styles.skeletonButton}>
+        <Skeleton width={16} height={16} style={styles.skeletonIcon} />
+        <Skeleton width={80} height={16} style={styles.skeletonText} />
+      </View>
+
+      {/* More Options Button Skeleton */}
+      <View style={styles.skeletonButtonSmall}>
+        <Skeleton width={16} height={16} style={styles.skeletonIcon} />
+      </View>
+    </View>
+  ),
 };
 
 const styles = StyleSheet.create({
@@ -249,6 +270,8 @@ const styles = StyleSheet.create({
   },
   textLine: {
     marginVertical: 4,
+    borderRadius: 4,
+
   },
   titleSkeleton: {
     marginBottom: 8,
@@ -258,9 +281,7 @@ const styles = StyleSheet.create({
     gap: 8,
     marginBottom: 8,
   },
-  textLine: {
-    borderRadius: 4,
-  },
+
   contactItemSkeleton: {
     flexDirection: "row",
     alignItems: "center",
@@ -315,7 +336,7 @@ const styles = StyleSheet.create({
     marginTop: 2,
   },
   menuIconSkeleton: {
-    marginLeft: 'auto',
+    marginLeft: "auto",
   },
   infoContainerSkeleton: {
     paddingHorizontal: 9,
@@ -339,13 +360,48 @@ const styles = StyleSheet.create({
     borderRadius: 4,
   },
   actionsContainerSkeleton: {
-    flexDirection: 'row',
+    flexDirection: "row",
     padding: 10,
     gap: 16,
   },
   actionIconSkeleton: {
     marginRight: 8,
-  }
+  },
+
+  skeletonContainer: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    marginBottom: 16,
+  },
+
+  skeletonButton: {
+    flex: 5,
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    borderRadius: 18,
+    marginHorizontal: 4,
+    paddingVertical: 9,
+    paddingHorizontal: 10,
+  },
+
+  skeletonButtonSmall: {
+    flex: 1,
+    alignItems: "center",
+    justifyContent: "center",
+    borderRadius: 18,
+    marginHorizontal: 4,
+    padding: 10,
+  },
+
+  skeletonIcon: {
+    borderRadius: 8,
+  },
+
+  skeletonText: {
+    marginLeft: 10,
+    borderRadius: 4,
+  },
 });
 
 export default Skeleton;

@@ -1,71 +1,43 @@
-import React, { useEffect, useState } from "react";
-import {
-  View,
-  FlatList,
-  StyleSheet,
-  RefreshControl, // Import RefreshControl
-} from "react-native";
-import { useRouter } from "expo-router";
-import { db } from "../../config/FirebaseConfig"; // Update with your actual Firebase config path
-import { collection, getDocs, query } from "firebase/firestore";
-import BidItem from "../../components/EntBidList/BidItem";
+import React, { useState } from "react";
+import { View, StyleSheet } from "react-native";
 import { Colors } from "../../constants/Colors";
 import Header from "../../components/Home/Header";
+import BidPosts from "../bids/bidPosts";
+import { RFValue } from "react-native-responsive-fontsize";
+import OngoingBids from "../bids/ongoingBids";
+import TabBar from "../../components/TabBar";
 
 export default function Bids() {
-  const [bids, setBids] = useState([]);
-  const router = useRouter();
-  const [refreshing, setRefreshing] = useState(false); // Add refreshing state
+  const [activeTab, setActiveTab] = useState("Jobs");
 
-  useEffect(() => {
-    const fetchBids = async () => {
-      try {
-        const bidsCollection = collection(db, "Bids");
-        const q = query(bidsCollection);
-        const bidsSnapshot = await getDocs(q);
-        const bidsList = bidsSnapshot.docs.map((doc) => ({
-          id: doc.id,
-          ...doc.data(),
-        }));
-        setBids(bidsList);
-      } catch (error) {
-        console.error("Error fetching bids: ", error);
-      }
-    };
-
-    fetchBids();
-  });
-
-  const renderBidItem = ({ item }) => <BidItem item={item} />;
-
-  // Handle refresh function
-  const handleRefresh = async () => {
-    setRefreshing(true); // Start the refreshing indicator
-    await fetchBids(); // Fetch bids again
-    setRefreshing(false); // Stop the refreshing indicator
+  const renderContent = () => {
+    if (activeTab === "Jobs") {
+      return <BidPosts />;
+    } else if (activeTab === "Ongoing Jobs") {
+      return <OngoingBids />;
+    } else if (activeTab === "Jobs Received") {
+      return <OfferBids />;
+    }
   };
 
   return (
     <>
       <Header />
-      <View style={{ flex: 1, backgroundColor: Colors.primaryColor }}>
-        <FlatList
-          data={bids}
-          renderItem={renderBidItem}
-          showsVerticalScrollIndicator={false}
-          keyExtractor={(item) => item.id}
-          contentContainerStyle={styles.list}
-          refreshControl={
-            <RefreshControl refreshing={refreshing} onRefresh={handleRefresh} />
-          }
+      <View style={styles.container}>
+        <TabBar
+          tabs={["Jobs","Jobs Recieved","Ongoing Jobs"]}
+          activeTab={activeTab}
+          onTabPress={setActiveTab}
         />
+        {renderContent()}
       </View>
     </>
   );
 }
 
 const styles = StyleSheet.create({
-  list: {
-    marginBottom: 80, // Adjusted to account for FAB size
+  container: {
+    flex: 1,
+    backgroundColor: Colors.primaryColor,
   },
 });

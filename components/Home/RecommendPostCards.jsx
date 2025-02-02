@@ -184,6 +184,9 @@ const RecommendPostCards = ({
     );
   };
 
+  const handleEditPost = async () => {
+   
+  };
   const toggleModal = (show, businessId = null) => {
     Animated.timing(animation, {
       toValue: show ? 1 : 0,
@@ -360,6 +363,14 @@ const RecommendPostCards = ({
                 onPress={() => {
                   toggleModal(false);
                   handleDeletePost();
+                }}
+              />
+               <ModalOption
+                icon="edit"
+                text="Edit Post"
+                onPress={() => {
+                  toggleModal(false);
+                  handleEditPost();
                 }}
               />
               <ModalOption

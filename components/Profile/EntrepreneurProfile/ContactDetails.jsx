@@ -95,6 +95,7 @@ const ContactDetails = ({ entrepreneurId }) => {
 
   // Fetch contact details when entrepreneurId is available
   useEffect(() => {
+    setLoading(true);
     fetchContactDetails();
   }, [entrepreneurId, user]); // Added user to dependency array
   if (loading) {

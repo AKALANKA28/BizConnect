@@ -77,7 +77,7 @@ const styles = StyleSheet.create({
     flex: 1,
     paddingHorizontal: 2, // Add horizontal padding for layout
     justifyContent: "center",
-    alignItems: "center",
+    // alignItems: "center",
     backgroundColor: "white",
   },
 });

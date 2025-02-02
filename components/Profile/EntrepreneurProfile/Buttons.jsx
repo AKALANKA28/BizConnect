@@ -6,11 +6,12 @@ import { Colors } from "../../../constants/Colors";
 import { useAuth } from "../../../context/authContext"; // Importing useAuth
 import { router } from "expo-router";
 import { StatusBar } from "expo-status-bar";
+import { SkeletonLayouts } from "../../Skeleton/Skeleton";
 
-const Buttons = ({ entrepreneurId, isPublicView }) => {
+const Buttons = ({ entrepreneurId, isPublicView, loading }) => {
   const { signout, user } = useAuth(); // Get the currently logged-in user
   const [isModalVisible, setIsModalVisible] = useState(false);
-  const [isLoading, setIsLoading] = useState(true);
+  // const [isLoading, setIsLoading] = useState(true);
 
   const toggleModal = () => {
     setIsModalVisible(!isModalVisible);
@@ -28,10 +29,13 @@ const Buttons = ({ entrepreneurId, isPublicView }) => {
     );
   }
 
-  
-    const handleLogout = async () => {
-      await signout(); // Call the signout function
-    };
+  const handleLogout = async () => {
+    await signout(); // Call the signout function
+  };
+
+  if (loading) {
+    return <SkeletonLayouts.ButtonRowSkeleton />;
+  }
   return (
     <View style={styles.container}>
       {/* Button Row */}
@@ -74,7 +78,7 @@ const Buttons = ({ entrepreneurId, isPublicView }) => {
         transparent={true}
         visible={isModalVisible}
         onRequestClose={toggleModal}
-      >        
+      >
         <TouchableOpacity
           style={styles.modalOverlay}
           activeOpacity={1}
@@ -103,7 +107,10 @@ const Buttons = ({ entrepreneurId, isPublicView }) => {
               <Text style={styles.modalOptionText}>Report Profile</Text>
             </TouchableOpacity> */}
 
-            <TouchableOpacity style={styles.modalOption} onPress={() => router.push("/posts/SavedPosts")}>
+            <TouchableOpacity
+              style={styles.modalOption}
+              onPress={() => router.push("/posts/SavedPosts")}
+            >
               <Feather name="bookmark" size={20} color="#333" />
               <Text style={styles.modalOptionText}>Saved Posts</Text>
             </TouchableOpacity>

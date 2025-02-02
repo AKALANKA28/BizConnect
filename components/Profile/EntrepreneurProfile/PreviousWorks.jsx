@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { View, StyleSheet, Text, ScrollView } from "react-native";
 import { collection, getDocs, getFirestore } from "firebase/firestore";
-import { getAuth } from "firebase/auth";
 import { RFValue } from "react-native-responsive-fontsize";
 import RecommendPostCards from "../../Home/RecommendPostCards";
 import { SkeletonLayouts } from "../../Skeleton/Skeleton";

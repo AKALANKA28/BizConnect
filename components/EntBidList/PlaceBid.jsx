@@ -8,12 +8,7 @@ import {
   StyleSheet,
 } from "react-native";
 import { db } from "../../config/FirebaseConfig"; // Update with your actual Firebase config path
-import {
-  addDoc,
-  collection,
-  doc,
-  getDoc,
-} from "firebase/firestore";
+import { addDoc, collection, doc, getDoc } from "firebase/firestore";
 import { Colors } from "../../constants/Colors";
 import { getAuth } from "firebase/auth"; // Import Firebase Auth
 import { RFValue } from "react-native-responsive-fontsize";
@@ -39,57 +34,80 @@ const PlaceBid = ({ item }) => {
   }, [entrepreneurId]);
 
   const handlePlaceBid = async () => {
-    if (!bidAmount || isNaN(bidAmount)) {
-      Alert.alert("Invalid Bid", "Please enter a  bid amount.");
+    // Extract numeric value from bidAmount
+    const numericBidAmount = bidAmount.replace(/^Rs\. /, "");
+  
+    // Validate bid amount
+    if (!numericBidAmount || isNaN(numericBidAmount) || Number(numericBidAmount) <= 0) {
+      Alert.alert("Invalid Bid", "Please enter a valid bid amount.");
       return;
     }
   
     try {
-      const bidId = item.id; // Bid document ID
-      const ownerId = item.userId; // ID of the bid owner
+      const bidId = item.id;
+      const ownerId = item.userId;
   
-      // Create a new document in the PlacedBids collection
+      // Store the numeric bid amount
       await addDoc(collection(db, "PlacedBids"), {
-        bidId, // ID of the original bid
-        entrepreneurId, // Use the actual logged entrepreneur's ID here
-        amount: bidAmount,
-        ownerId, // ID of the bid owner
-        timestamp: new Date(),
-      });
-  
-      // Create a notification for the bid owner
-      await addDoc(collection(db, "BuyerNotifications"), {
-        bidId, // ID of the original bid
+        bidId,
+        entrepreneurId,
+        amount: Number(numericBidAmount), // Convert to a number
         ownerId,
-        entrepreneurId, // Store the actual Entrepreneur's ID here
-        message: `You have received a new bid of ${bidAmount} from Entrepreneur ${username}.`, // Use the fetched username
         timestamp: new Date(),
       });
   
-      console.log("Bid placed:", bidAmount);
-      setBidAmount(""); // Reset bid amount after placing the bid
+      // Create a notification
+      await addDoc(collection(db, "BuyerNotifications"), {
+        bidId,
+        ownerId,
+        entrepreneurId,
+        message: `You have received a new bid of Rs. ${numericBidAmount} from Entrepreneur ${username}.`,
+        timestamp: new Date(),
+      });
   
+      console.log("Bid placed:", numericBidAmount);
+      setBidAmount(""); // Reset input
       Alert.alert("Success", "Your bid has been placed successfully!");
     } catch (error) {
       console.error("Error placing bid:", error);
       Alert.alert("Error", "There was an error placing your bid. Please try again.");
     }
   };
+  
+
+  const handleBidChange = (text) => {
+    // Remove "Rs. " if already present to avoid double prefixing
+    let cleanedText = text.replace(/^Rs\. /, "");
+
+    // Remove non-numeric characters except "."
+    cleanedText = cleanedText.replace(/[^0-9.]/g, "");
+
+    // Prevent multiple decimal points
+    const parts = cleanedText.split(".");
+    if (parts.length > 2) {
+      cleanedText = parts[0] + "." + parts.slice(1).join("");
+    }
+
+    // Ensure it doesn't start with multiple zeros unless it's "0."
+    if (cleanedText.startsWith("00")) {
+      cleanedText = "0";
+    }
+
+    // Format with Rs. prefix
+    setBidAmount(cleanedText ? `Rs. ${cleanedText}` : "");
+  };
 
   return (
     <View style={styles.bidInputContainer}>
       <TextInput
         style={styles.bidInput}
-        placeholder="Enter your bid amount"
+        placeholder="Enter your est. cost per item"
         value={bidAmount}
-        onChangeText={setBidAmount}
+        onChangeText={handleBidChange}
         keyboardType="numeric"
       />
-      <TouchableOpacity
-        onPress={handlePlaceBid}
-        style={styles.placeBidButton}
-      >
-        <Text style={{ color: "white", fontWeight: "bold" }}>Place Bid</Text>
+      <TouchableOpacity onPress={handlePlaceBid} style={styles.placeBidButton}>
+        <Text style={styles.placeBidButtonText}>Place</Text>
       </TouchableOpacity>
     </View>
   );
@@ -97,36 +115,31 @@ const PlaceBid = ({ item }) => {
 
 const styles = StyleSheet.create({
   bidInputContainer: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
-    marginTop: 0,
-    gap: 10,
+    position: "relative",
+    width: "100%",
   },
   bidInput: {
     borderWidth: 1,
     borderColor: "#ccc",
-    borderRadius: 26,
-    padding: 10,
-    marginTop: 10,
+    borderRadius: 20,
     paddingLeft: 20,
-    flex: 3,
+    paddingRight: 80, // Add padding to avoid text overlap with the button
+    height: 45,
     fontFamily: "poppins",
     fontSize: RFValue(12),
-
   },
   placeBidButton: {
+    position: "absolute",
+    right: 3,
+    top: 3,
     backgroundColor: Colors.secondaryColor,
-    borderRadius: 26,
-    padding: 10,
-    paddingVertical: 17,
-    marginTop: 10,
-    alignItems: "center",
-    flex: 1,
+    borderRadius: 17,
+    paddingHorizontal: 25,
+    paddingVertical: 8,
   },
   placeBidButtonText: {
     color: "white",
-    fontFamily: "poppins",
+    fontFamily: "poppins-bold",
     fontSize: RFValue(12),
   },
 });

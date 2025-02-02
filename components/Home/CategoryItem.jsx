@@ -25,7 +25,7 @@ const styles = StyleSheet.create({
     width: 75, // Set width
     height: 75, // Set height (adjust to your needs)
     backgroundColor: "#F8F9FA",
-    borderRadius:22, // To make it circular
+    borderRadius:20, // To make it circular
     borderColor: Colors.GRAY, // Black border
     borderWidth: 0.5,
     marginRight: 15,
@@ -36,7 +36,7 @@ const styles = StyleSheet.create({
     width: "100%",
     height: "100%", 
     resizeMode: "cover",
-    borderRadius:22, 
+    borderRadius:20, 
   },
   categoryName: {
     fontSize: 13,

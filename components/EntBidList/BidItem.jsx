@@ -1,66 +1,72 @@
 import React, { useEffect, useState } from "react";
-import {
-  View,
-  Text,
-  StyleSheet,
-  Image,
-  TouchableWithoutFeedback,
-  TouchableOpacity,
-  TextInput,
-} from "react-native";
+import { View, Text, StyleSheet, TouchableOpacity, Image } from "react-native";
 import Ionicons from "react-native-vector-icons/Ionicons";
 import { Colors } from "../../constants/Colors";
 import PlaceBid from "./PlaceBid";
 import { RFValue } from "react-native-responsive-fontsize";
+import { useExpoRouter } from "expo-router/build/global-state/router-store";
 
 const BidItem = ({ item }) => {
   const [expanded, setExpanded] = useState(false);
+  const router = useExpoRouter();
 
-  const toggleExpand = () => {
-    setExpanded(!expanded);
+  useEffect(() => {
+    // console.log("Image URL:", item.image);
+  }, [item.image]);
+
+  const formatTimeAgo = (seconds) => {
+    const now = new Date();
+    const postTime = new Date(seconds * 1000);
+    const diffInHours = Math.floor((now - postTime) / (1000 * 60 * 60));
+
+    if (diffInHours < 24) {
+      return `${diffInHours}h ago`;
+    } else {
+      const diffInDays = Math.floor(diffInHours / 24);
+      return `${diffInDays}d ago`;
+    }
   };
- // UseEffect hook to log the image URL only when `item.image` changes
- useEffect(() => {
-  console.log("Image URL:", item.image);
-}, [item.image]);
+  const handlePress = () => {
+    router.push({
+      pathname: "/bids/BidDetails",
+      params: { item: JSON.stringify(item) }, // Stringify the object
+    });
+  };
 
   return (
-    <TouchableOpacity onPress={toggleExpand}>
+    <TouchableOpacity onPress={handlePress}>
       <View style={styles.card}>
-        <View style={styles.imageContainer}>
-          {item.image && (
-            <Image source={{ uri: item.image }} style={styles.cardImage} />
-          )}
-          <View style={styles.cardClosingTimeContainer}>
-            <Ionicons name="time-outline" size={14} color="white" />
-            <Text style={styles.cardClosingTimeText}>
-              {new Date(item.bidClosingTime?.seconds * 1000).toLocaleString()}
+        <View style={styles.header}>
+          <Text style={styles.title}>{item.name}</Text>
+        </View>
+
+        <Text style={styles.description} numberOfLines={3}>
+          {item.description}
+        </Text>
+
+        <View style={styles.locationContainer}>
+          <Ionicons name="location-outline" size={16} color="#656565" />
+          <Text style={styles.location}>{item.address} | </Text>
+          <View style={styles.postedTime}>
+            <Ionicons name="time-outline" size={14} color="#656565" />
+            <Text style={styles.timeText}>
+              {formatTimeAgo(item.bidClosingTime?.seconds)}
             </Text>
           </View>
         </View>
-        <View style={styles.cardContent}>
-          {/* Hide title and address when expanded */}
-          {!expanded && (
-            <>
-              <Text style={styles.cardTitle}>{item.name}</Text>
-              <View style={styles.cardAddressContainer}>
-                <Ionicons name="location-outline" size={16} color="#6D4C41" />
-                <Text style={styles.cardAddress}>{item.address}</Text>
-              </View>
-            </>
-          )}
-          {expanded && (
-            <>
-              <Text style={styles.cardDescription}>{item.description}</Text>
-              <View>
-                <Text style={styles.cardInputTitle}>
-                  Estimate Cost /
-                  <Text style={styles.cardInputSubTitle}>per product</Text>
-                </Text>
-              </View>
-              <PlaceBid item={item}/>
-            </>
-          )}
+
+        <View style={styles.footer}>
+          <View style={styles.tags}>
+            <View style={styles.tag}>
+              <Text style={styles.tagText}>Fixed Price</Text>
+            </View>
+            <View style={styles.tag}>
+              <Text style={styles.tagText}>Est. Time: 2-4 weeks</Text>
+            </View>
+            <View style={styles.tag}>
+              <Text style={styles.tagText}>5-10 proposals</Text>
+            </View>
+          </View>
         </View>
       </View>
     </TouchableOpacity>
@@ -70,109 +76,81 @@ const BidItem = ({ item }) => {
 const styles = StyleSheet.create({
   card: {
     backgroundColor: "#fff",
-    borderRadius: 12,
-    padding: 8,
-    paddingBottom: 12,
+    borderRadius: 8,
+    padding: 10,
     marginVertical: 8,
-    marginHorizontal: 16,
-    elevation: 2,
+    marginHorizontal: 6,
+    elevation: 1,
     shadowColor: "#000",
     shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.2,
-    shadowRadius: 1,
+    shadowOpacity: 0.1,
+    shadowRadius: 2,
   },
-  imageContainer: {
-    position: "relative",
-  },
-  cardImage: {
-    width: "100%",
-    height: 186,
-    borderRadius: 8,
-  },
-  cardClosingTimeContainer: {
-    position: "absolute",
-    top: 10,
-    left: 10,
+  header: {
     flexDirection: "row",
-    alignItems: "center",
-    alignContent: "center",
-    backgroundColor: "rgba(0, 0, 0, 0.6)",
-    paddingHorizontal: 10,
-    paddingVertical: 4,
-    borderRadius: 20,
-  },
-  cardClosingTimeText: {
-    color: "white",
-    fontSize: RFValue(10.5),
-    fontFamily: "poppins",
-    marginLeft: 5,
-    marginTop: 2,
-  },
-  cardContent: {
-    flexDirection: "column",
-    marginTop: 10,
-  },
-  cardTitle: {
-    fontSize: 15,
-    fontFamily: "poppins-semibold",
-    marginBottom: 5,
-  },
-  cardAddressContainer: {
-    flexDirection: "row",
-    alignItems: "center",
-    marginBottom: 5,
-  },
-  cardAddress: {
-    fontSize: 14,
-    color: "#6D4C41",
-    fontFamily: "poppins",
-    marginLeft: 5,
-  },
-  cardDescription: {
-    fontSize: 14,
-    color: "#333",
-    fontFamily: "poppins",
-    lineHeight: 20,
-    marginBottom: 5,
-  },
-  cardInputTitle: {
-    fontSize: 14,
-    fontFamily: "poppins-semibold",
-    color: "#333",
-    marginTop: 10,
-  },
-  cardInputSubTitle: {
-    fontSize: 12,
-    color: "#555",
-  },
-  bidInputContainer: {
-    flexDirection: "row",
-    alignItems: "center",
     justifyContent: "space-between",
-    marginTop: 0,
-    gap: 10,
+    alignItems: "flex-start",
+    marginBottom: 12,
   },
-  bidInput: {
-    borderWidth: 1,
-    borderColor: "#ccc",
-    borderRadius: 26,
-    padding: 10,
-    marginTop: 10,
-    flex: 3,
-  },
-  placeBidButton: {
-    backgroundColor: Colors.secondaryColor,
-    borderRadius: 26,
-    padding: 10,
-    paddingVertical: 17,
-    marginTop: 10,
-    alignItems: "center",
+  title: {
+    fontSize: RFValue(14),
+    fontFamily: "poppins-semibold",
+    color: "#333",
     flex: 1,
+    marginRight: 8,
   },
-  placeBidButtonText: {
-    color: "white",
-    fontWeight: "bold",
+  postedTime: {
+    flexDirection: "row",
+    alignItems: "center",
+  },
+  timeText: {
+    fontSize: RFValue(11),
+    color: "#656565",
+    marginLeft: 4,
+    fontFamily: "poppins",
+  },
+  description: {
+    fontSize: RFValue(12),
+    color: "#333",
+    lineHeight: 20,
+    marginBottom: 12,
+    fontFamily: "lato",
+  },
+  locationContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+    marginBottom: 12,
+  },
+  location: {
+    fontSize: RFValue(11),
+    color: "#656565",
+    marginLeft: 4,
+    fontFamily: "poppins",
+  },
+  footer: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    marginTop: 12,
+  },
+  tags: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    gap: 8,
+  },
+  tag: {
+    backgroundColor: "rgba(170, 106, 28, 0.09)",
+    paddingHorizontal: 8,
+    paddingVertical: 4,
+    borderRadius: 4,
+  },
+  tagText: {
+    fontSize: RFValue(11),
+    color: "#656565",
+    fontFamily: "poppins-semibold",
   },
 });
+
 
 export default BidItem;
